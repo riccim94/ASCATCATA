@@ -8,7 +8,7 @@
 #' @import dplyr
 #' @import purrr
 #' @import tidyr
-#' @import magrittr
+#' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom stringr str_split
 #' @importFrom stringr str_split_1

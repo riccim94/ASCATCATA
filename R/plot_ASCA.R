@@ -1,4 +1,4 @@
-#' Compute ANOVA Simultaneous Component Analysis (ASCA) of Temporal Check All That Apply (TCATA) data.
+#' Creates bi-plots for each factor decompsed in the ASCA object elaborated by the function tcatasca().
 #' @param ASCA_obj A list of PCA estimated by the TCATASCA function.
 #' @param object A vector of string or numbers indicating which parameter of the ASCA decomposition will be plotted
 #' @param axes A numeric vector indicating two numbers indicating the axes of the ASCA decomposition.
@@ -6,11 +6,12 @@
 #' @param path.smooth Logical. Adds a path smoothed indicating the position of the loadings according to their cronological order. Default is TRUE.
 #' @param density Logical. Superimpose a 2-dimensional density plot, indicating th distribution of the temporal resolved loadings according to their density. Default is FLASE.
 #' @param point.size A numeric value defining the size of the points of the score values.
-#' @return A plot representing the scores of the ASCA decomposition and the density plot of the loadings of ASCA decomposition.
+#' @param print Logical. Indicates wether or not to print the plots.
+#' @return A series of plots representing the scores of the ASCA decomposition and the values of the loadings of the same ASCA decomposition.
 #' @import dplyr
 #' @import purrr
 #' @import tidyr
-#' @import magrittr
+#' @importFrom magrittr %>%
 #' @importFrom stats reorder
 #' @importFrom dplyr select
 #' @importFrom ggplot2 ggplot
@@ -20,12 +21,14 @@
 #' @importFrom ggplot2 scale_shape_manual
 #' @importFrom ggplot2 geom_path
 #' @importFrom ggplot2 aes
+#' @importFrom ggplot2 unit
 #' @importFrom ggplot2 guides
 #' @importFrom ggplot2 guide_legend
 #' @importFrom ggplot2 theme
 #' @importFrom ggplot2 element_text
 #' @importFrom ggplot2 element_blank
 #' @importFrom ggplot2 geom_point
+#' @importFrom ggplot2 arrow
 #' @importFrom ggplot2 xlab
 #' @importFrom ggplot2 ylab
 #' @importFrom ggplot2 stat_ellipse
@@ -40,10 +43,14 @@
 #' }
 
 plot_ASCA <- function(
-    ASCA_obj, object = 1:(length(ASCA_obj)-2),
+    ASCA_obj,
+    object = 1:(length(ASCA_obj)-2),
+    print = T,
     axes = c(1,2), path = T, density = F,
     path.smooth = T,
     point.size = 2){
+  resulting_plots <- list()
+
 for(reference in object){
   ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
     dplyr::select(axes) %>%
@@ -135,6 +142,7 @@ if(density){
       pl <- pl + geom_path(
         aes(x = !!sym(axes_x), y = !!sym(axes_y),
             color = param), linetype = 1,
+        arrow = arrow(type = "closed", length = unit(0.25, "cm")),
         data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
           as.data.frame() %>% .[,axes] %>%
           mutate_all(function(x){x <- x*(r)}) %>%
@@ -149,6 +157,14 @@ if(density){
 pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
   geom_hline(yintercept = 0, linetype = 2) +
   theme(legend.position = "bottom")
-  print(pl)
+resulting_plots[[names(ASCA_obj)[reference]]] <- pl
+
+if(print){print(pl)}
 }
+
+  return(resulting_plots)
+
   }
+
+
+

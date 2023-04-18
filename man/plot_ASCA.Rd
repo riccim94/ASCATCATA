@@ -2,11 +2,12 @@
 % Please edit documentation in R/plot_ASCA.R
 \name{plot_ASCA}
 \alias{plot_ASCA}
-\title{Compute ANOVA Simultaneous Component Analysis (ASCA) of Temporal Check All That Apply (TCATA) data.}
+\title{Creates bi-plots for each factor decompsed in the ASCA object elaborated by the function tcatasca().}
 \usage{
 plot_ASCA(
   ASCA_obj,
   object = 1:(length(ASCA_obj) - 2),
+  print = T,
   axes = c(1, 2),
   path = T,
   density = F,
@@ -19,6 +20,8 @@ plot_ASCA(
 
 \item{object}{A vector of string or numbers indicating which parameter of the ASCA decomposition will be plotted}
 
+\item{print}{Logical. Indicates wether or not to print the plots.}
+
 \item{axes}{A numeric vector indicating two numbers indicating the axes of the ASCA decomposition.}
 
 \item{path}{Logical. Adds a path indicating the position of the loadings according to their cronological order. Default is TRUE.}
@@ -30,10 +33,10 @@ plot_ASCA(
 \item{point.size}{A numeric value defining the size of the points of the score values.}
 }
 \value{
-A plot representing the scores of the ASCA decomposition and the density plot of the loadings of ASCA decomposition.
+A series of plots representing the scores of the ASCA decomposition and the values of the loadings of the same ASCA decomposition.
 }
 \description{
-Compute ANOVA Simultaneous Component Analysis (ASCA) of Temporal Check All That Apply (TCATA) data.
+Creates bi-plots for each factor decompsed in the ASCA object elaborated by the function tcatasca().
 }
 \examples{
 \dontrun{
