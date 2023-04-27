@@ -18,6 +18,7 @@
 #' @importFrom ggplot2 theme_minimal
 #' @importFrom ggplot2 ggtitle
 #' @importFrom ggplot2 theme
+#' @importFrom ggplot2 labs
 #' @importFrom ggplot2 element_text
 #' @importFrom ggplot2 scale_x_continuous
 #' @export
@@ -36,17 +37,17 @@ plot_time_loadings <- function(
   contrib <- data.frame()
   for(reference in object){
     contrib <- rbind(contrib, ASCA_obj %>% .[[reference]] %>%
-      fviz_contrib(choice = "var", axes = c(axes)) %>%
-      .$data %>%
+      fviz_contrib(choice = "var", axes = c(axes)) %>% .$data %>%
       mutate(
         Class = str_extract(name, "^\\d+"),
         Factor = names(ASCA_obj)[reference] ))
   }
   contrib %>%
     mutate(
-      Class2 = str_extract(
-        name, paste(pull(ASCA_obj$info$attributes), collapse = "|"))) %>%
-    group_by(Factor, Class,Class2) %>%
+      Attributes = str_extract(
+        name, paste((as.character(ASCA_obj$info$attributes)),
+                    collapse = "|"))) %>%
+    group_by(Factor, Class, Attributes) %>%
     summarize(contrib = sum(contrib)) %>% ungroup() %>%
     mutate(contrib_text = as.character(round(contrib,2)),
            Class = as.numeric(Class)) %>% ungroup() %>%
@@ -54,7 +55,7 @@ plot_time_loadings <- function(
 
 if("factors" %in% ref){
   resulting_plots[["factors"]] <- data %>% ggplot() +
-    geom_line(aes(x = Class, y = contrib, color = Class2), size = 0.8) +
+    geom_line(aes(x = Class, y = contrib, color = Attributes), size = 0.8) +
     xlab("time") + ylab("Contribution to explained variance") +
     facet_wrap(~Factor, scales = "free") +
     theme_minimal() +
@@ -70,10 +71,9 @@ if("factors" %in% ref){
 
 if("attributes" %in% ref){
   resulting_plots[["attributes"]] <- data %>% ggplot() +
-    geom_line(
-    aes(x = Class, y = contrib, color = Factor), size = 0.8) +
+    geom_line(aes(x = Class, y = contrib, color = Factor), size = 0.8) +
     xlab("time") + ylab("Contribution to explained variance") +
-    facet_wrap(~Class2, scales = "free") +
+    facet_wrap(~Attributes, scales = "free") +
     theme_minimal() +
     ggtitle(
       "Cumulative contribution of loadings on time organized for attributes",
@@ -85,9 +85,7 @@ if("attributes" %in% ref){
       plot.title = element_text(hjust = 0.5, family = "bold")) +
     scale_x_continuous(breaks = seq(min(data$Class),max(data$Class),5))
 }
-
-  if(print){print(resulting_plots[[ref]])}
-
+if(print){print(resulting_plots[[ref]])}
 return(resulting_plots)
 
 }

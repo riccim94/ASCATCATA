@@ -25,8 +25,27 @@ The decomposition applied consists in assuming a gaussian distribution after app
 ``` r
 library(ASCATCATA)
 library(tempR)
+library(tidyverse)
 ## basic example code
-data <- tempr::ojtcata
+data <- tempR::ojtcata
+
+#first step consists in wrangle the dataset to put it in long format
+# and to mutate in factors the columns "cons" and "samp", and in numeric the column time
+data.long <- data %>% gather(time, CATA, 5:25) %>%
+mutate(cons = as.factor(cons), samp = as.factor(samp),
+time = as.numeric(str_extract(time, "\\d+")))
+
+# then we apply time resolved ASCA decomposition on the dataset.
+
+ASCA_T1 <- ASCATCATA::tcatasca(CATA ~ cons+samp, data = data.long, timecol = "time", attributes = "attribute")
+
+# The results are representd then in biplot
+
+ASCATCATA::plot_ASCA(ASCA_T1)
+
+# To estimate the variability along time of the attributes we can use the function plot_time_loadings
+
+ASCATCATA::plot_time_loadings(ASCA_T1)
 
 ```
 

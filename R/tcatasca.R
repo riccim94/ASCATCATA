@@ -78,6 +78,7 @@ data3[[name2]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
   pivot_wider(names_from = refk, values_from = as.symbol(anchor)) %>%
   column_to_rownames(name2) %>%
   mutate_all(., function(x){x <- x - mean(x, na.rm = T)}) %>% prcomp()
+
    }
 
    #residuals
@@ -104,8 +105,12 @@ data3[["Residuals"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
   `rownames<-`(paste0(apply(.[,as.character(fact)], 1, paste, collapse = "_"),
     "_", 1:nrow(.))) %>% dplyr::select(., -c(as.character(fact))) %>% prcomp()
 
-data3[["info"]][["timecol"]] <- unique(data[,timecol])
-data3[["info"]][["attributes"]] <- unique(data[,attributes])
+
+data3[["info"]][["timecol"]] <- unique(data[,as.character(timecol)])
+data3[["info"]][["attributes"]] <- unique(data %>%
+    mutate_at(as.character(attributes), as.character()) %>%
+    .[,as.character(attributes)])
+
 
   options(contrasts =  prev_contr)
   return(data3)

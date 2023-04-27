@@ -45,7 +45,7 @@
 plot_ASCA <- function(
     ASCA_obj,
     object = 1:(length(ASCA_obj)-2),
-    print = T,
+    print = F,
     axes = c(1,2), path = T, density = F,
     path.smooth = T,
     point.size = 2){
@@ -54,19 +54,17 @@ plot_ASCA <- function(
 for(reference in object){
   ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
     dplyr::select(axes) %>%
-    #mutate_all(function(x){x/20}) %>%
     `colnames<-`(c("x", "y")) -> ind
 
   ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
     as.data.frame() %>%
-    #mutate_all(function(x){x <- x*5}) %>%
     dplyr::select(axes) %>%
     `colnames<-`(c("x", "y")) -> var
 
-  r <- min((max(ind[, "x"]) - min(ind[, "x"])/(
-    max(var[, "x"]) - min(var[, "x"]))),
-    (max(ind[, "y"]) - min(ind[, "y"])/(
-      max(var[, "y"]) - min(var[, "y"]))))
+  r <- min((max(ind[,"x"]) - min(ind[,"x"])/(
+    max(var[,"x"]) - min(var[,"x"]))),
+    (max(ind[,"y"]) - min(ind[,"y"])/(
+      max(var[,"y"]) - min(var[,"y"]))))
 
 axes_x <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
   colnames(.) %>% .[axes[1]]
@@ -75,10 +73,10 @@ axes_y <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
   colnames() %>% .[axes[2]]
 
 axe_x_title <- paste0("Dim", axes[1]," (", ASCA_obj %>% .[[reference]] %>%
-  summary() %>% .[] %>% .$importance %>% .[2,axes[1]]*100 %>% round(., 1), "%)")
+  summary() %>% .[] %>% .$importance %>% .[2,axes[1]]*100 %>% round( 0), "%)")
 
 axe_y_title <- paste0("Dim",axes[2]," (", ASCA_obj %>% .[[reference]] %>%
-  summary() %>% .[] %>% .$importance %>% .[2,axes[2]]*100 %>% round(., 1), "%)")
+  summary() %>% .[] %>% .$importance %>% .[2,axes[2]]*100 %>% round( 0), "%)")
 
 pl <- ggplot()
 if(density){
@@ -111,45 +109,43 @@ if(density){
       aes(x = !!sym(axes_x), y = !!sym(axes_y)#, color = col_p
           ), data = ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
         as.data.frame() %>% .[,axes] %>%
-        #mutate_all(function(x){x <- x*(r*0.7)}) %>%
         mutate(col_p = rownames(.)), size = point.size) +
     scale_shape_manual(values = rep(19,7)) + theme_minimal() +
     geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
-        label = col_p#, color = col_p
-        ),
+        label = col_p),
         data = ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
           as.data.frame() %>% .[,axes] %>%
-          #mutate_all(function(x){x <- x*(r*0.7)}) %>%
           mutate(col_p = rownames(.))) +
     guides(color = F, alpha = F) +
     xlab(axe_x_title) + ylab(axe_y_title)
 
 
   if(path.smooth){
-    pl <- pl + geom_path(aes(x = !!sym(axes_x), y = !!sym(axes_y),
-        color = param), linetype = 1, size = 5, alpha = 0.3,
+    pl <- pl + geom_path(
+      aes(x = !!sym(axes_x), y = !!sym(axes_y), color = param),
+      linetype = 1, size = 5, alpha = 0.3,
         data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
           as.data.frame() %>% .[,axes] %>%
           mutate_all(function(x){x <- x*(r)}) %>%
       mutate(param = rownames(.)) %>%
-        separate(param, c("time", "param") ) %>%
-        arrange(as.numeric(time)) %>% mutate(
-          time = reorder(time, as.numeric(time), mean)), sep = "_") +
+        separate(param, c("time", "param"), sep = "_") %>%
+        arrange(as.numeric(time)) %>%
+        mutate(time = reorder(time, as.numeric(time), mean))) +
       guides(color = guide_legend(title = "Attributes"))
   }
 
     if(path){
       pl <- pl + geom_path(
-        aes(x = !!sym(axes_x), y = !!sym(axes_y),
-            color = param), linetype = 1,
+        aes(x = !!sym(axes_x), y = !!sym(axes_y), color = param),
+        linetype = 1,
         arrow = arrow(type = "closed", length = unit(0.25, "cm")),
         data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
           as.data.frame() %>% .[,axes] %>%
           mutate_all(function(x){x <- x*(r)}) %>%
           mutate(param = rownames(.)) %>%
-          separate(param, c("time", "param") ) %>%
-          arrange(as.numeric(time)) %>% mutate(
-            time = reorder(time, as.numeric(time), mean)), sep = "_") +
+          separate(param, c("time", "param"), sep = "_") %>%
+          arrange(as.numeric(time)) %>%
+          mutate(time = reorder(time, as.numeric(time), mean))) +
         guides(color = guide_legend(title = "Attributes"))
     }
 
@@ -158,10 +154,8 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
   geom_hline(yintercept = 0, linetype = 2) +
   theme(legend.position = "bottom")
 resulting_plots[[names(ASCA_obj)[reference]]] <- pl
-
 if(print){print(pl)}
 }
-
   return(resulting_plots)
 
   }
