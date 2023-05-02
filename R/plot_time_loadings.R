@@ -43,10 +43,8 @@ plot_time_loadings <- function(
         Factor = names(ASCA_obj)[reference] ))
   }
   contrib %>%
-    mutate(
-      Attributes = str_extract(
-        name, paste((as.character(ASCA_obj$info$attributes)),
-                    collapse = "|"))) %>%
+    mutate(Attributes = str_extract(name,
+            paste(((ASCA_obj$info$attributes)), collapse = "|"))) %>%
     group_by(Factor, Class, Attributes) %>%
     summarize(contrib = sum(contrib)) %>% ungroup() %>%
     mutate(contrib_text = as.character(round(contrib,2)),

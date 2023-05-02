@@ -39,7 +39,7 @@ tcatasca <- function(formula, data, timecol, attributes, ...){
   timecol <- as.symbol(timecol)
   attributes <- as.symbol(attributes)
   data1 <- data %>% group_by_at(vars(c(timecol, attributes))) %>%
-     do(filter(., nrow(unique(dplyr::select(., ref))) != 1) %>%
+     do(filter(., length(pull(unique(.[, ref]))) != 1) %>%
           droplevels()) %>% ungroup() %>% droplevels()
 
   colnames1 <- names(data1)
@@ -50,6 +50,8 @@ tcatasca <- function(formula, data, timecol, attributes, ...){
   map(~droplevels(.) %>% data.frame(effect = predict(glm(as.formula(formula),
     data = mutate_at(., vars(ref), scale), family = gaussian()),
     type = "terms"))))
+
+
 
 colnames2 <- data2[[1]][[1]] %>% names(.)
 
@@ -77,6 +79,7 @@ data3[[name2]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
   group_by_at(vars(refk, name2)) %>% slice(1) %>% ungroup() %>%
   pivot_wider(names_from = refk, values_from = as.symbol(anchor)) %>%
   column_to_rownames(name2) %>%
+  mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
   mutate_all(., function(x){x <- x - mean(x, na.rm = T)}) %>% prcomp()
 
    }
@@ -103,14 +106,19 @@ data3[["Residuals"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
   dplyr::select(-colref) %>% mutate_at(.,
     colnames(.)[!(colnames(.) %in% as.character(fact))], scale) %>%
   `rownames<-`(paste0(apply(.[,as.character(fact)], 1, paste, collapse = "_"),
-    "_", 1:nrow(.))) %>% dplyr::select(., -c(as.character(fact))) %>% prcomp()
+    "_", 1:nrow(.))) %>% dplyr::select(., -c(as.character(fact))) %>%
+  mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
+  prcomp()
 
 
 data3[["info"]][["timecol"]] <- unique(data[,as.character(timecol)])
 data3[["info"]][["attributes"]] <- unique(data %>%
-    mutate_at(as.character(attributes), as.character()) %>%
+    mutate(across(attributes, as.character)) %>%
     .[,as.character(attributes)])
 
+if(is_tibble(data3[["info"]][["attributes"]])){
+  data3[["info"]][["attributes"]] <- pull(data3[["info"]][["attributes"]])
+  }
 
   options(contrasts =  prev_contr)
   return(data3)
