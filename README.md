@@ -47,9 +47,9 @@ ASCA_T1 <- ASCATCATA::tcatasca(CATA ~ cons+samp, data = data.long, timecol = "ti
 ASCATCATA::plot_ASCA(ASCA_T1)
 ```
 
-![](plot_ASCA_1.png)
+![](Images/plot_ASCA_1.png)
 
-![](plot_ASCA_2.png)
+![](Images/plot_ASCA_2.png)
 
 
 
@@ -59,6 +59,6 @@ ASCATCATA::plot_ASCA(ASCA_T1)
 ASCATCATA::plot_time_loadings(ASCA_T1)
 ```
 
-![](plot_time_loading_ex_1.png)
+![](Images/plot_time_loading_ex_1.png)
 
-![](plot_time_loadings_ex_2.png)
+![](Images/plot_time_loadings_ex_2.png)
