@@ -7,11 +7,12 @@
 plot_ASCA(
   ASCA_obj,
   object = 1:(length(ASCA_obj) - 2),
-  print = T,
+  print = F,
   axes = c(1, 2),
   path = T,
   density = F,
   path.smooth = T,
+  h_clus = NULL,
   point.size = 2
 )
 }
@@ -29,6 +30,8 @@ plot_ASCA(
 \item{density}{Logical. Superimpose a 2-dimensional density plot, indicating th distribution of the temporal resolved loadings according to their density. Default is FLASE.}
 
 \item{path.smooth}{Logical. Adds a path smoothed indicating the position of the loadings according to their cronological order. Default is TRUE.}
+
+\item{h_clus}{Numeric. Indicates wether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.}
 
 \item{point.size}{A numeric value defining the size of the points of the score values.}
 }

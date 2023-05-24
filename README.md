@@ -1,8 +1,8 @@
-# ASCATCATA
+# ASCATCATA package
 
 <!-- badges: start -->
 
-![](https://img.shields.io/badge/Preliminary%20Version-Test-blue.svg)
+![](https://img.shields.io/badge/Preliminary%20Version-Test-red.svg)
 
 <!-- badges: end -->
 
@@ -72,6 +72,7 @@ ASCATCATA::plot_ASCA(ASCA_T1, h_clus = 2)
 ![](Images/plot_asca_clus_1.png)
 
 ![](Images/plot_asca_clus_2.png)
+
 
 
 

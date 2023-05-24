@@ -5,6 +5,7 @@
 #' @param path Logical. Adds a path indicating the position of the loadings according to their cronological order. Default is TRUE.
 #' @param path.smooth Logical. Adds a path smoothed indicating the position of the loadings according to their cronological order. Default is TRUE.
 #' @param density Logical. Superimpose a 2-dimensional density plot, indicating th distribution of the temporal resolved loadings according to their density. Default is FLASE.
+#' @param h_clus Numeric. Indicates wether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.
 #' @param point.size A numeric value defining the size of the points of the score values.
 #' @param print Logical. Indicates wether or not to print the plots.
 #' @return A series of plots representing the scores of the ASCA decomposition and the values of the loadings of the same ASCA decomposition.
@@ -18,6 +19,7 @@
 #' @importFrom ggplot2 stat_density2d
 #' @importFrom ggplot2 after_stat
 #' @importFrom ggplot2 scale_alpha_continuous
+#' @importFrom ggplot2 scale_y_continuous
 #' @importFrom ggplot2 scale_shape_manual
 #' @importFrom ggplot2 geom_path
 #' @importFrom ggplot2 aes
@@ -48,10 +50,33 @@ plot_ASCA <- function(
     print = F,
     axes = c(1,2), path = T, density = F,
     path.smooth = T,
+    h_clus = NULL,
     point.size = 2){
+
+  { unicode_minus <- function(x){sub('^-', '\U2212', format(x))} }
+
+  cluster <- NULL
+  param <- NULL
+  level <- NULL
+  time <- NULL
+  col_p <- NULL
+  . <- NULL
+
+  attr <- ASCA_obj$info$attributes
+  num_attr <- length(attr)
+
+
   resulting_plots <- list()
 
 for(reference in object){
+  row_num <- nrow(ASCA_obj %>% .[[reference]] %>% .$x)
+  test_nrow <- row_num == 2
+
+  if(test_nrow){
+    message(paste0("The factor ", ASCA_obj %>% names() %>% .[reference],
+    " contains only 2 levels, therefore can't be represented using a biplot."));
+  next
+    }
   ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
     dplyr::select(axes) %>%
     `colnames<-`(c("x", "y")) -> ind
@@ -72,16 +97,43 @@ axes_x <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
 axes_y <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
   colnames() %>% .[axes[2]]
 
-axe_x_title <- paste0("Dim", axes[1]," (", ASCA_obj %>% .[[reference]] %>%
-  summary() %>% .[] %>% .$importance %>% .[2,axes[1]]*100 %>% round( 0), "%)")
 
-axe_y_title <- paste0("Dim",axes[2]," (", ASCA_obj %>% .[[reference]] %>%
-  summary() %>% .[] %>% .$importance %>% .[2,axes[2]]*100 %>% round( 0), "%)")
+axe_x_title <- paste0("Dim", axes[1]," (", as.character(ASCA_obj %>%
+ .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,axes[1]]*100) %>%
+   str_extract("\\d+\\.\\d{2}"), "%)")
+
+
+axe_y_title <- paste0("Dim",axes[2]," (", as.character(ASCA_obj %>%
+ .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,axes[2]]*100) %>%
+   str_extract("\\d+\\.\\d{2}"), "%)")
+
+
+if(is.numeric(h_clus)){
+  if(h_clus > row_num){
+    factor <- ASCA_obj %>% names() %>% .[reference]
+    message(paste0("The factor ", factor, " has only ", row_num,
+      " levels, therefore can not be clustered in ", h_clus, " groups."))
+    next
+  }
+  ASCA_obj %>% .[[reference]] %>% .$x %>% dist() %>%
+    hclust(method = "ward.D2") %>% cutree(k = h_clus) %>% as.data.frame() %>%
+    `colnames<-`(c("cluster")) %>% mutate(col_p = rownames(.),
+           cluster = paste0("cluster ", cluster)) -> cluster_km
+  ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
+    as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.)) %>%
+    left_join(cluster_km, by = c("col_p")) %>%
+    mutate(cluster = as.factor(cluster)) -> data_plot
+}else{
+  data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
+  as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.), cluster = NA)
+  }
+
+
+
 
 pl <- ggplot()
 if(density){
-  pl <- pl + stat_density2d(
-    aes(x = !!sym(axes_x), y = !!sym(axes_y),
+  pl <- pl + stat_density2d(aes(x = !!sym(axes_x), y = !!sym(axes_y),
         fill = param, alpha = after_stat(level/max(level))),
     data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
       as.data.frame() %>% .[,axes] %>%
@@ -95,28 +147,27 @@ if(density){
     theme(plot.title = element_text(hjust = 0.5, face = "italic"),
           legend.position = "bottom", legend.title = element_blank())
   }
-   # stat_ellipse(aes(x = !!sym(axes_x), y = !!sym(axes_y)), type = "euclid",
-   #              level = 0.95,
-   #              data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
-   #                as.data.frame() %>% .[,axes] %>%
-   #                mutate_all(function(x){x <- x*(r*0.7)})) +
-   # stat_ellipse(aes(x = !!sym(axes_x), y = !!sym(axes_y)),type = "euclid",
-   #              level = 0.5, linetype = 2,
-   #              data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
-   #                as.data.frame() %>% .[,axes] %>%
-   #                mutate_all(function(x){x <- x*(r*0.7)})) +
-    pl <- pl + geom_point(
-      aes(x = !!sym(axes_x), y = !!sym(axes_y)#, color = col_p
-          ), data = ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
-        as.data.frame() %>% .[,axes] %>%
-        mutate(col_p = rownames(.)), size = point.size) +
-    scale_shape_manual(values = rep(19,7)) + theme_minimal() +
-    geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
-        label = col_p),
-        data = ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
-          as.data.frame() %>% .[,axes] %>%
-          mutate(col_p = rownames(.))) +
-    guides(color = F, alpha = F) +
+
+
+  pl <- pl + {
+    if(is.numeric(h_clus)){
+      geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y), color = cluster),
+            data = data_plot, size = point.size)
+        }else{
+          geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)),
+            color = "black", data = data_plot, size = point.size)
+        }
+      } + scale_shape_manual(values = rep(19,7)) +
+    scale_x_continuous(labels = unicode_minus) +
+    scale_y_continuous(labels = unicode_minus) + theme_minimal() +
+      {if(is.numeric(h_clus)){
+        geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
+          label = col_p, color = cluster), data = data_plot)
+        }else{
+          geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
+            label = col_p), data = data_plot) }} +
+    theme(legend.position = "none") +
+    guides(color = "none", alpha = "none") +
     xlab(axe_x_title) + ylab(axe_y_title)
 
 
@@ -131,14 +182,13 @@ if(density){
         separate(param, c("time", "param"), sep = "_") %>%
         arrange(as.numeric(time)) %>%
         mutate(time = reorder(time, as.numeric(time), mean))) +
-      guides(color = guide_legend(title = "Attributes"))
+      guides(color = guide_legend(title = "Legend"))
   }
 
     if(path){
-      pl <- pl + geom_path(
-        aes(x = !!sym(axes_x), y = !!sym(axes_y), color = param),
-        linetype = 1,
-        arrow = arrow(type = "closed", length = unit(0.25, "cm")),
+      pl <- pl + geom_path(aes(x = !!sym(axes_x), y = !!sym(axes_y),
+        color = param), linetype = 1, arrow = arrow(type = "closed",
+          length = unit(0.25, "cm")),
         data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
           as.data.frame() %>% .[,axes] %>%
           mutate_all(function(x){x <- x*(r)}) %>%
@@ -150,8 +200,25 @@ if(density){
     }
 
 
+
+
+
+
+
+
+
 pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
   geom_hline(yintercept = 0, linetype = 2) +
+  # {
+  #   if(is.numeric(h_clus)){
+  #     scale_color_manual(breaks = c(attr),
+  #       values = c(palette(hcl.colors(h_clus, palette = "Green-Brown")),
+  #                  palette(hcl.colors(num_attr, palette = "Set 2"))))
+  #   }else{
+  #     scale_color_manual(breaks = c(attr),
+  #       values = palette(hcl.colors(num_attr, palette = "Set 2")))
+  #   } } +
+  ggtitle(names(ASCA_obj)[reference]) +
   theme(legend.position = "bottom")
 resulting_plots[[names(ASCA_obj)[reference]]] <- pl
 if(print){print(pl)}

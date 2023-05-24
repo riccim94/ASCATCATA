@@ -2,12 +2,15 @@
 #' @param data A data frame, or object coercible by as.data.frame to a data frame, containing the variables in the model. It must be in long format and must contain a column for Temporal Check All That Apply binary data, a column reporting the time values, and a column that defines the attributes analyzed.
 #' @param formula An object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. The formula will be applied for each atttribut at each time interval defined by the timecol column
 #' @param timecol A string containing the name of the column indicating the time intervals of the TCATA dataset.
-#' @param attributes A string contining the name of the column indicating the attributes of the TCATA.
+#' @param attributes A string containing the name of the column indicating the attributes of the TCATA.
 #' @param ... Optional parameters
 #' @return A list of objects containing the results of ASCA decomposition of a structured dataset.
 #' @import dplyr
 #' @import purrr
 #' @import tidyr
+#' @importFrom stats hclust
+#' @importFrom stats cutree
+#' @importFrom stats dist
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom stringr str_split
@@ -19,6 +22,7 @@
 #' @importFrom stats prcomp
 #' @importFrom stats residuals
 #' @importFrom tibble column_to_rownames
+#' @importFrom tibble is_tibble
 #' @export
 #' @examples
 #' \dontrun{
@@ -29,6 +33,8 @@
 tcatasca <- function(formula, data, timecol, attributes, ...){
   prev_contr <- options()$contrasts
   options(contrasts =  rep("contr.sum", 2))
+  colref <- NULL
+  . <- NULL
 
   data3 <- list()
 
@@ -65,7 +71,7 @@ data2 <- data2 %>% map(., ~plyr::ldply(., function(x){as.data.frame(x) %>%
    for(i in (length(colnames1)+1):ncol(data2)){
      anchor <- names(data2)[i]
      name <- anchor %>% str_remove(., "^effect.") %>% str_split_1(., "\\.")
-     name2 <- paste(name, collapse = "_")
+     name2 <- paste(name, collapse = "_") %>% str_remove(., "_1$")
      refk <- c("refk")
 
 data2 %>% .[,c(1:2, i)] %>% cbind(data2 %>% .[,3:length(colnames1)] %>%

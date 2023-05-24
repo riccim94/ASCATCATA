@@ -33,18 +33,25 @@ plot_time_loadings <- function(
     object = 1:(length(ASCA_obj)-2),
     print = T,
     axes = c(1,2)){
+
   resulting_plots <- list()
   contrib <- data.frame()
+  name <- NULL
+  Factor <- NULL
+  Class <- NULL
+  Attributes <- NULL
+  . <- NULL
+
+
   for(reference in object){
     contrib <- rbind(contrib, ASCA_obj %>% .[[reference]] %>%
       fviz_contrib(choice = "var", axes = c(axes)) %>% .$data %>%
-      mutate(
-        Class = str_extract(name, "^\\d+"),
-        Factor = names(ASCA_obj)[reference] ))
+      mutate(Class = str_extract(name, "\\d+\\.?\\d*"),
+             Factor = names(ASCA_obj)[reference]))
   }
   contrib %>%
     mutate(Attributes = str_extract(name,
-            paste(((ASCA_obj$info$attributes)), collapse = "|"))) %>%
+            paste((ASCA_obj$info$attributes), collapse = "|"))) %>%
     group_by(Factor, Class, Attributes) %>%
     summarize(contrib = sum(contrib)) %>% ungroup() %>%
     mutate(contrib_text = as.character(round(contrib,2)),
@@ -55,16 +62,15 @@ if("factors" %in% ref){
   resulting_plots[["factors"]] <- data %>% ggplot() +
     geom_line(aes(x = Class, y = contrib, color = Attributes), size = 0.8) +
     xlab("time") + ylab("Contribution to explained variance") +
-    facet_wrap(~Factor, scales = "free") +
-    theme_minimal() +
+    facet_wrap(~Factor, scales = "free") + theme_minimal() +
     ggtitle("Cumulative contribution of loadings on time organized for factors",
             subtitle = paste0("Estimation on axes: ", axes[1], ", ", axes[2])) +
-    theme(
-      legend.position = "bottom",
+    theme(legend.position = "bottom",
       plot.title = element_text(hjust = 0.5, family = "bold"),
       plot.subtitle = element_text(hjust = 0.5, family = "italic"),
       axis.text = element_text(color = "black")) +
-    scale_x_continuous(breaks = seq(min(data$Class), max(data$Class),5))
+    scale_x_continuous(
+      breaks = seq(0, max(data$Class, na.rm = T),5))
 }
 
 if("attributes" %in% ref){
@@ -81,7 +87,7 @@ if("attributes" %in% ref){
       axis.text = element_text(color = "black"),
       plot.subtitle = element_text(hjust = 0.5, family = "italic"),
       plot.title = element_text(hjust = 0.5, family = "bold")) +
-    scale_x_continuous(breaks = seq(min(data$Class),max(data$Class),5))
+    scale_x_continuous(breaks = seq(0,max(data$Class, na.rm = T),5))
 }
 if(print){print(resulting_plots[[ref]])}
 return(resulting_plots)
