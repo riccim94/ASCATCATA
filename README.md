@@ -62,3 +62,17 @@ ASCATCATA::plot_time_loadings(ASCA_T1)
 ![](Images/plot_time_loading_ex_1.png)
 
 ![](Images/plot_time_loadings_ex_2.png)
+
+
+``` r
+# The function plot_ASCA allows also to apply a hierarchical clustering for the results of the hierarchical clustering and report the results.
+
+ASCATCATA::plot_ASCA(ASCA_T1, h_clus = 2)
+```
+![](Images/plot_asca_clus_1.png)
+
+![](Images/plot_asca_clus_2.png)
+
+
+
+
