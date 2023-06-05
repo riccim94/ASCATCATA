@@ -52,6 +52,15 @@ ASCATCATA::plot_ASCA(ASCA_T1)
 ![](Images/plot_ASCA_2.png)
 
 
+``` r
+# There are multiple display options available
+
+ASCATCATA::plot_ASCA(ASCA_T1, density = T, path = F,, path.smooth = F)
+```
+
+![](Images/plot_ASCA_3.png)
+
+![](Images/plot_ASCA_4.png)
 
 ``` r
 # To estimate the variability along time of the attributes we can use the function plot_time_loadings

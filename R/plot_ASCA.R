@@ -47,7 +47,7 @@
 plot_ASCA <- function(
     ASCA_obj,
     object = 1:(length(ASCA_obj)-2),
-    print = F,
+    print = T,
     axes = c(1,2), path = T, density = F,
     path.smooth = T,
     h_clus = NULL,
@@ -174,7 +174,7 @@ if(density){
   if(path.smooth){
     pl <- pl + geom_path(
       aes(x = !!sym(axes_x), y = !!sym(axes_y), color = param),
-      linetype = 1, size = 5, alpha = 0.3,
+      linetype = 1, linewidth = 5, alpha = 0.3,
         data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
           as.data.frame() %>% .[,axes] %>%
           mutate_all(function(x){x <- x*(r)}) %>%
@@ -218,12 +218,12 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
   #     scale_color_manual(breaks = c(attr),
   #       values = palette(hcl.colors(num_attr, palette = "Set 2")))
   #   } } +
-  ggtitle(names(ASCA_obj)[reference]) +
+  ggtitle("", subtitle = paste0("Factor: ", names(ASCA_obj)[reference])) +
   theme(legend.position = "bottom")
 resulting_plots[[names(ASCA_obj)[reference]]] <- pl
 if(print){print(pl)}
 }
-  return(resulting_plots)
+  invisible(resulting_plots)
 
   }
 

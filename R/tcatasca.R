@@ -34,7 +34,7 @@ tcatasca <- function(formula, data, timecol, attributes, ...){
   prev_contr <- options()$contrasts
   options(contrasts =  rep("contr.sum", 2))
   colref <- NULL
-  . <- NULL
+  . <-NULL
 
   data3 <- list()
 
