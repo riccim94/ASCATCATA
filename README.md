@@ -19,7 +19,7 @@ devtools::install_github("riccim94/ASCATCATA")
 
 ## Example
 
-The ASCATCATA package offers a main function to apply an ANOVA decomposition across a TCATA dataset. The decomposition applied consists in assuming a gaussian distribution after applying an union scale normalization to the interval considered.
+The ASCATCATA package offers a main function to apply an ASCA decomposition across a TCATA dataset. The decomposition applied consists in assuming a gaussian distribution after applying an union scale normalization to the interval considered.
 
 ``` r
 library(ASCATCATA)
