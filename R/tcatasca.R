@@ -44,7 +44,8 @@ tcatasca <- function(formula, data, timecol, attributes, ...){
     .[str_detect(., ".+")]
   timecol <- as.symbol(timecol)
   attributes <- as.symbol(attributes)
-  data1 <- data %>% group_by_at(vars(c(timecol, attributes))) %>%
+  data1 <- data %>% group_by_at(vars(as.name(timecol),
+                                     as.name(attributes))) %>%
      do(filter(., length(pull(unique(.[, ref]))) != 1) %>%
           droplevels()) %>% ungroup() %>% droplevels()
 
@@ -82,7 +83,8 @@ data2 %>% .[,c(1:2, i)] %>% cbind(data2 %>% .[,3:length(colnames1)] %>%
                temp[,as.character(attributes)])
 
 data3[[name2]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
-  group_by_at(vars(refk, name2)) %>% slice(1) %>% ungroup() %>%
+  group_by_at(vars(as.name(refk), as.name(name2))) %>% slice(1) %>%
+  ungroup() %>%
   pivot_wider(names_from = refk, values_from = as.symbol(anchor)) %>%
   column_to_rownames(name2) %>%
   mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
@@ -111,8 +113,8 @@ data3[["Residuals"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
   pivot_wider(names_from = refk, values_from = residuals) %>%
   dplyr::select(-colref) %>% mutate_at(.,
     colnames(.)[!(colnames(.) %in% as.character(fact))], scale) %>%
-  `rownames<-`(paste0(apply(.[,as.character(fact)], 1, paste, collapse = "_"),
-    "_", 1:nrow(.))) %>% dplyr::select(., -c(as.character(fact))) %>%
+  #`rownames<-`(paste0(apply(.[,as.character(fact)], 1, paste, collapse = "_"), "_", 1:nrow(.))) %>%
+  dplyr::select(., -c(as.character(fact))) %>%
   mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
   prcomp()
 

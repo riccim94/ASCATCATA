@@ -3,6 +3,7 @@
 #' @param object A vector of string or numbers indicating which parameter of the ASCA decomposition will be plotted
 #' @param axes A numeric vector indicating two numbers indicating the axes of the ASCA decomposition.
 #' @param ref A string vector indicating which graph print. "attributes" prints a plot using the attributes factor as a faceting variable. "factor" prints a plot with the attribute variable as a faceting factor.
+#' @param choice A string that could be "loadings" or "contrib", to indicate whether the loading values or the contribution values will be estimatd and plotted.
 #' @param print Logical. Indicates wether or not to print the plots.
 #' @return A plot representing the loadings of the ASCA decomposition and the density plot of the loadings of ASCA decomposition.
 #' @import dplyr
@@ -29,6 +30,7 @@
 
 plot_time_loadings <- function(
     ASCA_obj,
+    choice = "contrib",
     ref = c("attributes", "factors"),
     object = 1:(length(ASCA_obj)-2),
     print = T,
@@ -44,10 +46,20 @@ plot_time_loadings <- function(
 
 
   for(reference in object){
+    if(choice == "contrib"){
     contrib <- rbind(contrib, ASCA_obj %>% .[[reference]] %>%
       fviz_contrib(choice = "var", axes = c(axes)) %>% .$data %>%
       mutate(Class = str_extract(name, "\\d+\\.?\\d*"),
              Factor = names(ASCA_obj)[reference]))
+    }
+    if(choice == "loadings"){
+      contrib <- rbind(contrib, ASCA_obj %>% .[[reference]] %>%
+        .$rotation %>% .[,axes[1]] %>% as.data.frame() %>%
+          `colnames<-`("contrib") %>%
+            mutate(name = rownames(.),
+              Class = str_extract(name, "\\d+\\.?\\d*"),
+              Factor = names(ASCA_obj)[reference]))
+    }
   }
   contrib %>%
     mutate(Attributes = str_extract(name,
@@ -57,14 +69,23 @@ plot_time_loadings <- function(
     mutate(contrib_text = as.character(round(contrib,2)),
            Class = as.numeric(Class)) %>% ungroup() %>%
     droplevels() -> data
+if(choice== "loadings"){
+  title <- "Loadings value in time organized per factor"
+  subtitle <- paste0("Estimations on axe: ", axes[1])
+}
+
+  if(choice == "contrib"){
+    title <- "Cumulative contribution of loadings on time organized for attributes"
+    subtitle <- paste0("Estimation on axes: ", axes[1], ", ", axes[2])
+  }
+
 
 if("factors" %in% ref){
   resulting_plots[["factors"]] <- data %>% ggplot() +
     geom_line(aes(x = Class, y = contrib, color = Attributes), size = 0.8) +
     xlab("time") + ylab("Contribution to explained variance") +
     facet_wrap(~Factor, scales = "free") + theme_minimal() +
-    ggtitle("Cumulative contribution of loadings on time organized for factors",
-            subtitle = paste0("Estimation on axes: ", axes[1], ", ", axes[2])) +
+    ggtitle(title, subtitle = subtitle) +
     theme(legend.position = "bottom",
       plot.title = element_text(hjust = 0.5, family = "bold"),
       plot.subtitle = element_text(hjust = 0.5, family = "italic"),
@@ -79,9 +100,7 @@ if("attributes" %in% ref){
     xlab("time") + ylab("Contribution to explained variance") +
     facet_wrap(~Attributes, scales = "free") +
     theme_minimal() +
-    ggtitle(
-      "Cumulative contribution of loadings on time organized for attributes",
-      subtitle = paste0("Estimation on axes: ", axes[1], ", ", axes[2])) +
+    ggtitle(title, subtitle = subtitle) +
     theme(
       legend.position = "bottom",
       axis.text = element_text(color = "black"),
