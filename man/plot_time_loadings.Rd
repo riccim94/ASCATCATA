@@ -6,6 +6,7 @@
 \usage{
 plot_time_loadings(
   ASCA_obj,
+  choice = "contrib",
   ref = c("attributes", "factors"),
   object = 1:(length(ASCA_obj) - 2),
   print = T,
@@ -14,6 +15,8 @@ plot_time_loadings(
 }
 \arguments{
 \item{ASCA_obj}{A list of PCA estimated by the TCATASCA function.}
+
+\item{choice}{A string that could be "loadings" or "contrib", to indicate whether the loading values or the contribution values will be estimatd and plotted.}
 
 \item{ref}{A string vector indicating which graph print. "attributes" prints a plot using the attributes factor as a faceting variable. "factor" prints a plot with the attribute variable as a faceting factor.}
 
