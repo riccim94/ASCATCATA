@@ -80,7 +80,7 @@ ASCATCATA::plot_time_loadings(ASCA_T1)
 
 ![](Images/plot_time_loading_ex_3.png)
 
-![](Images/plot_time_loadings_ex_4.png)
+![](Images/plot_time_loading_ex_4.png)
 
 
 ``` r
