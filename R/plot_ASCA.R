@@ -100,12 +100,12 @@ axes_y <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
 
 axe_x_title <- paste0("Dim", axes[1]," (", as.character(ASCA_obj %>%
  .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,axes[1]]*100) %>%
-   str_extract("\\d+\\.\\d{2}"), "%)")
+   str_extract("\\d+\\.\\d{1,2}"), "%)")
 
 
 axe_y_title <- paste0("Dim",axes[2]," (", as.character(ASCA_obj %>%
  .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,axes[2]]*100) %>%
-   str_extract("\\d+\\.\\d{2}"), "%)")
+   str_extract("\\d+\\.\\d{1,2}"), "%)")
 
 
 if(is.numeric(h_clus)){
@@ -203,8 +203,12 @@ if(density){
 
 
 
-
-
+if(is.numeric(reference)){
+  final_label <- names(ASCA_obj)[reference]
+}
+if(is.character(reference)){
+  final_label <- reference
+}
 
 
 pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
@@ -218,7 +222,7 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
   #     scale_color_manual(breaks = c(attr),
   #       values = palette(hcl.colors(num_attr, palette = "Set 2")))
   #   } } +
-  ggtitle("", subtitle = paste0("Factor: ", names(ASCA_obj)[reference])) +
+  ggtitle("", subtitle = paste0("Factor: ", final_label)) +
   theme(legend.position = "bottom")
 resulting_plots[[names(ASCA_obj)[reference]]] <- pl
 if(print){print(pl)}
