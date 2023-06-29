@@ -63,7 +63,9 @@ ASCATCATA::plot_ASCA(ASCA_T1, density = T, path = F,, path.smooth = F)
 ![](Images/plot_ASCA_4.png)
 
 ``` r
-# To estimate the variability along time of the attributes we can use the function plot_time_loadings
+# To estimate the variability along time of the attributes we can use the function plot_time_loadings.
+
+#In its standard formulation, this function plots the contribution during time of each attribut organized by factor or organized by individual attribute.
 
 ASCATCATA::plot_time_loadings(ASCA_T1)
 ```
@@ -71,6 +73,14 @@ ASCATCATA::plot_time_loadings(ASCA_T1)
 ![](Images/plot_time_loading_ex_1.png)
 
 ![](Images/plot_time_loadings_ex_2.png)
+
+``` r
+#The same function can also plot the loading values risolved by time for one axes at time
+``` 
+
+![](Images/plot_time_loading_ex_3.png)
+
+![](Images/plot_time_loadings_ex_4.png)
 
 
 ``` r
@@ -84,5 +94,10 @@ ASCATCATA::plot_ASCA(ASCA_T1, h_clus = 2)
 
 
 
+
+## Author
+
+Michele Ricci, Ph.D.
+ricci.michele94@gmail.com
 
 
