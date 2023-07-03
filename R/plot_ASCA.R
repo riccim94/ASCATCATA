@@ -46,7 +46,7 @@
 
 plot_ASCA <- function(
     ASCA_obj,
-    object = 1:(length(ASCA_obj)-2),
+    object = 1:(length(ASCA_obj)-3),
     print = T,
     axes = c(1,2), path = T, density = F,
     path.smooth = T,
@@ -78,13 +78,10 @@ for(reference in object){
   next
     }
   ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
-    dplyr::select(axes) %>%
-    `colnames<-`(c("x", "y")) -> ind
+    dplyr::select(axes) %>% `colnames<-`(c("x", "y")) -> ind
 
-  ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
-    as.data.frame() %>%
-    dplyr::select(axes) %>%
-    `colnames<-`(c("x", "y")) -> var
+  ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>% as.data.frame() %>%
+    dplyr::select(axes) %>% `colnames<-`(c("x", "y")) -> var
 
   r <- min((max(ind[,"x"]) - min(ind[,"x"])/(
     max(var[,"x"]) - min(var[,"x"]))),
