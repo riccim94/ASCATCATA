@@ -122,7 +122,8 @@ data3[["Residuals"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
 
 
 data3[["Parameters"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
-  .[,names(.) %in% c(fact, refk, "residuals", "fitted")]
+  .[,names(.) %in% c(fact, refk, "residuals", "fitted")] %>%
+  separate(refk, c("time", "attribute"), sep = "_")
 
 data3[["info"]][["timecol"]] <- unique(data[,as.character(timecol)])
 data3[["info"]][["attributes"]] <- unique(data %>%
