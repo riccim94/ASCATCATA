@@ -92,15 +92,18 @@ data3[[name2]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
 
    }
 
-   #residuals
+   #residuals & fitted
    data1 %>% split(dplyr::select(., timecol)) %>%
      map(~droplevels(.) %>% split(., dplyr::select(., attributes)) %>%
            map(~droplevels(.) %>% data.frame(
              residuals = residuals.glm(glm(as.formula(formula),
-          data = mutate_at(., vars(ref), scale), family = gaussian())))) %>%
+          data = mutate_at(., vars(ref), scale), family = gaussian())),
+          fitted = fitted.values(glm(as.formula(formula),
+            data = mutate_at(., vars(ref), scale), family = gaussian())))) %>%
        plyr::ldply(., function(x){data.frame(x)}) ) %>%
       plyr::ldply(., function(x){data.frame(x) %>%
-      `colnames<-`(c(as.character(attributes), colnames1, "residuals"))}) %>%
+      `colnames<-`(c(as.character(attributes), colnames1,
+                     "residuals", "fitted"))}) %>%
      dplyr::select(-ref, -timecol) %>% `colnames<-`(
        c(as.character(timecol),names(.)[2:length(names(.))])) -> temp
 
@@ -113,11 +116,13 @@ data3[["Residuals"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
   pivot_wider(names_from = refk, values_from = residuals) %>%
   dplyr::select(-colref) %>% mutate_at(.,
     colnames(.)[!(colnames(.) %in% as.character(fact))], scale) %>%
-  #`rownames<-`(paste0(apply(.[,as.character(fact)], 1, paste, collapse = "_"), "_", 1:nrow(.))) %>%
   dplyr::select(., -c(as.character(fact))) %>%
   mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
   prcomp()
 
+
+data3[["Parameters"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
+  .[,names(.) %in% c(fact, refk, "residuals", "fitted")]
 
 data3[["info"]][["timecol"]] <- unique(data[,as.character(timecol)])
 data3[["info"]][["attributes"]] <- unique(data %>%
