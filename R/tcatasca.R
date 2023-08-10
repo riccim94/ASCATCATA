@@ -3,6 +3,7 @@
 #' @param formula An object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. The formula will be applied for each atttribut at each time interval defined by the timecol column
 #' @param timecol A string containing the name of the column indicating the time intervals of the TCATA dataset.
 #' @param attributes A string containing the name of the column indicating the attributes of the TCATA.
+#' @param time.quantization A single number reporting the number of time units contained in the new intervals used to quantize the time column.
 #' @param ... Optional parameters
 #' @return A list of objects containing the results of ASCA decomposition of a structured dataset.
 #' @import dplyr
@@ -11,6 +12,7 @@
 #' @importFrom stats hclust
 #' @importFrom stats cutree
 #' @importFrom stats dist
+#' @importFrom car Anova
 #' @importFrom magrittr %>%
 #' @importFrom rlang .data
 #' @importFrom stringr str_split
@@ -30,11 +32,13 @@
 #' describe(dataset, col1, col2)
 #' }
 
-tcatasca <- function(formula, data, timecol, attributes, ...){
+tcatasca <- function(formula, data, timecol, attributes,
+                     time.quantization = NULL, ...){
   prev_contr <- options()$contrasts
   options(contrasts =  rep("contr.sum", 2))
   colref <- NULL
   . <-NULL
+  formula_ <- formula
 
   data3 <- list()
 
@@ -44,10 +48,13 @@ tcatasca <- function(formula, data, timecol, attributes, ...){
     .[str_detect(., ".+")]
   timecol <- as.symbol(timecol)
   attributes <- as.symbol(attributes)
-  data1 <- data %>% group_by_at(vars(as.name(timecol),
-                                     as.name(attributes))) %>%
-     do(filter(., length(pull(unique(.[, ref]))) != 1) %>%
-          droplevels()) %>% ungroup() %>% droplevels()
+  if(!is.null(time.quantization)){
+data <- mutate_at(data, vars(timecol),
+                  function(x){x <- cut(x, round(x/time.quantization))})
+  }
+  data1 <- data %>% group_by_at(vars(as.name(timecol), as.name(attributes))) %>%
+    do(filter(., length(pull(unique(.[, ref]))) != 1) %>% droplevels()) %>%
+    ungroup() %>% droplevels()
 
   colnames1 <- names(data1)
 
@@ -93,19 +100,20 @@ data3[[name2]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
    }
 
    #residuals & fitted
-   data1 %>% split(dplyr::select(., timecol)) %>%
-     map(~droplevels(.) %>% split(., dplyr::select(., attributes)) %>%
-           map(~droplevels(.) %>% data.frame(
-             residuals = residuals.glm(glm(as.formula(formula),
-          data = mutate_at(., vars(ref), scale), family = gaussian())),
-          fitted = fitted.values(glm(as.formula(formula),
-            data = mutate_at(., vars(ref), scale), family = gaussian())))) %>%
-       plyr::ldply(., function(x){data.frame(x)}) ) %>%
-      plyr::ldply(., function(x){data.frame(x) %>%
-      `colnames<-`(c(as.character(attributes), colnames1,
-                     "residuals", "fitted"))}) %>%
-     dplyr::select(-ref, -timecol) %>% `colnames<-`(
-       c(as.character(timecol),names(.)[2:length(names(.))])) -> temp
+    data1 %>% split(dplyr::select(., timecol)) %>%
+      map(~droplevels(.) %>% split(., dplyr::select(., attributes)) %>%
+            map(~droplevels(.) %>% data.frame(
+              residuals = rstandard(glm(as.formula(formula),
+           data = mutate_at(., vars(ref), scale), family = gaussian()),
+           type = "deviance"),
+           fitted = fitted.values(glm(as.formula(formula),
+             data = mutate_at(., vars(ref), scale), family = gaussian())))) %>%
+        plyr::ldply(., function(x){data.frame(x)}) ) %>%
+       plyr::ldply(., function(x){data.frame(x) %>%
+       `colnames<-`(c(as.character(attributes), colnames1,
+                      "residuals", "fitted"))}) %>%
+      dplyr::select(-ref, -timecol) %>% `colnames<-`(
+        c(as.character(timecol),names(.)[2:length(names(.))])) -> temp
 
 temp[refk] <- paste0(temp[,as.character(timecol)], "_",
                      temp[,as.character(attributes)])
@@ -124,6 +132,32 @@ data3[["Residuals"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
 data3[["Parameters"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
   .[,names(.) %in% c(fact, refk, "residuals", "fitted")] %>%
   separate(refk, c("time", "attribute"), sep = "_")
+
+
+#SSum of squares
+temp <- data1 %>% split(dplyr::select(., timecol)) %>%
+  map(~droplevels(.) %>% split(., dplyr::select(., attributes)) %>%
+        map(~droplevels(.) %>% data.frame(Anova(glm(as.formula(formula),
+          data = mutate_at(., vars(ref), scale), family = gaussian()),
+          test.statistic = "F", type = "III") %>%
+            mutate(Factor = as.character(rownames(.)))) %>%
+            dplyr::select(attributes, timecol, Sum.Sq, Df, Factor)) %>%
+        plyr::ldply(., function(x){data.frame(x)})) %>%
+  plyr::ldply(., function(x){data.frame(x) %>% `colnames<-`(c("__",
+    as.character(attributes), as.character(timecol), "Sum.Sq", "Df",
+    "Factor"))}) %>% dplyr::select(-c(1,2)) %>%
+  group_by_at(vars(as.name(timecol), as.name(attributes), Factor) ) %>%
+  slice(1) %>%
+  group_by_at(vars(as.name(timecol), as.name(attributes))) %>%
+  do(mutate(., Sum.Sq_ = Sum.Sq/sum(Sum.Sq))) %>%
+  ungroup() %>% mutate(reference = sum(Sum.Sq_)) %>%
+  group_by(Factor) %>% summarize(Sum.Sq = sum(Sum.Sq_)/reference) %>%
+  slice(1) %>% ungroup()
+
+
+
+data3[["SS_decomposition"]] <- temp
+
 
 data3[["info"]][["timecol"]] <- unique(data[,as.character(timecol)])
 data3[["info"]][["attributes"]] <- unique(data %>%
