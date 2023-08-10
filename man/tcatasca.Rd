@@ -2,7 +2,7 @@
 \alias{tcatasca}
 \title{Application of ANOVA simultaneous Component Analysis on TCATA data}
 \usage{
-tcatasca(formula, data, timecol, attributes, ...)
+tcatasca(formula, data, timecol, attributes, time.quantization, ...)
 }
 \description{
 Apply Anova Simultaneous component analysis (ASCA) on temporal-Check-All-That-Apply(TCATA).
@@ -18,6 +18,8 @@ Apply Anova Simultaneous component analysis (ASCA) on temporal-Check-All-That-Ap
 \item{timecol}{A string containing the name of the column indicating the time intervals of the TCATA dataset.}
 
 \item{attributes}{A string contining the name of the column indicating the attributes of the TCATA.}
+
+\item{time.quantization}{A single number reporting the number of time units contained in the new intervals used to quantize the time column.}
 
 \item{...}{Optional parameters}
 
