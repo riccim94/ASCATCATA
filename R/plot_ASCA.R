@@ -12,6 +12,8 @@
 #' @import dplyr
 #' @import purrr
 #' @import tidyr
+#' @import gridExtra
+#' @import cowplot
 #' @importFrom magrittr %>%
 #' @importFrom stats reorder
 #' @importFrom dplyr select
@@ -22,6 +24,7 @@
 #' @importFrom ggplot2 scale_y_continuous
 #' @importFrom ggplot2 scale_shape_manual
 #' @importFrom ggplot2 geom_path
+#' @importFrom ggplot2 geom_col
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 unit
 #' @importFrom ggplot2 guides
@@ -37,6 +40,7 @@
 #' @importFrom ggplot2 geom_vline
 #' @importFrom ggplot2 geom_hline
 #' @importFrom ggplot2 theme_minimal
+#' @importFrom ggplot2 facet_grid
 #' @importFrom ggrepel geom_text_repel
 #' @export
 #' @examples
@@ -61,6 +65,10 @@ plot_ASCA <- function(
   time <- NULL
   col_p <- NULL
   . <- NULL
+  Component <- NULL
+  Score <- NULL
+  Loadings <- NULL
+  Levels <- NULL
 
   attr <- ASCA_obj$info$attributes
   num_attr <- length(attr)
@@ -104,6 +112,7 @@ axe_y_title <- paste0("Dim",axes[2]," (", as.character(ASCA_obj %>%
  .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,axes[2]]*100) %>%
    str_extract("\\d+\\.\\d{1,2}"), "%)")
 
+if(ASCA_obj %>% .[["info"]] %>% .[["structure"]] == "long"){
 
 if(is.numeric(h_clus)){
   if(h_clus > row_num){
@@ -154,7 +163,7 @@ if(density){
           geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)),
             color = "black", data = data_plot, size = point.size)
         }
-      } + scale_shape_manual(values = rep(19,7)) +
+      } + scale_shape_manual(values = rep(19,15)) +
     scale_x_continuous(labels = unicode_minus) +
     scale_y_continuous(labels = unicode_minus) + theme_minimal() +
       {if(is.numeric(h_clus)){
@@ -196,7 +205,55 @@ if(density){
         guides(color = guide_legend(title = "Attributes"))
     }
 
+}
 
+if(ASCA_obj %>% .[["info"]] %>% .[["structure"]] == "short"){
+  if(is.numeric(h_clus)){
+      message("Clustering is not estimated for loadings.time.structure = 'short'")
+  }
+
+if(names(ASCA_obj)[reference] != "Residuals" & reference != "Residuals"){
+  data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
+      as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.)) %>%
+      separate(col_p, c("time", "levels")) %>%
+    gather(Component, Score, 1:2) %>% mutate(time = as.numeric(time))
+  pl <- ggplot()
+  pl <- pl + geom_line(aes(x = time, y = Score, color = levels), data_plot) +
+  facet_grid(rows = "Component", scales = "free_y") +
+    geom_hline(yintercept = 0, linetype = 2) +
+    theme_minimal() + theme(legend.position = "bottom") +
+    guides(color = guide_legend(ncol = 10, byrow = TRUE))
+  data_loadings <- ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
+    as.data.frame() %>% .[,axes] %>% mutate(Levels = rownames(.)) %>%
+    gather(Component, Loadings, 1:2)
+  pl2 <- ggplot() + geom_col(aes(x = Levels, y = Loadings),
+      color = "black", fill = "white", data = data_loadings) +
+    facet_grid(rows = "Component", scales = "free_y") +
+    theme_minimal()
+pl <- cowplot::plot_grid(pl, pl2, nrow = 1)
+}
+
+if(names(ASCA_obj)[reference] == "Residuals"|reference == "Residuals"){
+
+  data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
+    as.data.frame() %>% .[,axes] %>% mutate(levels = rownames(.))
+  pl <- ggplot()
+  pl <- pl + geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)), data_plot) +
+    geom_hline(yintercept = 0, linetype = 2) +
+    theme_minimal() + theme(legend.position = "bottom") +
+    guides(color = guide_legend(ncol = 10, byrow = TRUE))
+  data_loadings <- ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
+    as.data.frame() %>% .[,axes] %>%
+    mutate_all(function(x){x <- x*(r)}) %>%
+    mutate(Levels = rownames(.))
+  pl <- pl + geom_text(
+    aes(x = !!sym(axes_x), y = !!sym(axes_y), label = Levels),
+    data = data_loadings)
+
+
+  }
+
+}
 
 
 
@@ -207,7 +264,7 @@ if(is.character(reference)){
   final_label <- reference
 }
 
-
+if(ASCA_obj %>% .[["info"]] %>% .[["structure"]] == "long"){
 pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
   geom_hline(yintercept = 0, linetype = 2) +
   # {
@@ -221,8 +278,17 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
   #   } } +
   ggtitle("", subtitle = paste0("Factor: ", final_label)) +
   theme(legend.position = "bottom")
+}
+
+if(ASCA_obj %>% .[["info"]] %>% .[["structure"]] == "short"){
+  pl <- pl + ggtitle("", subtitle = paste0("Factor: ", final_label))
+}
+
+
 resulting_plots[[names(ASCA_obj)[reference]]] <- pl
 if(print){print(pl)}
+
+
 }
   invisible(resulting_plots)
 

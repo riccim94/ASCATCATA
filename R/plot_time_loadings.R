@@ -32,7 +32,7 @@ plot_time_loadings <- function(
     ASCA_obj,
     choice = "contrib",
     ref = c("attributes", "factors"),
-    object = 1:(length(ASCA_obj)-2),
+    object = 1:(length(ASCA_obj)-3),
     print = T,
     axes = c(1,2)){
 
@@ -50,7 +50,7 @@ plot_time_loadings <- function(
     contrib <- rbind(contrib, ASCA_obj %>% .[[reference]] %>%
       fviz_contrib(choice = "var", axes = c(axes)) %>% .$data %>%
       mutate(Class = str_extract(name, "\\d+\\.?\\d*"),
-             Factor = names(ASCA_obj)[reference]))
+        Factor = names(ASCA_obj)[reference]))
     }
     if(choice == "loadings"){
       contrib <- rbind(contrib, ASCA_obj %>% .[[reference]] %>%
@@ -72,18 +72,20 @@ plot_time_loadings <- function(
 if(choice== "loadings"){
   title <- "Loadings value in time organized per factor"
   subtitle <- paste0("Estimations on axe: ", axes[1])
+  ylab_text <- "Loading values"
 }
 
   if(choice == "contrib"){
     title <- "Cumulative contribution of loadings on time organized for attributes"
     subtitle <- paste0("Estimation on axes: ", axes[1], ", ", axes[2])
+    ylab_text <- "Contribution to explained variance"
   }
 
 
 if("factors" %in% ref){
   resulting_plots[["factors"]] <- data %>% ggplot() +
     geom_line(aes(x = Class, y = contrib, color = Attributes), size = 0.8) +
-    xlab("time") + ylab("Contribution to explained variance") +
+    xlab("time") + ylab(ylab_text) +
     facet_wrap(~Factor, scales = "free") + theme_minimal() +
     ggtitle(title, subtitle = subtitle) +
     theme(legend.position = "bottom",
@@ -94,10 +96,12 @@ if("factors" %in% ref){
       breaks = seq(0, max(data$Class, na.rm = T),5))
 }
 
+
+
 if("attributes" %in% ref){
   resulting_plots[["attributes"]] <- data %>% ggplot() +
     geom_line(aes(x = Class, y = contrib, color = Factor), size = 0.8) +
-    xlab("time") + ylab("Contribution to explained variance") +
+    xlab("time") + ylab(ylab_text) +
     facet_wrap(~Attributes, scales = "free") +
     theme_minimal() +
     ggtitle(title, subtitle = subtitle) +
