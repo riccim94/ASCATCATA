@@ -8,7 +8,7 @@ plot_time_loadings(
   ASCA_obj,
   choice = "contrib",
   ref = c("attributes", "factors"),
-  object = 1:(length(ASCA_obj) - 2),
+  object = 1:(length(ASCA_obj) - 3),
   print = T,
   axes = c(1, 2)
 )

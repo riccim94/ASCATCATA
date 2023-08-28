@@ -6,7 +6,7 @@
 \usage{
 plot_ASCA(
   ASCA_obj,
-  object = 1:(length(ASCA_obj) - 2),
+  object = 1:(length(ASCA_obj) - 3),
   print = T,
   axes = c(1, 2),
   path = T,
