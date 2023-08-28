@@ -12,10 +12,10 @@ LazyData: true
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Imports: 
-   rlang, magrittr, stringr, dplyr, plyr, purrr, tidyr, tibble, ggplot2, ggrepel, factoextra, car, scales
+   rlang, magrittr, stringr, dplyr, plyr, purrr, tidyr, tibble, ggplot2, ggrepel, factoextra, car, scales, gridExtra, cowplot
 Suggests: 
     knitr,
     rmarkdown,
-    testthat (>= 3.5.0)
+    testthat (>= 3.1.0)
 Config/testthat/edition: 3
 VignetteBuilder: knitr
