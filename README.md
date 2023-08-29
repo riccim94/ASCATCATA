@@ -17,32 +17,42 @@ library(devtools)
 devtools::install_github("riccim94/ASCATCATA")
 ```
 
-## Example
+## Application of main functions available
 
-The ASCATCATA package offers a main function to apply an ASCA decomposition across a TCATA dataset. The decomposition applied consists in assuming a gaussian distribution after applying an union scale normalization to the interval considered.
+The ASCATCATA package offers a main function to apply an ASCA decomposition on datasets from dynamic sensory analysis and offers a set of functions to plot, interpret, and validate the results of the analysis. The decomposition applied consists of assuming a Gaussian distribution after applying a unit scale normalization to the interval considered. The decomposition is applied for each combination of unit of time and, when available, sensory attributes asked. 
 
+The package offers a set of function to analyze three different kinds of dynamic sensory analysis:
+* asca_ti: To analyze data from Time Intensity (TI) analysis
+* asca_tds: To analyze data from Temporal Dominant Sensation (TDS) analysis.
+* asca_tcata: To analyze data from Temporal Check All That Apply (TCATA) data.
+
+  ***
+
+###asca_tcata
 ``` r
 library(ASCATCATA)
 library(tempR)
 library(tidyverse)
 ## basic example code
-data <- tempR::ojtcata
 ```
 
 ``` r
-#first step consists in wrangle the dataset to put it in long format
+# The first step consists of wrangling the dataset to put it in a long format
 # and to mutate in factors the columns "cons" and "samp", and in numeric the column time
+data <- tempR::ojtcata
 data.long <- data %>% gather(time, CATA, 5:25) %>%
 mutate(cons = as.factor(cons), samp = as.factor(samp),
 time = as.numeric(str_extract(time, "\\d+")))
 
-# then we apply time resolved ASCA decomposition on the dataset.
-
-ASCA_T1 <- ASCATCATA::tcatasca(CATA ~ cons+samp, data = data.long, timecol = "time", attributes = "attribute")
+# then we apply time-resolved ASCA decomposition on the dataset.
 ```
 
 ``` r
-# The results can be representd using biplots
+ASCA_T1 <- ASCATCATA::asca_tcata(CATA ~ cons+samp, data = data.long, timecol = "time", attributes = "attribute")
+```
+
+``` r
+# The results can be represented using biplots
 
 ASCATCATA::plot_ASCA(ASCA_T1)
 ```
@@ -93,6 +103,32 @@ ASCATCATA::plot_ASCA(ASCA_T1, h_clus = 2)
 ![](Images/plot_asca_clus_2.png)
 
 
+####loadings.time.structure
+
+
+####time.quantization
+
+
+###asca_tds
+This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) dataset. It is required that the dataset is put in long format. The decomposition applied is based on the assumption of a normal distribution of the data. Each decomposition is applied to each combination of units of time and sensory descriptors.  
+
+
+``` r
+# The first step consists of wrangling the dataset to put it in a long format
+# and to mutate in factors the columns "cons" and "samp", and in numeric the column time
+data <- tempR::ojtds
+data.long <- data %>% gather( time, CATA, 5:25) %>% mutate(time = str_remove(time, "time_") %>% str_remove(., "s$"))
+
+# then we apply time-resolved ASCA decomposition on the dataset.
+```
+
+
+``` r
+
+```
+
+###asca_ti
+This function applies ASCA decomposition to a Time-intensity (TDS) dataset. It is required that the dataset is put in long format. The decomposition applied is based on the assumption of a normal distribution of the data. Each decomposition is applied to each units of time.  
 
 
 ## Author
