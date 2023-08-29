@@ -28,7 +28,7 @@ The package offers a set of function to analyze three different kinds of dynamic
 
   ***
 
-###asca_tcata
+### asca_tcata
 ``` r
 library(ASCATCATA)
 library(tempR)
@@ -103,13 +103,13 @@ ASCATCATA::plot_ASCA(ASCA_T1, h_clus = 2)
 ![](Images/plot_asca_clus_2.png)
 
 
-####loadings.time.structure
+#### loadings.time.structure
 
 
-####time.quantization
+#### time.quantization
 
 
-###asca_tds
+### asca_tds
 This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) dataset. It is required that the dataset is put in long format. The decomposition applied is based on the assumption of a normal distribution of the data. Each decomposition is applied to each combination of units of time and sensory descriptors.  
 
 
