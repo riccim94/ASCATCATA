@@ -41,18 +41,28 @@ This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) 
 ``` r
 # The first step consists of wrangling the dataset to put it in a long format
 # and to mutate in factors the columns "cons" and "samp", and in numeric the column time
-data <- tempR::ojtds
-data.long <- data %>% gather( time, CATA, 5:25) %>% mutate(time = str_remove(time, "time_") %>% str_remove(., "s$"))
+data <- tempR::bars
+data.long <- data %>% gather( time, CATA, 5:455) %>% mutate(time = str_remove(time, "time_") %>% str_remove(., "s$"))
 
 ```
 Once the dataset is arranged in long format with a column for the time values and a column for the attribute values, then we apply time-resolved ASCA decomposition on the dataset using the function asca_tds().
 
 ``` r
-test_tds <- asca_tds(CATA~cons+samp, data = data.long, timecol = "time", attributes = "attribute")
+test_tds <- asca_tds(CATA~(sample+assessor)^2, data = data.long, timecol = "time", attributes = "attribute")
 ```
 
-The results can be rportd using
+The results can be reported using the plot_ASCA function.
 
+``` r
+plot_ASCA(test_tds)
+```
+![](Images/plot_tds_1.png)
+
+![](Images/plot_tds_2.png)
+
+![](Images/plot_tds_3.png)
+
+And it is possible to select different arrangements for the depiction of loading values.
 
 ### asca_tcata
 ``` r
