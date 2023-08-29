@@ -90,7 +90,7 @@ asca_ti <- function(formula, data, timecol,
       prcomp()
 
   }
-
+  data3[["info"]][["structure"]] <- "long"
   data3[["info"]][["type"]] <- "TI_ASCA"
   data3[["info"]][["timecol"]] <- unique(data[,as.character(timecol)])
 

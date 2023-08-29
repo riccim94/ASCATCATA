@@ -112,7 +112,7 @@ asca_tds <- function(formula, data, timecol, attributes,
 
    #View(data2)
    #View(data3)
-
+  data3[["info"]][["structure"]] <- "long"
   data3[["info"]][["type"]] <- "TDS_ASCA"
   data3[["info"]][["timecol"]] <- unique(data[,as.character(timecol)])
   data3[["info"]][["attributes"]] <- unique(data %>%
