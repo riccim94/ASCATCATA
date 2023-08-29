@@ -138,6 +138,15 @@ ASCA_T2 <- ASCATCATA::asca_tcata(CATA ~ cons+samp, data = data.long, timecol = "
 
 The function plot_ASCA() will plot the results adopting a different plot structure to represent properly the results.
 
+``` r
+plot_ASCA(ASCA_T2)
+```
+![](Images/plot_line_1.png)
+
+![](Images/plot_line_2.png)
+
+![](Images/plot_line_3.png)
+
 #### time.quantization
 
 
