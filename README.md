@@ -31,6 +31,9 @@ The package offers a set of function to analyze three different kinds of dynamic
 ### asca_ti
 This function applies ASCA decomposition to a Time-intensity (TDS) dataset. It is required that the dataset is put in long format. The decomposition applied is based on the assumption of a normal distribution of the data. Each decomposition is applied to each units of time.  
 
+
+
+
 ### asca_tds
 This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) dataset. It is required that the dataset is put in long format. The decomposition applied is based on the assumption of a normal distribution of the data. Each decomposition is applied to each combination of units of time and sensory descriptors.  
 
@@ -41,15 +44,14 @@ This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) 
 data <- tempR::ojtds
 data.long <- data %>% gather( time, CATA, 5:25) %>% mutate(time = str_remove(time, "time_") %>% str_remove(., "s$"))
 
-# then we apply time-resolved ASCA decomposition on the dataset.
 ```
-
+Once the dataset is arranged in long format with a column for the time values and a column for the attribute values, then we apply time-resolved ASCA decomposition on the dataset using the function asca_tds().
 
 ``` r
-
+test_tds <- asca_tds(CATA~cons+samp, data = data.long, timecol = "time", attributes = "attribute")
 ```
 
-
+The results can be rportd using
 
 
 ### asca_tcata
@@ -76,7 +78,7 @@ ASCA_T1 <- ASCATCATA::asca_tcata(CATA ~ cons+samp, data = data.long, timecol = "
 ```
 
 ``` r
-# The results can be represented using biplots
+# The results can be represented using biplots adopting the plot_ASCA() function.
 
 ASCATCATA::plot_ASCA(ASCA_T1)
 ```
@@ -87,7 +89,7 @@ ASCATCATA::plot_ASCA(ASCA_T1)
 
 
 ``` r
-# There are multiple display options available
+# There are multiple display options available to show the loading values
 
 ASCATCATA::plot_ASCA(ASCA_T1, density = T, path = F,, path.smooth = F)
 ```
@@ -118,7 +120,7 @@ ASCATCATA::plot_time_loadings(ASCA_T1)
 
 
 ``` r
-# The function plot_ASCA allows also to apply a hierarchical clustering for the results of the hierarchical clustering and report the results.
+# The function plot_ASCA allows also to apply a hierarchical clustering for the results of the hierarchical clustering and reports the results.
 
 ASCATCATA::plot_ASCA(ASCA_T1, h_clus = 2)
 ```
@@ -128,9 +130,21 @@ ASCATCATA::plot_ASCA(ASCA_T1, h_clus = 2)
 
 
 #### loadings.time.structure
+The parameter loadings.time.structure in the function asca_tcata() is set by default to "long". if the input is switched to "short" the multivariate analysis of the factors levels of ASCA will be done with a different arrangement. The loading values estimated will be a single value, and the scores will be estimated for each combination of time units and levels of the factors considered.
 
+``` r
+ASCA_T2 <- ASCATCATA::asca_tcata(CATA ~ cons+samp, data = data.long, timecol = "time", attributes = "attribute", loadings.time.structure = "short")
+```
+
+The function plot_ASCA() will plot the results adopting a different plot structure to represent properly the results.
 
 #### time.quantization
+
+
+#### residuals versus fitted
+
+
+#### Sum of squares estimation
 
 
 
