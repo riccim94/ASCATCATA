@@ -62,7 +62,17 @@ plot_ASCA(test_tds)
 
 ![](Images/plot_tds_3.png)
 
-And it is possible to select different arrangements for the depiction of loading values.
+It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function.
+
+It is possible to plot the contribution of each attribute on the overall variability for each factor adopting the function plot_time_loadings()
+
+``` r
+plot_time_loadings(test_tds)
+```
+
+![](Images/tds_time_1.png)
+
+![](Images/tds_time_2.png)
 
 ### asca_tcata
 ``` r
