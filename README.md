@@ -31,7 +31,9 @@ The package offers a set of function to analyze three different kinds of dynamic
 ### asca_ti
 This function applies ASCA decomposition to a Time-intensity (TDS) dataset. It is required that the dataset is put in long format. The decomposition applied is based on the assumption of a normal distribution of the data. Each decomposition is applied to each units of time.  
 
+``` r
 
+```
 
 
 ### asca_tds
@@ -168,12 +170,13 @@ plot_ASCA(ASCA_T2)
 ![](Images/plot_line_3.png)
 
 #### time.quantization
-
+The time.quantization parameter allows the quantization of the time units. The number reported consists in defying the number of time units which are required to be incorporated in singular time units. All the other operations would be the same, and the functions plot_ASCA() and plot_time_loadings() would function in the same way, reporting values for aggregated estimation of ASCA decomposition
 
 #### residuals versus fitted
-
+In the object is reported data.frame containing all the residuals and fitted values estimated by each ANOVA decomposition applied.
 
 #### Sum of squares estimation
+In the object is reported data.frame containing the percentage of the Sum of Squares attributed to each factor and to residuals at aggregate levels.
 
 
 
