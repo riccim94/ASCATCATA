@@ -41,29 +41,39 @@ asca_ti <- function(formula, data, timecol,
   ref <- NULL
   fact <- NULL
   formula_ <- formula
-
   data3 <- list()
+  ref <- formula[[2L]]
+  fact <- as.character(formula[[3L]]) %>% as.vector() %>%
+    str_split(., "[+*:]", simplify = T) %>% str_trim() %>%
+    .[str_detect(., ".+")] %>% .[!str_detect(.,"^\\d")] %>%
+    str_remove(., "^\\(") %>% str_remove(., "\\)$")
+  timecol <- as.symbol(timecol)
+
 
   data1 <- data %>% group_by_at(vars(as.name(timecol))) %>%
     do(filter(., length(pull(unique(.[, ref]))) != 1) %>% droplevels()) %>%
     ungroup() %>% droplevels()
-
+#View(data1)
   colnames1 <- names(data1)
-  #View(data1)
+
   data2 <- data1 %>%
-    mutate_at(vars(fact), as.factor) %>% split(dplyr::select(., timecol )) %>%
-      map(~droplevels(.) %>% data.frame(
+    split(dplyr::select(., timecol )) %>%
+      map(~droplevels(.) %>%
+            mutate_at(., vars(ref), scale) %>%
+            data.frame(
         effect = predict(glm(as.formula(formula),
-          data = mutate_at(., vars(ref), scale),
+          data = mutate_at(., vars(fact), as.factor),
           family = gaussian()), type = "terms")))
   #View(data2)
 
 
-  colnames2 <- data2[[1]][[1]] %>% names(.)
+  colnames2 <- data2[[1]] %>% names(.)
 
+  #print(colnames2)
 
   data2 <- data2 %>% plyr::ldply(., function(x){
-    data.frame(x) %>% `colnames<-`(c(colnames2))}) %>% dplyr::select(-timecol)
+    data.frame(x) %>% `colnames<-`(c(colnames2))}) %>%
+    dplyr::select(-timecol)
 
   names(data2)[1] <- as.character(timecol)
 

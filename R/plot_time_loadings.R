@@ -32,9 +32,14 @@ plot_time_loadings <- function(
     ASCA_obj,
     choice = "contrib",
     ref = c("attributes", "factors"),
-    object = 1:(length(ASCA_obj)-3),
+    object = NA,
     print = T,
     axes = c(1,2)){
+
+  if(is.na(object)){
+    object <- 1:(length(names(ASCA_obj)[!(names(ASCA_obj) %in% c(
+      "Residuals","Parameters", "SS_decomposition", "info"))]))
+  }
 
   resulting_plots <- list()
   contrib <- data.frame()

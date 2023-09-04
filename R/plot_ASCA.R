@@ -50,12 +50,17 @@
 
 plot_ASCA <- function(
     ASCA_obj,
-    object = 1:(length(ASCA_obj)-3),
+    object = NA,
     print = T,
     axes = c(1,2), path = T, density = F,
     path.smooth = T,
     h_clus = NULL,
     point.size = 2){
+
+  if(is.na(object)){
+    object <- 1:(length(names(ASCA_obj)[!(names(ASCA_obj) %in% c(
+      "Parameters", "SS_decomposition", "info"))]))
+  }
 
   { unicode_minus <- function(x){sub('^-', '\U2212', format(x))} }
 
@@ -112,6 +117,14 @@ axe_y_title <- paste0("Dim",axes[2]," (", as.character(ASCA_obj %>%
  .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,axes[2]]*100) %>%
    str_extract("\\d+\\.\\d{1,2}"), "%)")
 
+if(is.numeric(reference)){
+  final_label <- names(ASCA_obj)[reference]
+}
+if(is.character(reference)){
+  final_label <- reference
+}
+
+if(ASCA_obj[["info"]][["type"]] %in% c("TCATA_ASCA", "TDS_ASCA")){
 if(ASCA_obj %>% .[["info"]] %>% .[["structure"]] == "long"){
 
 if(is.numeric(h_clus)){
@@ -221,8 +234,12 @@ if(names(ASCA_obj)[reference] != "Residuals" & reference != "Residuals"){
   pl <- pl + geom_line(aes(x = time, y = Score, color = levels), data_plot) +
   facet_grid(rows = "Component", scales = "free_y") +
     geom_hline(yintercept = 0, linetype = 2) +
-    theme_minimal() + theme(legend.position = "bottom") +
-    guides(color = guide_legend(ncol = 10, byrow = TRUE))
+    ggtitle("", subtitle = paste0("Factor: ", final_label)) +
+    theme_minimal() + theme(legend.position = "bottom",
+        plot.title = element_blank(),
+        legend.key.size = unit(0.2, 'cm')
+        ) +
+    guides(color = guide_legend(ncol = 13, byrow = TRUE))
   data_loadings <- ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
     as.data.frame() %>% .[,axes] %>% mutate(Levels = rownames(.)) %>%
     gather(Component, Loadings, 1:2)
@@ -240,7 +257,9 @@ if(names(ASCA_obj)[reference] == "Residuals"|reference == "Residuals"){
   pl <- ggplot()
   pl <- pl + geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)), data_plot) +
     geom_hline(yintercept = 0, linetype = 2) +
-    theme_minimal() + theme(legend.position = "bottom") +
+    ggtitle("", subtitle = paste0("Factor: ", final_label)) +
+    theme_minimal() + theme(legend.position = "bottom",
+      plot.title = element_blank()) +
     guides(color = guide_legend(ncol = 10, byrow = TRUE))
   data_loadings <- ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
     as.data.frame() %>% .[,axes] %>%
@@ -257,12 +276,6 @@ if(names(ASCA_obj)[reference] == "Residuals"|reference == "Residuals"){
 
 
 
-if(is.numeric(reference)){
-  final_label <- names(ASCA_obj)[reference]
-}
-if(is.character(reference)){
-  final_label <- reference
-}
 
 if(ASCA_obj %>% .[["info"]] %>% .[["structure"]] == "long"){
 pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
@@ -279,11 +292,100 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
   ggtitle("", subtitle = paste0("Factor: ", final_label)) +
   theme(legend.position = "bottom")
 }
-
-if(ASCA_obj %>% .[["info"]] %>% .[["structure"]] == "short"){
-  pl <- pl + ggtitle("", subtitle = paste0("Factor: ", final_label))
 }
 
+  if(ASCA_obj[["info"]][["type"]] %in% c("TI_ASCA")){
+
+    if(is.numeric(h_clus)){
+      if(h_clus > row_num){
+        factor <- ASCA_obj %>% names() %>% .[reference]
+        message(paste0("The factor ", factor, " has only ", row_num,
+                       " levels, therefore can not be clustered in ", h_clus, " groups."))
+        next
+      }
+      ASCA_obj %>% .[[reference]] %>% .$x %>% dist() %>%
+        hclust(method = "ward.D2") %>% cutree(k = h_clus) %>% as.data.frame() %>%
+        `colnames<-`(c("cluster")) %>% mutate(col_p = rownames(.),
+                                              cluster = paste0("cluster ", cluster)) -> cluster_km
+      ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
+        as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.)) %>%
+        left_join(cluster_km, by = c("col_p")) %>%
+        mutate(cluster = as.factor(cluster)) -> data_plot
+    }else{
+      data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
+        as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.), cluster = NA)
+    }
+
+    pl <- ggplot()
+
+    if(density){
+      pl <- pl + stat_density2d(aes(x = !!sym(axes_x), y = !!sym(axes_y),
+                                    fill = param, alpha = after_stat(level/max(level))),
+                                data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
+                                  as.data.frame() %>% .[,axes] %>%
+                                  mutate_all(function(x){x <- x*(r)}) %>%
+                                  mutate(param = rownames(.)) %>%
+                                  separate(param, c("time", "param"), sep = "_") %>% arrange(as.numeric(time)) %>%
+                                  mutate(time = reorder(time, as.numeric(time), mean)),
+                                geom = "polygon") +
+        theme_minimal() + scale_alpha_continuous(range = c(0.25,0.7)) +
+        guides(fill = guide_legend(title = "Attributes")) +
+        theme(plot.title = element_text(hjust = 0.5, face = "italic"),
+              legend.position = "bottom", legend.title = element_blank())
+    }
+
+
+    pl <- pl + {
+      if(is.numeric(h_clus)){
+        geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y), color = cluster),
+                   data = data_plot, size = point.size)
+      }else{
+        geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)),
+                   color = "black", data = data_plot, size = point.size)
+      }
+    } + scale_shape_manual(values = rep(19,15)) +
+      scale_x_continuous(labels = unicode_minus) +
+      scale_y_continuous(labels = unicode_minus) + theme_minimal() +
+      {if(is.numeric(h_clus)){
+        geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
+                            label = col_p, color = cluster), data = data_plot)
+      }else{
+        geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
+                            label = col_p), data = data_plot) }} +
+      theme(legend.position = "none") +
+      guides(color = "none", alpha = "none") +
+      xlab(axe_x_title) + ylab(axe_y_title)
+
+
+    if(path.smooth){
+      pl <- pl + geom_path(aes(x = !!sym(axes_x), y = !!sym(axes_y)),
+        linetype = 1, linewidth = 5, alpha = 0.3,
+        data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
+          as.data.frame() %>% .[,axes] %>%
+          mutate_all(function(x){x <- x*(r)}) %>%
+          mutate(time = rownames(.)) %>%
+          arrange(as.numeric(time)) %>%
+          mutate(time = reorder(time, as.numeric(time), mean))) +
+        guides(color = guide_legend(title = "Legend"))
+    }
+
+    if(path){
+      pl <- pl + geom_path(aes(x = !!sym(axes_x), y = !!sym(axes_y)),
+              linetype = 1,
+              arrow = arrow(type = "closed", length = unit(0.25, "cm")),
+              data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
+                as.data.frame() %>% .[,axes] %>%
+                mutate_all(function(x){x <- x*(r)}) %>%
+                mutate(time = rownames(.)) %>%
+                arrange(as.numeric(time)) %>%
+                mutate(time = reorder(time, as.numeric(time), mean))) +
+        guides(color = guide_legend(title = "Time"))
+    }
+
+pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
+  geom_hline(yintercept = 0, linetype = 2)
+
+  }
 
 resulting_plots[[names(ASCA_obj)[reference]]] <- pl
 if(print){print(pl)}
