@@ -196,12 +196,20 @@ plot_ASCA(ASCA_T2)
 The time.quantization parameter allows the quantization of the time units. The number reported consists in defying the number of time units which are required to be incorporated in singular time units. All the other operations would be the same, and the functions plot_ASCA() and plot_time_loadings() would function in the same way, reporting values for aggregated estimation of ASCA decomposition
 
 #### residuals versus fitted
-In the object is reported data.frame containing all the residuals and fitted values estimated by each ANOVA decomposition applied.
+In the object is reported data.frame containing all the residuals and fitted values estimated by each ANOVA decomposition applied and the correspondent time unit and attribute.
 
 #### Sum of squares estimation
 In the object is reported data.frame containing the percentage of the Sum of Squares attributed to each factor and to residuals at aggregate levels.
 
+``` r
+ASCA_T1$SS_decomposition
+```
 
+Factor | Sum_Sq 
+--- | ---
+Residuals | 0.687 
+cons | 0.239 
+samp | 0.0740 
 
 
 
