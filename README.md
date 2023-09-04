@@ -21,7 +21,7 @@ devtools::install_github("riccim94/ASCATCATA")
 
 The ASCATCATA package offers a main function to apply an ASCA decomposition on datasets from dynamic sensory analysis and offers a set of functions to plot, interpret, and validate the results of the analysis. The decomposition applied consists of assuming a Gaussian distribution after applying a unit scale normalization to the interval considered. The decomposition is applied for each combination of unit of time and, when available, sensory attributes asked. 
 
-The package offers a set of function to analyze three different kinds of dynamic sensory analysis:
+The package offers a set of functions to analyze three different kinds of dynamic sensory analysis:
 * asca_ti: To analyze data from Time Intensity (TI) analysis
 * asca_tds: To analyze data from Temporal Dominant Sensation (TDS) analysis.
 * asca_tcata: To analyze data from Temporal Check All That Apply (TCATA) data.
@@ -29,11 +29,34 @@ The package offers a set of function to analyze three different kinds of dynamic
   ***
 
 ### asca_ti
-This function applies ASCA decomposition to a Time-intensity (TDS) dataset. It is required that the dataset is put in long format. The decomposition applied is based on the assumption of a normal distribution of the data. Each decomposition is applied to each units of time.  
+This function applies ASCA decomposition to a Time-intensity (TDS) dataset. It is required that the dataset is put in a long format. The decomposition applied is based on the assumption of a normal data distribution. Each decomposition is applied to each unit of time.  
 
 ``` r
+#first of all a dataset of Time Intensity data is used. An open Time Intensity is taken from the website https://help.xlstat.com/dataset/time-intensity-data_0.xlsm
+library(readxl)
+library(httr)
+url1 <- "https://help.xlstat.com/dataset/time-intensity-data_0.xlsm"
 
+GET(url1, write_disk(tf <- tempfile(fileext = ".xls")))
+data <- read_excel(tf, 2L)
+data.long <- data %>% gather(time, intensity, 6:36) %>% filter(time != "0") %>% droplevels()
+#the function is then applied on the dataset, defining the formula applied by the ASCA decomposition and the column containing the time column
+test_ti <- asca_ti(intensity ~ PANELIST+PRODUCT, data = data.long, timecol = "time")
 ```
+The package also offers two functions that report the data in visual graphical devices. The first is plot_ASCA() function
+
+``` r
+plot_ASCA(test_ti)
+```
+![](Images/plot_ti_1.png)
+
+
+
+The second is plot_time_loadings().
+``` r
+plot_time_loadings(test_ti)
+```
+![](Images/plot_ti_2.png)
 
 
 ### asca_tds
