@@ -12,8 +12,6 @@
 #' @import dplyr
 #' @import purrr
 #' @import tidyr
-#' @import gridExtra
-#' @import cowplot
 #' @importFrom magrittr %>%
 #' @importFrom stats reorder
 #' @importFrom dplyr select
@@ -41,6 +39,7 @@
 #' @importFrom ggplot2 geom_hline
 #' @importFrom ggplot2 theme_minimal
 #' @importFrom ggplot2 facet_grid
+#' @importFrom ggpubr ggarrange
 #' @importFrom ggrepel geom_text_repel
 #' @export
 #' @examples
@@ -247,7 +246,7 @@ if(names(ASCA_obj)[reference] != "Residuals" & reference != "Residuals"){
       color = "black", fill = "white", data = data_loadings) +
     facet_grid(rows = "Component", scales = "free_y") +
     theme_minimal()
-pl <- cowplot::plot_grid(pl, pl2, nrow = 1)
+pl <- ggarrange(pl, pl2, nrow = 1)
 }
 
 if(names(ASCA_obj)[reference] == "Residuals"|reference == "Residuals"){
