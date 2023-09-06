@@ -29,7 +29,7 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' tcatasca(CATA~(samp+cons)^2, data = tempR::ojtcata, timecol = "time", attributes = "attribute")
+#' asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata, timecol = "time", attributes = "attribute")
 #' describe(dataset, col1, col2)
 #' }
 
