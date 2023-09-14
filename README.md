@@ -156,7 +156,9 @@ ASCATCATA::plot_time_loadings(ASCA_T1)
 ![](Images/plot_time_loadings_ex_2.png)
 
 ``` r
-#The same function can also plot the loading values risolved by time for one axes at time
+#The same function can also plot the loading values risolved by time for one axes at time.
+ASCATCATA::plot_time_loadings(ASCA_T1, choice = "loadings")
+
 ``` 
 
 ![](Images/plot_time_loading_ex_3.png)
