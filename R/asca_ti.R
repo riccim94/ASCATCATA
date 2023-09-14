@@ -49,6 +49,10 @@ asca_ti <- function(formula, data, timecol,
     str_remove(., "^\\(") %>% str_remove(., "\\)$")
   timecol <- as.symbol(timecol)
 
+  if(!is.null(time.quantization)){
+    data <- mutate_at(data, vars(timecol),
+                      function(x){x <- cut(x, round(x/time.quantization))})
+  }
 
   data1 <- data %>% group_by_at(vars(as.name(timecol))) %>%
     do(filter(., length(pull(unique(.[, ref]))) != 1) %>% droplevels()) %>%
@@ -100,6 +104,9 @@ asca_ti <- function(formula, data, timecol,
       prcomp()
 
   }
+
+
+
   data3[["info"]][["structure"]] <- "long"
   data3[["info"]][["type"]] <- "TI_ASCA"
   data3[["info"]][["timecol"]] <- unique(data[,as.character(timecol)])
