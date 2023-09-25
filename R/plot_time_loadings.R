@@ -51,6 +51,7 @@ plot_time_loadings <- function(
 
 
   for(reference in object){
+
     if(choice == "contrib"){
     contrib <- rbind(contrib, ASCA_obj %>% .[[reference]] %>%
       fviz_contrib(choice = "var", axes = c(axes)) %>% .$data %>%
@@ -66,6 +67,8 @@ plot_time_loadings <- function(
               Factor = names(ASCA_obj)[reference]))
     }
   }
+
+if(ASCA_obj[["info"]][["type"]] %in% c("TDS_ASCA", "TCATA_ASCA")){
   contrib %>%
     mutate(Attributes = str_extract(name,
             paste((ASCA_obj$info$attributes), collapse = "|"))) %>%
@@ -74,6 +77,17 @@ plot_time_loadings <- function(
     mutate(contrib_text = as.character(round(contrib,2)),
            Class = as.numeric(Class)) %>% ungroup() %>%
     droplevels() -> data
+}
+
+  if(ASCA_obj[["info"]][["type"]] == "TI_ASCA"){
+    contrib %>%
+      group_by(Factor, Class) %>%
+      summarize(contrib = sum(contrib)) %>% ungroup() %>%
+      mutate(contrib_text = as.character(round(contrib,2)),
+             Class = as.numeric(Class)) %>% ungroup() %>%
+      droplevels() -> data
+  }
+
 if(choice== "loadings"){
   title <- "Loadings value in time organized per factor"
   subtitle <- paste0("Estimations on axe: ", axes[1])
@@ -86,7 +100,7 @@ if(choice== "loadings"){
     ylab_text <- "Contribution to explained variance"
   }
 
-
+if(ASCA_obj[["info"]][["type"]] %in% c("TDS_ASCA", "TCATA_ASCA")){
 if("factors" %in% ref){
   resulting_plots[["factors"]] <- data %>% ggplot() +
     geom_line(aes(x = Class, y = contrib, color = Attributes), size = 0.8) +
@@ -100,8 +114,6 @@ if("factors" %in% ref){
     scale_x_continuous(
       breaks = seq(0, max(data$Class, na.rm = T),5))
 }
-
-
 
 if("attributes" %in% ref){
   resulting_plots[["attributes"]] <- data %>% ggplot() +
@@ -117,6 +129,24 @@ if("attributes" %in% ref){
       plot.title = element_text(hjust = 0.5, family = "bold")) +
     scale_x_continuous(breaks = seq(0,max(data$Class, na.rm = T),5))
 }
+}
+
+if(ASCA_obj[["info"]][["type"]] == "TI_ASCA"){
+  resulting_plots[["attributes"]] <- data %>% ggplot() +
+    geom_line(aes(x = Class, y = contrib, color = Factor), size = 0.8) +
+    xlab("time") + ylab(ylab_text) +
+    theme_minimal() +
+    ggtitle(title, subtitle = subtitle) +
+    theme(
+      legend.position = "bottom",
+      axis.text = element_text(color = "black"),
+      plot.subtitle = element_text(hjust = 0.5, family = "italic"),
+      plot.title = element_text(hjust = 0.5, family = "bold")) +
+    scale_x_continuous(breaks = seq(0,max(data$Class, na.rm = T),5))
+}
+
+
+
 if(print){print(resulting_plots[[ref]])}
 return(resulting_plots)
 

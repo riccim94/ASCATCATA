@@ -122,6 +122,8 @@ data3[[name2]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
   mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
   mutate_all(., function(x){x <- x - mean(x, na.rm = T)}) %>% prcomp()
 }
+
+
 if(loadings.time.structure == "short"){
 
   temp[refk] <- paste0(temp[,as.character(timecol)], "_",
@@ -173,7 +175,7 @@ data3[["Residuals"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
 
 if(loadings.time.structure == "short"){
   temp[refk] <- paste0(temp[,as.character(attributes)])
-print(name2)
+#print(name2)
   data3[["Residuals"]] <- temp %>% dplyr::select(-attributes) %>%
     .[,names(.) %in% c(c(as.character(fact)), refk, "residuals")] %>%
     group_by(refk) %>%
@@ -226,6 +228,10 @@ data3[["info"]][["attributes"]] <- unique(data %>%
 if(is_tibble(data3[["info"]][["attributes"]])){
   data3[["info"]][["attributes"]] <- pull(data3[["info"]][["attributes"]])
   }
+
+data3[["info"]][["formula"]] <- formula
+data3[["info"]][["labels"]]$timecol <- as.character(timecol)
+data3[["info"]][["labels"]]$attributes <- as.character(attributes)
 
   options(contrasts =  prev_contr)
   return(data3)

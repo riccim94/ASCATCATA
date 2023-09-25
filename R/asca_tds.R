@@ -109,6 +109,30 @@ asca_tds <- function(formula, data, timecol, attributes,
 
   }
 
+  #residuals & fitted
+  data1 %>% split(dplyr::select(., timecol)) %>%
+    map(~droplevels(.) %>% split(., dplyr::select(., attributes)) %>%
+          map(~droplevels(.) %>% data.frame(
+            residuals = rstandard(glm(as.formula(formula),
+                                      data = mutate_at(., vars(ref), scale), family = gaussian()),
+                                  type = "deviance"),
+            fitted = fitted.values(glm(as.formula(formula),
+                                       data = mutate_at(., vars(ref), scale), family = gaussian())))) %>%
+          plyr::ldply(., function(x){data.frame(x)}) ) %>%
+    plyr::ldply(., function(x){data.frame(x) %>%
+        `colnames<-`(c(as.character(attributes), colnames1,
+                       "residuals", "fitted"))}) %>%
+    dplyr::select(-ref, -timecol) %>% `colnames<-`(
+      c(as.character(timecol),names(.)[2:length(names(.))])) -> temp
+
+  temp[refk] <- paste0(temp[,as.character(timecol)], "_",
+                       temp[,as.character(attributes)])
+
+  data3[["Parameters"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
+    .[,names(.) %in% c(fact, refk, "residuals", "fitted")] %>%
+    separate(refk, c("time", "attribute"), sep = "_")
+
+
 
    #View(data2)
    #View(data3)
@@ -122,6 +146,9 @@ asca_tds <- function(formula, data, timecol, attributes,
   if(is_tibble(data3[["info"]][["attributes"]])){
     data3[["info"]][["attributes"]] <- pull(data3[["info"]][["attributes"]])
   }
+  data3[["info"]][["formula"]] <- formula
+  data3[["info"]][["labels"]]$timecol <- as.character(timecol)
+  data3[["info"]][["labels"]]$attributes <- as.character(attributes)
 
   options(contrasts =  prev_contr)
   return(data3)
