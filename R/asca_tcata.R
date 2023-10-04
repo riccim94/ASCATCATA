@@ -52,7 +52,8 @@ asca_tcata <- function(formula, data, timecol, attributes,
 
   if(!loadings.time.structure %in% c("long", "short")){
     message("The values assigned to loadings.time.structure must be only 'long' or 'short'. Other values are invalid");
-    return(NULL)
+    #return(NULL)
+    stop()
   }
 
 
@@ -195,19 +196,22 @@ data3[["Parameters"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
 
 
 #SSum of squares
-temp <- data1 %>% split(dplyr::select(., timecol)) %>%
+temp <- data1 %>%
+  dplyr::select(attributes, timecol, fact, ref) %>%
+  split(dplyr::select(., timecol)) %>%
   map(~droplevels(.) %>% split(., dplyr::select(., attributes)) %>%
-        map(~droplevels(.) %>% data.frame(Anova(glm(as.formula(formula),
-          data = mutate_at(., vars(ref), scale), family = gaussian()),
-          test.statistic = "F", type = "III") %>%
-            mutate(Factor = as.character(rownames(.)))) %>%
-            dplyr::select(attributes, timecol, Sum.Sq, Df, Factor)) %>%
+        map(~droplevels(.) %>% mutate_at(., vars(ref), scale) %>%
+          glm(as.formula(formula), data = ., family = gaussian()) %>%
+          car::Anova(., test.statistic = "F", type = "III") %>%
+            mutate(Factor = as.character(rownames(.))) %>%
+            as.data.frame() %>%
+            dplyr::select(`Sum Sq`, Df, Factor)) %>%
         plyr::ldply(., function(x){data.frame(x)})) %>%
-  plyr::ldply(., function(x){data.frame(x) %>% `colnames<-`(c("__",
-    as.character(attributes), as.character(timecol), "Sum.Sq", "Df",
-    "Factor"))}) %>% dplyr::select(-c(1,2)) %>%
-  group_by_at(vars(as.name(timecol), as.name(attributes), Factor) ) %>%
-  slice(1) %>%
+  plyr::ldply(., function(x){data.frame(x) %>%
+      `colnames<-`(c(as.character(attributes), "Sum.Sq", "Df", "Factor"))}) %>%
+  `colnames<-`(c(as.character(timecol), colnames(.)[2:length(colnames(.))])) %>%
+  group_by_at(vars(as.name(timecol), as.name(attributes), Factor)) %>%
+  slice(1) %>% ungroup() %>%
   group_by_at(vars(as.name(timecol), as.name(attributes))) %>%
   do(mutate(., Sum.Sq_ = Sum.Sq/sum(Sum.Sq))) %>%
   ungroup() %>% mutate(reference = sum(Sum.Sq_)) %>%
