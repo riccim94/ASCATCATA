@@ -44,7 +44,62 @@
 #' @export
 #' @examples
 #' \dontrun{
+#' library(tidyverse)
+#' # According to the type and the structure of the ASCA_obj inserted in the function
+#' # there will be displayed an according plot.
+#'
+#' # For ASCA_TCATA and ASCA_TDS in long structure the data will be
+#' # displayed using bi-plots for
+#' # each factor included in the ASCA decomposition.
+#'
+#' ASCA_obj <- asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata  %>%
+#' gather(time, CATA, 5:25) %>%
+#'  mutate(cons = as.factor(cons), samp = as.factor(samp),
+#'         time = as.numeric(str_extract(time, "\\d+"))), timecol = "time",
+#'         attributes = "attribute")
+#'
 #' plot_ASCA(ASCA_obj, object = 1:3)
+#'
+#' # For ASCA_TCATA and ASCA_TDS in short structure, the results
+#' # will be displayed in line plots for each component, with barplots
+#' # reporting the loading values
+#'
+#' ASCA_obj <- asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata  %>%
+#' gather(time, CATA, 5:25) %>%
+#'  mutate(cons = as.factor(cons), samp = as.factor(samp),
+#'         time = as.numeric(str_extract(time, "\\d+"))), timecol = "time",
+#'         attributes = "attribute", loadings.time.structure = "short")
+#'
+#' plot_ASCA(ASCA_obj)
+#'
+#' # It is possible to define only one or more factors to be reported using
+#' # `object`, can be defined using a string or a numerical value.
+#'
+#' plot_ASCA(ASCA_obj, object = "cons")
+#'
+#' # For ASCA_TI object the results will be reported in biplots
+#'
+#' ASCA_obj <- asca_ti(CATA~(sample+assessor)^2,
+#' data = read_excel("time-intensity-data_0.xlsm") %>%
+#' gather(time, intensity, 6:36), timecol = "time")
+#'
+#' plot_ASCA(ASCA_obj)
+#'
+#' # using the `axes` parameter is possible to specify which axes will be
+#' # displayed in the plot
+#'
+#' plot_ASCA(ASCA_obj, axes = c(2,3))
+#'
+#' # Estethic parameters can be addd or removed specifying TRUE or FALSE towards
+#'  # the parameters density, path, and path.smooth
+#'
+#' plot_ASCA(ASCA_obj, density = TRUE, path = FALSE, path.smooth = FALSE)
+#'
+#' # for data in long structure it is possible to apply a hierachical
+#' clustering procedure indicating the number of desidered clusters in h_clus+
+#'
+#' plot_ASCA(ASCA_obj, h_clus = 3)
+#'
 #' }
 
 plot_ASCA <- function(
@@ -116,6 +171,7 @@ axe_y_title <- paste0("Dim",axes[2]," (", as.character(ASCA_obj %>%
  .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,axes[2]]*100) %>%
    str_extract("\\d+\\.\\d{1,2}"), "%)")
 
+
 if(is.numeric(reference)){
   final_label <- names(ASCA_obj)[reference]
 }
@@ -124,6 +180,7 @@ if(is.character(reference)){
 }
 
 if(ASCA_obj[["info"]][["type"]] %in% c("TCATA_ASCA", "TDS_ASCA")){
+
 if(ASCA_obj %>% .[["info"]] %>% .[["structure"]] == "long"){
 
 if(is.numeric(h_clus)){
@@ -299,13 +356,13 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
       if(h_clus > row_num){
         factor <- ASCA_obj %>% names() %>% .[reference]
         message(paste0("The factor ", factor, " has only ", row_num,
-                       " levels, therefore can not be clustered in ", h_clus, " groups."))
+          " levels, therefore can not be clustered in ", h_clus, " groups."))
         next
       }
       ASCA_obj %>% .[[reference]] %>% .$x %>% dist() %>%
         hclust(method = "ward.D2") %>% cutree(k = h_clus) %>% as.data.frame() %>%
         `colnames<-`(c("cluster")) %>% mutate(col_p = rownames(.),
-                                              cluster = paste0("cluster ", cluster)) -> cluster_km
+              cluster = paste0("cluster ", cluster)) -> cluster_km
       ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
         as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.)) %>%
         left_join(cluster_km, by = c("col_p")) %>%
@@ -319,14 +376,15 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
 
     if(density){
       pl <- pl + stat_density2d(aes(x = !!sym(axes_x), y = !!sym(axes_y),
-                                    fill = param, alpha = after_stat(level/max(level))),
-                                data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
-                                  as.data.frame() %>% .[,axes] %>%
-                                  mutate_all(function(x){x <- x*(r)}) %>%
-                                  mutate(param = rownames(.)) %>%
-                                  separate(param, c("time", "param"), sep = "_") %>% arrange(as.numeric(time)) %>%
-                                  mutate(time = reorder(time, as.numeric(time), mean)),
-                                geom = "polygon") +
+              fill = param, alpha = after_stat(level/max(level))),
+              data = ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
+                as.data.frame() %>% .[,axes] %>%
+                mutate_all(function(x){x <- x*(r)}) %>%
+                mutate(param = rownames(.)) %>%
+                separate(param, c("time", "param"), sep = "_") %>%
+                arrange(as.numeric(time)) %>%
+                mutate(time = reorder(time, as.numeric(time), mean)),
+              geom = "polygon") +
         theme_minimal() + scale_alpha_continuous(range = c(0.25,0.7)) +
         guides(fill = guide_legend(title = "Attributes")) +
         theme(plot.title = element_text(hjust = 0.5, face = "italic"),

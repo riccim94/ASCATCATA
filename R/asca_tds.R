@@ -30,7 +30,12 @@
 #' \dontrun{
 #' asca_tds(CATA~(sample+assessor)^2, data = tempR::bars %>%
 #' gather( time, CATA, 5:455),timecol = "time", attributes = "attribute")
-#' describe(dataset, col1, col2)
+#' # To quantize the time units in larger intervals, it is possible to
+#'  # specify the number of time unit contained in the new intervals
+#'  # in time.quantization
+#' asca_tds(CATA~(sample+assessor)^2, data = tempR::bars %>%
+#' gather( time, CATA, 5:455),timecol = "time", attributes = "attribute",
+#' time.quantization = 2)
 #' }
 
 asca_tds <- function(formula, data, timecol, attributes,

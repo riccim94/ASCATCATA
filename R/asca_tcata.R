@@ -29,8 +29,32 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata, timecol = "time", attributes = "attribute")
-#' describe(dataset, col1, col2)
+#' library(tidyverse)
+#' # To apply ASCA decomposition for each combination of time and attribute
+#' # and estimate unique coordinates for each levels on score values.
+#' # It is necessary to organize the data in long format
+#' asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata  %>%
+#' gather(time, CATA, 5:25) %>%
+#'  mutate(cons = as.factor(cons), samp = as.factor(samp),
+#'         time = as.numeric(str_extract(time, "\\d+"))), timecol = "time",
+#'         attributes = "attribute")
+#' # To estimate Score values for each unit of time for each level
+#' # of the factors included it is necessary to specify
+#' # loadings.time.structure == "short"
+#' asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata  %>%
+#' gather(time, CATA, 5:25) %>%
+#'  mutate(cons = as.factor(cons), samp = as.factor(samp),
+#'         time = as.numeric(str_extract(time, "\\d+"))),
+#'         loadings.time.structure = "short",
+#'         timecol = "time", attributes = "attribute")
+#' # To quantize the time units in larger intervals, it is possible to specify
+#' # the number of time unit contained in the new intervals in time.quantization
+#'asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata  %>%
+#' gather(time, CATA, 5:25) %>%
+#'  mutate(cons = as.factor(cons), samp = as.factor(samp),
+#'         time = as.numeric(str_extract(time, "\\d+"))),
+#'         time.quantization = 2,
+#'         timecol = "time", attributes = "attribute")
 #' }
 
 asca_tcata <- function(formula, data, timecol, attributes,

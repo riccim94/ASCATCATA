@@ -11,13 +11,17 @@
 #' @import tidyr
 #' @importFrom tibble is_tibble
 #' @importFrom car Anova
+#' @importFrom stats quantile
+#' @importFrom ggplot2 geom_bar
 #' @importFrom EFA.dimensions PROCRUSTES
 #' @importFrom matrixcalc frobenius.norm
 #' @export
 #' @examples
 #' \dontrun{
-#' perm_asca(CATA~(samp+cons)^2, data = tempR::ojtcata, type = "tcata", timecol = "time", attributes = "attribute", nrep = 1000)
-#' describe(dataset, col1, col2)
+#' perm_asca(CATA~(samp+cons)^2, data = tempR::ojtcata  %>%
+#' gather(time, CATA, 5:25) %>%
+#'  mutate(cons = as.factor(cons), samp = as.factor(samp), type = "tcata",
+#' timecol = "time", attributes = "attribute", nrep = 1000)
 #' }
 #'
 
@@ -32,7 +36,10 @@ perm_asca <- function(data, ASCA_object, nrep = 1000,
 
   . <- NULL
   colnames1 <- NULL
-
+F_norm <- NULL
+Component <- NULL
+value <- NULL
+reference <- NULL
 
   if(!is.numeric(nrep)){
     message("'nrep' must be numeric.")
@@ -144,13 +151,13 @@ data_perm <- rbind(data_perm, data_temp )
     }
 
   if(plot == T){
-    data_perm %>% ggplot() + gghistogram(aes(x = F_norm)) +
+    data_perm %>% ggplot() + geom_bar(aes(x = F_norm)) +
        facet_wrap(~ factor, scales = "free")
 
     }
 
   }
-    View(data_perm)
+    #View(data_perm)
 #print(fact)
 
   if("bootstrap" %in% test){
@@ -323,13 +330,15 @@ for(i in names(data_boot)){
 
 
 }
+results <- list(data_boot_2, data_score_2)
+# View(data_boot_2)
+# View(data_boot_2[["cons"]])
+#
+# View(data_score_2)
+# View(data_score_2[["cons"]])
 
-View(data_boot_2)
-View(data_boot_2[["cons"]])
 
-View(data_score_2)
-View(data_score_2[["cons"]])
-
+return(results)
   options(contrasts =  prev_contr)
 
 }
