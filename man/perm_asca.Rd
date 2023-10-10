@@ -8,6 +8,7 @@ perm_asca(
   data,
   ASCA_object,
   nrep = 1000,
+  plot = F,
   test = c("permutation", "bootstrap"),
   ...
 )
@@ -18,6 +19,8 @@ perm_asca(
 \item{ASCA_object}{An object obtained from the functions asca_ti(), asca_tds(), and asca_tcata() from the package ASCATCATA. The model selected must be th one estimated from the data value.}
 
 \item{nrep}{Number of iteration for bootstrap and permutation test, default is 1000.}
+
+\item{plot}{Logical. If TRUE, prints a plot after estimating the permutation test.}
 
 \item{test}{A vector of strings defyning which kind of iteration test will be performed by the function between permutation test (to estimate the statistical significance of the model) and bootstrap test (to define the confidence intervals of the parameters estimated). The application of permutation depends on the presence of the string "permutation" in the vector, and the application of bootstrap dpends on the presence of the string "bootstrap".}
 
@@ -31,7 +34,10 @@ Compute permutation test to validate the results from ANOVA Simultaneous Compone
 }
 \examples{
 \dontrun{
-perm_asca(CATA~(samp+cons)^2, data = tempR::ojtcata, type = "tcata", timecol = "time", attributes = "attribute", nrep = 1000)
+perm_asca(CATA~(samp+cons)^2, data = tempR::ojtcata  \%>\%
+gather(time, CATA, 5:25) \%>\%
+ mutate(cons = as.factor(cons), samp = as.factor(samp), type = "tcata",
+timecol = "time", attributes = "attribute", nrep = 1000)
 describe(dataset, col1, col2)
 }
 

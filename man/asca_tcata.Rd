@@ -37,7 +37,10 @@ Compute ANOVA Simultaneous Component Analysis (ASCA) of Temporal Check All That 
 }
 \examples{
 \dontrun{
-asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata, timecol = "time", attributes = "attribute")
-describe(dataset, col1, col2)
+library(tidyverse)
+asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata  \%>\%
+gather(time, CATA, 5:25) \%>\%
+ mutate(cons = as.factor(cons), samp = as.factor(samp),
+        time = as.numeric(str_extract(time, "\\\\d+"))), timecol = "time", attributes = "attribute")
 }
 }
