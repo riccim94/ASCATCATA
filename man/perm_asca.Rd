@@ -38,7 +38,6 @@ perm_asca(CATA~(samp+cons)^2, data = tempR::ojtcata  \%>\%
 gather(time, CATA, 5:25) \%>\%
  mutate(cons = as.factor(cons), samp = as.factor(samp), type = "tcata",
 timecol = "time", attributes = "attribute", nrep = 1000)
-describe(dataset, col1, col2)
 }
 
 }
