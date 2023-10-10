@@ -43,6 +43,61 @@ Creates bi-plots for each factor decompsed in the ASCA object elaborated by the 
 }
 \examples{
 \dontrun{
+library(tidyverse)
+# According to the type and the structure of the ASCA_obj inserted in the function
+# there will be displayed an according plot.
+
+# For ASCA_TCATA and ASCA_TDS in long structure the data will be
+# displayed using bi-plots for
+# each factor included in the ASCA decomposition.
+
+ASCA_obj <- asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata  \%>\%
+gather(time, CATA, 5:25) \%>\%
+ mutate(cons = as.factor(cons), samp = as.factor(samp),
+        time = as.numeric(str_extract(time, "\\\\d+"))), timecol = "time",
+        attributes = "attribute")
+
 plot_ASCA(ASCA_obj, object = 1:3)
+
+# For ASCA_TCATA and ASCA_TDS in short structure, the results
+# will be displayed in line plots for each component, with barplots
+# reporting the loading values
+
+ASCA_obj <- asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata  \%>\%
+gather(time, CATA, 5:25) \%>\%
+ mutate(cons = as.factor(cons), samp = as.factor(samp),
+        time = as.numeric(str_extract(time, "\\\\d+"))), timecol = "time",
+        attributes = "attribute", loadings.time.structure = "short")
+
+plot_ASCA(ASCA_obj)
+
+# It is possible to define only one or more factors to be reported using
+# `object`, can be defined using a string or a numerical value.
+
+plot_ASCA(ASCA_obj, object = "cons")
+
+# For ASCA_TI object the results will be reported in biplots
+
+ASCA_obj <- asca_ti(CATA~(sample+assessor)^2,
+data = read_excel("time-intensity-data_0.xlsm") \%>\%
+gather(time, intensity, 6:36), timecol = "time")
+
+plot_ASCA(ASCA_obj)
+
+# using the `axes` parameter is possible to specify which axes will be
+# displayed in the plot
+
+plot_ASCA(ASCA_obj, axes = c(2,3))
+
+# Estethic parameters can be addd or removed specifying TRUE or FALSE towards
+ # the parameters density, path, and path.smooth
+
+plot_ASCA(ASCA_obj, density = TRUE, path = FALSE, path.smooth = FALSE)
+
+# for data in long structure it is possible to apply a hierachical
+clustering procedure indicating the number of desidered clusters in h_clus+
+
+plot_ASCA(ASCA_obj, h_clus = 3)
+
 }
 }
