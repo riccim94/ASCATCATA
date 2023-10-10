@@ -25,7 +25,34 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' plot_time_loadings(ASCA_obj, object = 1:3, axes = c(1,2), print = T)
+#' # The function creates two plots from an ASCA_obj in long format
+#'
+#' ASCA_obj <- asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata  %>%
+#' gather(time, CATA, 5:25) %>%
+#'  mutate(cons = as.factor(cons), samp = as.factor(samp),
+#'         time = as.numeric(str_extract(time, "\\d+"))), timecol = "time",
+#'         attributes = "attribute")
+#'
+#' plot_time_loadings(ASCA_obj)
+#'
+#' # it is possible to define which are the factor considered using the object
+#' # parameter, to define wich factors will be reported in the plots
+#'
+#' plot_time_loadings(ASCA_obj, object = 1:2)
+#'
+#' #On default settings, the function reports the estimation of the contribution
+#' # on the overall variance of each attribute among time.
+#' # To report the loading values it is necessary to define `choice` = "loadings",
+#' # once it is defined, the function reports a line plot presenting the loading values
+#' # among time for each attribute.
+#'
+#' plot_time_loadings(ASCA_obj, choice = "loadings")
+#'
+#' # It is possible to define for which axes the contribution or
+#' # the loading values will be reported. You can define them at the axes variable
+#'
+#' plot_time_loadings(ASCA_obj, axes = c(2,3))
+#'
 #' }
 
 plot_time_loadings <- function(
