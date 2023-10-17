@@ -7,6 +7,7 @@
 #' @param density Logical. Superimpose a 2-dimensional density plot, indicating th distribution of the temporal resolved loadings according to their density. Default is FLASE.
 #' @param h_clus Numeric. Indicates wether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.
 #' @param point.size A numeric value defining the size of the points of the score values.
+#' @param max.overlaps.value Numeric, default is 10. Define the maximum number of overlaps allowed for text in the plots.
 #' @param print Logical. Indicates wether or not to print the plots.
 #' @return A series of plots representing the scores of the ASCA decomposition and the values of the loadings of the same ASCA decomposition.
 #' @import dplyr
@@ -109,6 +110,7 @@ plot_ASCA <- function(
     axes = c(1,2), path = T, density = F,
     path.smooth = T,
     h_clus = NULL,
+    max.overlaps.value = 10,
     point.size = 2){
 
   if(is.na(object)){
@@ -237,10 +239,16 @@ if(density){
     scale_y_continuous(labels = unicode_minus) + theme_minimal() +
       {if(is.numeric(h_clus)){
         geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
-          label = col_p, color = cluster), data = data_plot)
+          label = col_p, color = cluster),
+          max.overlaps = getOption("ggrepel.max.overlaps",
+                                   default = max.overlaps.value),
+          data = data_plot)
         }else{
           geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
-            label = col_p), data = data_plot) }} +
+            label = col_p),
+            max.overlaps = getOption("ggrepel.max.overlaps",
+                                     default = max.overlaps.value),
+            data = data_plot) }} +
     theme(legend.position = "none") +
     guides(color = "none", alpha = "none") +
     xlab(axe_x_title) + ylab(axe_y_title)
@@ -405,10 +413,16 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
       scale_y_continuous(labels = unicode_minus) + theme_minimal() +
       {if(is.numeric(h_clus)){
         geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
-                            label = col_p, color = cluster), data = data_plot)
+          label = col_p, color = cluster),
+          max.overlaps = getOption("ggrepel.max.overlaps",
+                                   default = max.overlaps.value),
+          data = data_plot)
       }else{
         geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
-                            label = col_p), data = data_plot) }} +
+            label = col_p),
+            max.overlaps = getOption("ggrepel.max.overlaps",
+                                     default = max.overlaps.value),
+              data = data_plot) }} +
       theme(legend.position = "none") +
       guides(color = "none", alpha = "none") +
       xlab(axe_x_title) + ylab(axe_y_title)
