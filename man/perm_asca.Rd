@@ -9,6 +9,7 @@ perm_asca(
   ASCA_object,
   nrep = 1000,
   plot = F,
+  confidence = 0.95,
   test = c("permutation", "bootstrap"),
   ...
 )
@@ -21,6 +22,8 @@ perm_asca(
 \item{nrep}{Number of iteration for bootstrap and permutation test, default is 1000.}
 
 \item{plot}{Logical. If TRUE, prints a plot after estimating the permutation test.}
+
+\item{confidence}{Numeric, values from 0 to 1. Indicates the probability applied for the estimation of the confidence interval via bootstrapping.}
 
 \item{test}{A vector of strings defyning which kind of iteration test will be performed by the function between permutation test (to estimate the statistical significance of the model) and bootstrap test (to define the confidence intervals of the parameters estimated). The application of permutation depends on the presence of the string "permutation" in the vector, and the application of bootstrap dpends on the presence of the string "bootstrap".}
 
