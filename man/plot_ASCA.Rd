@@ -13,6 +13,7 @@ plot_ASCA(
   density = F,
   path.smooth = T,
   h_clus = NULL,
+  max.overlaps.value = 10,
   point.size = 2
 )
 }
@@ -32,6 +33,8 @@ plot_ASCA(
 \item{path.smooth}{Logical. Adds a path smoothed indicating the position of the loadings according to their cronological order. Default is TRUE.}
 
 \item{h_clus}{Numeric. Indicates wether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.}
+
+\item{max.overlaps.value}{Numeric, default is 10. Define the maximum number of overlaps allowed for text in the plots.}
 
 \item{point.size}{A numeric value defining the size of the points of the score values.}
 }
