@@ -4,6 +4,7 @@
 #' @param test A vector of strings defyning which kind of iteration test will be performed by the function between permutation test (to estimate the statistical significance of the model) and bootstrap test (to define the confidence intervals of the parameters estimated). The application of permutation depends on the presence of the string "permutation" in the vector, and the application of bootstrap dpends on the presence of the string "bootstrap".
 #' @param nrep Number of iteration for bootstrap and permutation test, default is 1000.
 #' @param plot Logical. If TRUE, prints a plot after estimating the permutation test.
+#' @param confidence Numeric, values from 0 to 1. Indicates the probability applied for the estimation of the confidence interval via bootstrapping.
 #' @param ... Optional parameters
 #' @return A list of objects containing the results of ASCA decomposition of a structured dataset.
 #' @import dplyr
@@ -12,7 +13,7 @@
 #' @importFrom tibble is_tibble
 #' @importFrom car Anova
 #' @importFrom stats quantile
-#' @importFrom ggplot2 geom_bar
+#' @importFrom ggplot2 geom_histogram
 #' @importFrom EFA.dimensions PROCRUSTES
 #' @importFrom matrixcalc frobenius.norm
 #' @export
@@ -28,6 +29,7 @@
 
 perm_asca <- function(data, ASCA_object, nrep = 1000,
                       plot = F,
+                      confidence = 0.95,
                       test = c("permutation", "bootstrap"),
                       ...){
 
@@ -40,6 +42,9 @@ F_norm <- NULL
 Component <- NULL
 value <- NULL
 reference <- NULL
+plot_perm <- NULL
+real_norm <- NULL
+p_values <- NULL
 
   if(!is.numeric(nrep)){
     message("'nrep' must be numeric.")
@@ -89,20 +94,17 @@ if(!(ASCA_object[["info"]][["type"]] %in% c("TI_ASCA", "TDS_ASCA", "TCATA_ASCA")
     for(j in 1:nrep){
 
 
-      data1 %>%
-        mutate_at(vars(fact), as.factor) %>%
+      data1 %>% mutate_at(vars(fact), as.factor) %>%
         split(dplyr::select(., timecol)) %>%
         map(~droplevels(.) %>% split(., dplyr::select(., attributes)) %>%
               map(~droplevels(.) %>%
                     mutate_at(vars(fact), function(x){sample(x)} ) %>%
                     dplyr::select(timecol, attributes, fact, ref) %>%
-                    data.frame(
-                      effect = predict(
+                    data.frame(effect = predict(
                         glm(as.formula(formula),
                             data = mutate_at(., vars(ref), scale),
-                            family = gaussian()),
-                        type = "terms")) ) %>%
-              plyr::ldply(., data.frame) ) %>%
+                            family = gaussian()), type = "terms"))) %>%
+              plyr::ldply(., data.frame)) %>%
         plyr::ldply(., data.frame) %>% mutate(n = j) -> data2
 
 
@@ -135,26 +137,41 @@ if(!(ASCA_object[["info"]][["type"]] %in% c("TI_ASCA", "TDS_ASCA", "TCATA_ASCA")
             mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
             mutate_all(., function(x){x <- x - mean(x, na.rm = T)}) %>%
             prcomp() %>% .$x %>% matrixcalc::frobenius.norm(.),
-            factor = name2,
-            rep = j )
-
-
-
+            factor = name2, rep = j)
         }
 
-
-
-data_perm <- rbind(data_perm, data_temp )
+data_perm <- rbind(data_perm, data_temp)
 
       }
 
     }
 
-  if(plot == T){
-    data_perm %>% ggplot() + geom_bar(aes(x = F_norm)) +
-       facet_wrap(~ factor, scales = "free")
+    real_norm <- ASCA_object %>% .[fact] %>%
+      lapply(., function(x){matrixcalc::frobenius.norm(x$x)}) %>%
+      as.data.frame() %>% gather(factor, norm)
 
+  if(plot){
+plot_perm <- data_perm %>% ggplot() +
+  geom_histogram(aes(x = F_norm), bins = 50) +
+  geom_vline(aes(xintercept = norm), linetype = 2, size = 1, color = "red",
+    data = real_norm) +
+  facet_wrap(~ factor, scales = "free") +
+  theme_minimal()
+ print(plot_perm)
     }
+
+    #message(paste0("The estimated p.value considering the Frobenius norm is: "))
+
+    p_values <- real_norm %>% group_by(factor) %>%
+      do(mutate(., p_value = mean(unique(norm) < (filter(
+        data_perm, factor == unique(.$factor)) %>%
+          droplevels() %>% .$F_norm)))) %>% slice(1) %>% ungroup() %>%
+      dplyr::select(-norm)
+
+    #print(p_values)
+apply(p_values, 1, function(x){
+  print(paste0("The p.value estimated for the factor ", x[1], " is: ", x[2]))
+  })
 
   }
     #View(data_perm)
@@ -180,10 +197,10 @@ data_score <- list()
                 # filter(!is.na(!!sym(ref))) %>% droplevels() %>%
                 #colnames() %>% print()
                 #View()
-                mutate_at(vars(ref), function(x){
-                  if(sum(x, na.rm = T) < 5){
-                    x <- replace(x, sample(1:length(x),5),1)
-                    }else{x} }) %>%
+                 mutate_at(vars(ref), function(x){
+                   if(sum(x, na.rm = T) < 5){
+                     x <- replace(x, sample(1:length(x),5),1)
+                     }else{x} }) %>%
                 mutate_at(., vars(ref), scale) %>%
                 #  .[, as.character(ref)] %>%
                 #.$CATA %>% summary() %>% print()
@@ -310,8 +327,10 @@ for(i in names(data_boot)){
       gather(Component, value, -reference) %>%
       group_by(reference, Component) %>%
       summarize(
-        low = as.numeric(quantile(value, probs = 0.025, na.rm = T)),
-        high = as.numeric(quantile(value, probs = 0.975, na.rm = T))) %>%
+        low = as.numeric(quantile(
+          value, probs = 0 + ((1-confidence)/2), na.rm = T)),
+        high = as.numeric(quantile(
+          value, probs = 1 - ((1-confidence)/2), na.rm = T))) %>%
       ungroup() )#s %>% as.data.frame()
 
 
@@ -330,7 +349,7 @@ for(i in names(data_boot)){
 
 
 }
-results <- list(data_boot_2, data_score_2)
+results <- list(Loadings = data_boot_2, Scores = data_score_2)
 # View(data_boot_2)
 # View(data_boot_2[["cons"]])
 #
