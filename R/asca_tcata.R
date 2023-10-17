@@ -239,8 +239,8 @@ temp <- data1 %>%
   group_by_at(vars(as.name(timecol), as.name(attributes))) %>%
   do(mutate(., Sum.Sq_ = Sum.Sq/sum(Sum.Sq))) %>%
   ungroup() %>% mutate(reference = sum(Sum.Sq_)) %>%
-  group_by(Factor) %>% summarize(Sum.Sq = sum(Sum.Sq_)/reference) %>%
-  slice(1) %>% ungroup()
+  group_by(Factor) %>% reframe(Sum.Sq = sum(Sum.Sq_)/reference) %>%
+  group_by(Factor) %>% slice(1) %>% ungroup()
 
 
 
