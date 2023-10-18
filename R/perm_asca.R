@@ -19,10 +19,16 @@
 #' @export
 #' @examples
 #' \dontrun{
-#' perm_asca(CATA~(samp+cons)^2, data = tempR::ojtcata  %>%
+#'
+#'data.long <- tempR::ojtcata  %>%
 #' gather(time, CATA, 5:25) %>%
-#'  mutate(cons = as.factor(cons), samp = as.factor(samp), type = "tcata",
-#' timecol = "time", attributes = "attribute", nrep = 1000)
+#'  mutate(cons = as.factor(cons), samp = as.factor(samp),
+#'         time = as.numeric(str_extract(time, "\\d+")))
+#'
+#'ASCA_model <- asca_tcata(CATA~(samp+cons)^2, data = data.long, timecol = "time",
+#'         attributes = "attribute")
+#' perm_model <- perm_asca(data = data.long, ASCA_object = ASCA_model,
+#' nrep = 1000)
 #' }
 #'
 

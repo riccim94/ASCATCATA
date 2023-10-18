@@ -28,7 +28,9 @@
 #' @examples
 #' \dontrun{
 #'
-#' #first of all a dataset of Time Intensity data is used. An open Time Intensity is taken from the website https://help.xlstat.com/dataset/time-intensity-data_0.xlsm
+#' #first of all a dataset of Time Intensity data is used.
+#' # An open Time Intensity dataset is downloaded from the website
+#' # https://help.xlstat.com/dataset/time-intensity-data_0.xlsm
 #'library(readxl)
 #'library(tidyverse)
 #'library(httr)
