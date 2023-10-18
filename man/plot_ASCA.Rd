@@ -22,7 +22,7 @@ plot_ASCA(
 
 \item{object}{A vector of string or numbers indicating which parameter of the ASCA decomposition will be plotted}
 
-\item{print}{Logical. Indicates wether or not to print the plots.}
+\item{print}{Logical. Indicates whether or not to print the plots.}
 
 \item{axes}{A numeric vector indicating two numbers indicating the axes of the ASCA decomposition.}
 
@@ -32,7 +32,7 @@ plot_ASCA(
 
 \item{path.smooth}{Logical. Adds a path smoothed indicating the position of the loadings according to their cronological order. Default is TRUE.}
 
-\item{h_clus}{Numeric. Indicates wether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.}
+\item{h_clus}{Numeric. Indicates whether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.}
 
 \item{max.overlaps.value}{Numeric, default is 10. Define the maximum number of overlaps allowed for text in the plots.}
 
