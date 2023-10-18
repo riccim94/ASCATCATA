@@ -60,6 +60,12 @@
 asca_tcata <- function(formula, data, timecol, attributes,
                      loadings.time.structure = "long",
                      time.quantization = NULL, ...){
+  if(!loadings.time.structure %in% c("long", "short")){
+    message("The values assigned to loadings.time.structure must be only 'long' or 'short'. Other values are invalid");
+    stop()
+  }
+
+
   prev_contr <- options()$contrasts
   options(contrasts =  rep("contr.sum", 2))
   colref <- NULL
@@ -74,11 +80,6 @@ asca_tcata <- function(formula, data, timecol, attributes,
 
   data3 <- list()
 
-  if(!loadings.time.structure %in% c("long", "short")){
-    message("The values assigned to loadings.time.structure must be only 'long' or 'short'. Other values are invalid");
-    #return(NULL)
-    stop()
-  }
 
 
 
@@ -128,13 +129,14 @@ data2 <- data2 %>% map(., ~plyr::ldply(., function(x){as.data.frame(x) %>%
    for(i in (length(colnames1)+1):ncol(data2)){
      anchor <- names(data2)[i]
      name <- anchor %>% str_remove(., "^effect.") %>% str_split_1(., "\\.")
-     name2 <- paste(name, collapse = "_") %>% str_remove(., "_1$")
+     name2 <- paste(name, collapse = ":") %>% str_remove(., "_1$")
      refk <- c("refk")
 
 data2 %>% .[,c(1:2, i)] %>% cbind(data2 %>% .[,3:length(colnames1)] %>%
   .[, names(.) %in% name] %>% as.data.frame(.) %>% ifelse(!is.null(ncol(.)),
-  unite(., col = name2, sep = "_"), .)) %>%
+  unite(., col = name2, sep = ":"), .)) %>%
   `colnames<-`(c(names(data2)[c(1,2,i)], name2)) -> temp;
+
 if(loadings.time.structure == "long"){
    temp[refk] <- paste0(temp[,as.character(timecol)], "_",
                temp[,as.character(attributes)])
@@ -195,6 +197,11 @@ data3[["Residuals"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
   dplyr::select(., -c(as.character(fact))) %>%
   mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
   prcomp()
+
+data3[["Parameters"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
+  .[,names(.) %in% c(fact, refk, "residuals", "fitted")] %>%
+  separate(refk, c("time", "attribute"), sep = "_")
+
 }
 
 
@@ -211,12 +218,14 @@ if(loadings.time.structure == "short"){
     dplyr::select(., -c(as.character(fact))) %>%
     mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
     prcomp()
+
+  data3[["Parameters"]] <- temp %>% dplyr::select(-refk) %>%
+    .[,names(.) %in% c(fact,  "residuals", "fitted", timecol, attributes)]
+
 }
 
 
-data3[["Parameters"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
-  .[,names(.) %in% c(fact, refk, "residuals", "fitted")] %>%
-  separate(refk, c("time", "attribute"), sep = "_")
+
 
 
 #SSum of squares

@@ -5,10 +5,10 @@
 #' @param path Logical. Adds a path indicating the position of the loadings according to their cronological order. Default is TRUE.
 #' @param path.smooth Logical. Adds a path smoothed indicating the position of the loadings according to their cronological order. Default is TRUE.
 #' @param density Logical. Superimpose a 2-dimensional density plot, indicating th distribution of the temporal resolved loadings according to their density. Default is FLASE.
-#' @param h_clus Numeric. Indicates wether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.
+#' @param h_clus Numeric. Indicates whether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.
 #' @param point.size A numeric value defining the size of the points of the score values.
 #' @param max.overlaps.value Numeric, default is 10. Define the maximum number of overlaps allowed for text in the plots.
-#' @param print Logical. Indicates wether or not to print the plots.
+#' @param print Logical. Indicates whether or not to print the plots.
 #' @return A series of plots representing the scores of the ASCA decomposition and the values of the loadings of the same ASCA decomposition.
 #' @import dplyr
 #' @import purrr
@@ -292,7 +292,7 @@ if(ASCA_obj %>% .[["info"]] %>% .[["structure"]] == "short"){
 if(names(ASCA_obj)[reference] != "Residuals" & reference != "Residuals"){
   data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
       as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.)) %>%
-      separate(col_p, c("time", "levels")) %>%
+      separate(col_p, c("time", "levels"), sep = "_") %>%
     gather(Component, Score, 1:2) %>% mutate(time = as.numeric(time))
   pl <- ggplot()
   pl <- pl + geom_line(aes(x = time, y = Score, color = levels), data_plot) +

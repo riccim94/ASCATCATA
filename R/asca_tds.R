@@ -1,9 +1,10 @@
 #' Compute ANOVA Simultaneous Component Analysis (ASCA) of Temporal Dominant Sensation (TDS) data.
 #' @param data A data frame, or object coercible by as.data.frame to a data frame, containing the variables in the model. It must be in long format and must contain a column for Temporal Dominant Sensation binary data, a column reporting the time values, and a column that defines the attributes analyzed.
-#' @param formula An object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. The formula will be applied for each atttribut at each time interval defined by the timecol column
+#' @param formula An object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. The formula will be applied for each atttribute at each time interval defined by the timecol column.
 #' @param timecol A string containing the name of the column indicating the time intervals of the TDS dataset.
 #' @param attributes A string containing the name of the column indicating the attributes of the TDS.
 #' @param time.quantization A single number reporting the number of time units contained in the new intervals used to quantize the time column.
+#' @param loadings.time.structure A string that specifies whether the estimation of the ASCA decomposition has to be done putting each time unit in the loading values or in the scores values. Standard is "long", for multiple loadings values for each combination of time and attributes. If it is specified "short", the score values will be defined as the combination of ach level of the factor and each unit of time, and the loadings will be the attributes overall values.
 #' @param ... Optional parameters
 #' @return A list of objects containing the results of ASCA decomposition of a structured dataset.
 #' @import dplyr
@@ -29,17 +30,40 @@
 #' @examples
 #' \dontrun{
 #' asca_tds(CATA~(sample+assessor)^2, data = tempR::bars %>%
-#' gather( time, CATA, 5:455),timecol = "time", attributes = "attribute")
+#' gather( time, CATA, 5:455)  %>% mutate(time = str_extract(time, "\\d+\\.\\d")),
+#' timecol = "time", attributes = "attribute")
 #' # To quantize the time units in larger intervals, it is possible to
 #'  # specify the number of time unit contained in the new intervals
 #'  # in time.quantization
 #' asca_tds(CATA~(sample+assessor)^2, data = tempR::bars %>%
-#' gather( time, CATA, 5:455),timecol = "time", attributes = "attribute",
+#' gather( time, CATA, 5:455) %>% mutate(time = str_extract(time, "\\d+\\.\\d")),
+#' timecol = "time", attributes = "attribute",
 #' time.quantization = 2)
+#'
+#' # To estimate Score values for each unit of time for each level
+#' # of the factors included it is necessary to specify
+#' # loadings.time.structure == "short"
+#'
+#' asca_tds(CATA~(sample+assessor)^2, data = tempR::bars %>%
+#' gather( time, CATA, 5:455) %>% mutate(time = str_extract(time, "\\d+\\.\\d")),
+#' timecol = "time", attributes = "attribute",
+#' loadings.time.structure = "short")
+#'
 #' }
 
-asca_tds <- function(formula, data, timecol, attributes,
+asca_tds <- function(formula,
+                     data,
+                     timecol,
+                     attributes,
+                     loadings.time.structure = "long",
                      time.quantization = NULL, ...){
+
+  if(!loadings.time.structure %in% c("long", "short")){
+    message("The values assigned to loadings.time.structure must be only 'long' or 'short'. Other values are invalid");
+    stop()
+  }
+
+
   prev_contr <- options()$contrasts
   options(contrasts =  rep("contr.sum", 2))
   colref <- NULL
@@ -93,13 +117,15 @@ asca_tds <- function(formula, data, timecol, attributes,
   for(i in (length(colnames1)+1):ncol(data2)){
     anchor <- names(data2)[i]
     name <- anchor %>% str_remove(., "^effect.") %>% str_split_1(., "\\.")
-    name2 <- paste(name, collapse = "_") %>% str_remove(., "_1$")
+    name2 <- paste(name, collapse = ":") %>% str_remove(., "_1$")
     refk <- c("refk")
 
     data2 %>% .[,c(1:2, i)] %>% cbind(data2 %>% .[,3:length(colnames1)] %>%
       .[, names(.) %in% name] %>% as.data.frame(.) %>% ifelse(!is.null(ncol(.)),
-                                                                                                unite(., col = name2, sep = "_"), .)) %>%
+          unite(., col = name2, sep = ":"), .)) %>%
       `colnames<-`(c(names(data2)[c(1,2,i)], name2)) -> temp;
+
+    if(loadings.time.structure == "long"){
     temp[refk] <- paste0(temp[,as.character(timecol)], "_",
                          temp[,as.character(attributes)])
 
@@ -111,6 +137,23 @@ asca_tds <- function(formula, data, timecol, attributes,
       mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
       mutate_all(., function(x){x <- x - mean(x, na.rm = T)}) %>%
       prcomp()
+    }
+
+    if(loadings.time.structure == "short"){
+
+      temp[refk] <- paste0(temp[,as.character(timecol)], "_",
+                           temp[,as.character(name2)])
+
+      data3[[name2]] <- temp %>% dplyr::select(-timecol) %>%
+        dplyr::select(-c(name2)) %>%
+        group_by_at(vars(as.name(refk), as.name(attributes))) %>% slice(1) %>%
+        ungroup() %>%
+        pivot_wider(names_from = attributes, values_from = as.symbol(anchor)) %>%
+        column_to_rownames(refk) %>%
+        mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
+        mutate_all(., function(x){x <- x - mean(x, na.rm = T)}) %>% prcomp()
+    }
+
 
   }
 
@@ -130,18 +173,53 @@ asca_tds <- function(formula, data, timecol, attributes,
     dplyr::select(-ref, -timecol) %>% `colnames<-`(
       c(as.character(timecol),names(.)[2:length(names(.))])) -> temp
 
-  temp[refk] <- paste0(temp[,as.character(timecol)], "_",
-                       temp[,as.character(attributes)])
+  if(loadings.time.structure == "long"){
+    temp[refk] <- paste0(temp[,as.character(timecol)], "_",
+                         temp[,as.character(attributes)])
 
-  data3[["Parameters"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
-    .[,names(.) %in% c(fact, refk, "residuals", "fitted")] %>%
-    separate(refk, c("time", "attribute"), sep = "_")
+    data3[["Residuals"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
+      .[,names(.) %in% c(fact, refk, "residuals")] %>% group_by(refk) %>%
+      do(mutate(., colref = 1:nrow(.))) %>% ungroup() %>%
+      pivot_wider(names_from = refk, values_from = residuals) %>%
+      dplyr::select(-colref) %>% mutate_at(.,
+                                           colnames(.)[!(colnames(.) %in% as.character(fact))], scale) %>%
+      dplyr::select(., -c(as.character(fact))) %>%
+      mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
+      prcomp()
+
+    data3[["Parameters"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
+      .[,names(.) %in% c(fact, refk, "residuals", "fitted")] %>%
+      separate(refk, c("time", "attribute"), sep = "_")
+
+  }
+
+
+  if(loadings.time.structure == "short"){
+    temp[refk] <- paste0(temp[,as.character(attributes)])
+    #print(name2)
+    data3[["Residuals"]] <- temp %>% dplyr::select(-attributes) %>%
+      .[,names(.) %in% c(c(as.character(fact)), refk, "residuals")] %>%
+      group_by(refk) %>%
+      do(mutate(., colref = 1:nrow(.))) %>% ungroup() %>%
+      pivot_wider(names_from = refk, values_from = residuals) %>%
+      dplyr::select(-colref) %>% mutate_at(.,
+                                           colnames(.)[!(colnames(.) %in% as.character(fact))], scale) %>%
+      dplyr::select(., -c(as.character(fact))) %>%
+      mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
+      prcomp()
+
+    data3[["Parameters"]] <- temp %>% dplyr::select(-refk) %>%
+      .[,names(.) %in% c(fact, "residuals", "fitted", timecol, attributes)]
+  }
+
+
+
 
 
 
    #View(data2)
    #View(data3)
-  data3[["info"]][["structure"]] <- "long"
+  data3[["info"]][["structure"]] <- loadings.time.structure
   data3[["info"]][["type"]] <- "TDS_ASCA"
   data3[["info"]][["timecol"]] <- unique(data[,as.character(timecol)])
   data3[["info"]][["attributes"]] <- unique(data %>%
