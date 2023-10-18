@@ -89,7 +89,26 @@ plot_ASCA(test_tds)
 
 ![](Images/plot_tds_3.png)
 
-It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function.
+It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function. By defining a number or the name of the factor in **object** it is possible to select which plot will be printed. Specifying the logical value of **density**, **path**, and **path.smooth** is possible to modify the aestethic of the plot.
+
+``` r
+plot_ASCA(test_tds, object = 1, density = T, path = F, path.smooth = F)
+
+```
+![](Images/ASCA_plot_tds_density.tds)
+
+``` r
+test_tds_short <- asca_tds(CATA~(sample+assessor)^2, data = data.long, timecol = "time", attributes = "attribute", loadings.time.structure = "short")
+
+plot_ASCA(test_tds_short)
+
+```
+
+![](Images/ASCA_plot_tds_s_1.png)
+
+![](Images/ASCA_plot_tds_s_2.png)
+
+![](Images/ASCA_plot_tds_s_3.png)
 
 It is possible to plot the contribution of each attribute on the overall variability for each factor adopting the function plot_time_loadings()
 
