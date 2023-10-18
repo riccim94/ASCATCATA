@@ -35,10 +35,12 @@ This function applies ASCA decomposition to a Time-intensity (TDS) dataset. It i
 #first of all a dataset of Time Intensity data is used. An open Time Intensity is taken from the website https://help.xlstat.com/dataset/time-intensity-data_0.xlsm
 library(readxl)
 library(httr)
+library(tidyverse)
 url1 <- "https://help.xlstat.com/dataset/time-intensity-data_0.xlsm"
 
-GET(url1, write_disk(tf <- tempfile(fileext = ".xls")))
-data <- read_excel(tf, 2L)
+GET(url1, write_disk(tf <- tempfile(fileext = ".xlsm")))
+tf <- str_replace_all(tf, "\\\\", "//")
+data <- read_excel(tf)
 data.long <- data %>% gather(time, intensity, 6:36) %>% filter(time != "0") %>% droplevels()
 #the function is then applied on the dataset, defining the formula applied by the ASCA decomposition and the column containing the time column
 test_ti <- asca_ti(intensity ~ PANELIST+PRODUCT, data = data.long, timecol = "time")
