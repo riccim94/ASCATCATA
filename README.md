@@ -95,7 +95,7 @@ It is possible to select different arrangements for the depiction of loading val
 plot_ASCA(test_tds, object = 1, density = T, path = F, path.smooth = F)
 
 ```
-![](Images/ASCA_plot_tds_density.tds)
+![](Images/ASCA_plot_tds_density.png)
 
 ``` r
 test_tds_short <- asca_tds(CATA~(sample+assessor)^2, data = data.long, timecol = "time", attributes = "attribute", loadings.time.structure = "short")
