@@ -30,15 +30,18 @@ Compute ANOVA Simultaneous Component Analysis (ASCA) of Time Intensity (TI) data
 # An open Time Intensity dataset is downloaded from the website
 # https://help.xlstat.com/dataset/time-intensity-data_0.xlsm
 library(readxl)
-library(tidyverse)
+library(tidyr)
+library(stringr)
 library(httr)
 url1 <- "https://help.xlstat.com/dataset/time-intensity-data_0.xlsm"
 GET(url1, write_disk(tf <- tempfile(fileext = ".xlsm")))
 tf <- str_replace_all(tf, "\\\\\\\\", "//")
 data <- read_excel(tf)
-data.long <- data \%>\% gather(time, intensity, 6:36) \%>\% droplevels()
+data.long <- data \%>\%
+pivot_longer(names_to = "time", values_to = "intensity", cols = 6:36) \%>\%
+droplevels()
 
-asca_ti(intensity~(PRODUCT+PANELIST)^2,
+asca_ti(intensity~PRODUCT*PANELIST,
 data = data.long,timecol = "time")
 }
 }
