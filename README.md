@@ -29,7 +29,7 @@ The package offers a set of functions to analyze three different kinds of dynami
   ***
 
 ### asca_ti
-This function applies ASCA decomposition to a Time-intensity (TDS) dataset. It is required that the dataset is put in a long format. The decomposition applied is based on the assumption of a normal data distribution. Each decomposition is applied to each unit of time.  
+This function applies ASCA decomposition to a Time-Intensity (TI) dataset. It is required that the dataset is put in a long format. The decomposition applied is based on the assumption of a normal data distribution. Each decomposition is applied to each unit of time.  
 
 ``` r
 #first of all a dataset of Time Intensity data is used. An open Time Intensity is taken from the website https://help.xlstat.com/dataset/time-intensity-data_0.xlsm
