@@ -107,8 +107,7 @@ if(ASCA_obj[["info"]][["type"]] %in% c("TDS_ASCA", "TCATA_ASCA")){
 }
 
   if(ASCA_obj[["info"]][["type"]] == "TI_ASCA"){
-    contrib %>%
-      group_by(Factor, Class) %>%
+    contrib %>% group_by(Factor, Class) %>%
       summarize(contrib = sum(contrib)) %>% ungroup() %>%
       mutate(contrib_text = as.character(round(contrib,2)),
              Class = as.numeric(Class)) %>% ungroup() %>%
@@ -133,10 +132,14 @@ if("factors" %in% ref){
     geom_line(aes(x = Class, y = contrib, color = Attributes), size = 0.8) +
     xlab("time") + ylab(ylab_text) +
     facet_wrap(~Factor, scales = "free") + theme_minimal() +
-    ggtitle(title, subtitle = subtitle) +
+    {
+      if(choice== "loadings"){
+        geom_hline(yintercept = 0, linetype = 2)
+      }
+    } + ggtitle(title, subtitle = subtitle) +
     theme(legend.position = "bottom",
-      plot.title = element_text(hjust = 0.5, family = "bold"),
-      plot.subtitle = element_text(hjust = 0.5, family = "italic"),
+      plot.title = element_text(hjust = 0.5, face = "bold"),
+      plot.subtitle = element_text(hjust = 0.5, face = "italic"),
       axis.text = element_text(color = "black")) +
     scale_x_continuous(
       breaks = seq(0, max(data$Class, na.rm = T),5))
@@ -147,13 +150,17 @@ if("attributes" %in% ref){
     geom_line(aes(x = Class, y = contrib, color = Factor), size = 0.8) +
     xlab("time") + ylab(ylab_text) +
     facet_wrap(~Attributes, scales = "free") +
-    theme_minimal() +
+    {
+      if(choice== "loadings"){
+        geom_hline(yintercept = 0, linetype = 2)
+      }
+    } + theme_minimal() +
     ggtitle(title, subtitle = subtitle) +
     theme(
       legend.position = "bottom",
       axis.text = element_text(color = "black"),
-      plot.subtitle = element_text(hjust = 0.5, family = "italic"),
-      plot.title = element_text(hjust = 0.5, family = "bold")) +
+      plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+      plot.title = element_text(hjust = 0.5, face = "bold")) +
     scale_x_continuous(breaks = seq(0,max(data$Class, na.rm = T),5))
 }
 }
@@ -167,15 +174,18 @@ if(ASCA_obj[["info"]][["type"]] == "TI_ASCA"){
     theme(
       legend.position = "bottom",
       axis.text = element_text(color = "black"),
-      plot.subtitle = element_text(hjust = 0.5, family = "italic"),
-      plot.title = element_text(hjust = 0.5, family = "bold")) +
+      plot.subtitle = element_text(hjust = 0.5, face = "italic"),
+      plot.title = element_text(hjust = 0.5, face = "bold")) +
     scale_x_continuous(breaks = seq(0,max(data$Class, na.rm = T),5))
 }
 
 
 
-if(print){print(resulting_plots[[ref]])}
-return(resulting_plots)
+if(print){
+  print(resulting_plots)
+  }
+
+invisible(resulting_plots)
 
 }
 

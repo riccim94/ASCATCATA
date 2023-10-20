@@ -65,7 +65,8 @@ asca_tds <- function(formula,
 
 
   prev_contr <- options()$contrasts
-  options(contrasts =  rep("contr.sum", 2))
+  options(contrasts =  rep("contr.sum", 2),
+          dplyr.show_progress = F)
   colref <- NULL
   . <-NULL
   formula_ <- formula
@@ -73,19 +74,14 @@ asca_tds <- function(formula,
   data3 <- list()
 
   ref <- formula[[2L]]
-  fact <- as.character(formula[[3L]]) %>% as.vector() %>%
-    str_split(., "[+*:]", simplify = T) %>% str_trim() %>%
-    .[str_detect(., ".+")] %>% .[!str_detect(.,"^\\^")] %>%
-    .[!str_detect(.,"^\\d")] %>% str_remove(., "^\\(") %>%
-    str_remove(., "\\)$")
+  fact <- all.vars(formula) %>% .[!(. %in% as.character(ref))]
   timecol <- as.symbol(timecol)
   attributes <- as.symbol(attributes)
   if(!is.null(time.quantization)){
     data <- mutate_at(data, vars(timecol),
                       function(x){x <- cut(x, round(x/time.quantization))})
   }
-#print(fact)
-# str(fact)
+
   data1 <- data %>% group_by_at(vars(as.name(timecol), as.name(attributes))) %>%
      do(filter(., length(pull(unique(.[, ref]))) != 1) %>% droplevels()) %>%
      ungroup() %>% droplevels()
@@ -196,7 +192,7 @@ asca_tds <- function(formula,
 
   if(loadings.time.structure == "short"){
     temp[refk] <- paste0(temp[,as.character(attributes)])
-    #print(name2)
+
     data3[["Residuals"]] <- temp %>% dplyr::select(-attributes) %>%
       .[,names(.) %in% c(c(as.character(fact)), refk, "residuals")] %>%
       group_by(refk) %>%
@@ -233,7 +229,8 @@ asca_tds <- function(formula,
   data3[["info"]][["labels"]]$timecol <- as.character(timecol)
   data3[["info"]][["labels"]]$attributes <- as.character(attributes)
 
-  options(contrasts =  prev_contr)
+  options(contrasts =  prev_contr,
+          dplyr.show_progress = T)
   return(data3)
 
 }

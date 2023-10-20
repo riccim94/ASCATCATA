@@ -32,16 +32,19 @@
 #' # An open Time Intensity dataset is downloaded from the website
 #' # https://help.xlstat.com/dataset/time-intensity-data_0.xlsm
 #'library(readxl)
-#'library(tidyverse)
+#'library(tidyr)
+#'library(stringr)
 #'library(httr)
 #'url1 <- "https://help.xlstat.com/dataset/time-intensity-data_0.xlsm"
 
 #'GET(url1, write_disk(tf <- tempfile(fileext = ".xlsm")))
 #'tf <- str_replace_all(tf, "\\\\", "//")
 #'data <- read_excel(tf)
-#'data.long <- data %>% gather(time, intensity, 6:36) %>% droplevels()
+#'data.long <- data %>%
+#'pivot_longer(names_to = "time", values_to = "intensity", cols = 6:36) %>%
+#'droplevels()
 #'
-#' asca_ti(intensity~(PRODUCT+PANELIST)^2,
+#' asca_ti(intensity~PRODUCT*PANELIST,
 #' data = data.long,timecol = "time")
 #' }
 
@@ -49,7 +52,8 @@
 asca_ti <- function(formula, data, timecol, time.quantization = NULL, ...){
 
   prev_contr <- options()$contrasts
-  options(contrasts =  rep("contr.sum", 2))
+  options(contrasts =  rep("contr.sum", 2),
+          dplyr.show_progress = F)
   colref <- NULL
   . <-NULL
   ref <- NULL
@@ -57,10 +61,7 @@ asca_ti <- function(formula, data, timecol, time.quantization = NULL, ...){
   formula_ <- formula
   data3 <- list()
   ref <- formula[[2L]]
-  fact <- as.character(formula[[3L]]) %>% as.vector() %>%
-    str_split(., "[+*:]", simplify = T) %>% str_trim() %>%
-    .[str_detect(., ".+")] %>% .[!str_detect(.,"^\\d")] %>%
-    str_remove(., "^\\(") %>% str_remove(., "\\)$")
+  fact <- all.vars(formula) %>% .[!(. %in% as.character(ref))]
   timecol <- as.symbol(timecol)
 
   if(!is.null(time.quantization)){
@@ -126,14 +127,9 @@ asca_ti <- function(formula, data, timecol, time.quantization = NULL, ...){
   data3[["info"]][["timecol"]] <- unique(data[,as.character(timecol)])
   data3[["info"]][["formula"]] <- formula
   data3[["info"]][["labels"]]$timecol <- as.character(timecol)
-  data3[["info"]][["labels"]]$attributes <- as.character(attributes)
 
-
-  # if(is_tibble(data3[["info"]][["attributes"]])){
-  #   data3[["info"]][["attributes"]] <- pull(data3[["info"]][["attributes"]])
-  # }
-
-  options(contrasts =  prev_contr)
+  options(contrasts =  prev_contr,
+          dplyr.show_progress = T)
   return(data3)
 
 }

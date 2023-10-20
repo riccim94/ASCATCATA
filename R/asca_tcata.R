@@ -67,7 +67,8 @@ asca_tcata <- function(formula, data, timecol, attributes,
 
 
   prev_contr <- options()$contrasts
-  options(contrasts =  rep("contr.sum", 2))
+  options(contrasts =  rep("contr.sum", 2),
+          dplyr.show_progress = F)
   colref <- NULL
   . <-NULL
   Sum.Sq_ <- NULL
@@ -84,11 +85,7 @@ asca_tcata <- function(formula, data, timecol, attributes,
 
 
   ref <- formula[[2L]]
-  fact <- as.character(formula[[3L]]) %>% as.vector() %>%
-    str_split(., "[+*:]", simplify = T) %>% str_trim() %>%
-    .[str_detect(., ".+")] %>%
-    .[!str_detect(.,"^\\d")] %>% str_remove(., "^\\(") %>%
-    str_remove(., "\\)$")
+  fact <- all.vars(formula) %>% .[!(. %in% as.character(ref))]
   timecol <- as.symbol(timecol)
   attributes <- as.symbol(attributes)
   if(!is.null(time.quantization)){
@@ -106,7 +103,7 @@ data[,as.character(timecol)] <- left_join(data %>% select_at(., vars(as.name(tim
 
   colnames1 <- names(data1)
 
-  #View(data1)
+
   data2 <- data1 %>%
     mutate_at(vars(fact), as.factor) %>%
     split(dplyr::select(., timecol)) %>%
@@ -207,7 +204,7 @@ data3[["Parameters"]] <- temp %>% dplyr::select(-timecol, -attributes) %>%
 
 if(loadings.time.structure == "short"){
   temp[refk] <- paste0(temp[,as.character(attributes)])
-#print(name2)
+
   data3[["Residuals"]] <- temp %>% dplyr::select(-attributes) %>%
     .[,names(.) %in% c(c(as.character(fact)), refk, "residuals")] %>%
     group_by(refk) %>%
@@ -270,7 +267,8 @@ data3[["info"]][["formula"]] <- formula
 data3[["info"]][["labels"]]$timecol <- as.character(timecol)
 data3[["info"]][["labels"]]$attributes <- as.character(attributes)
 
-  options(contrasts =  prev_contr)
+  options(contrasts =  prev_contr,
+          dplyr.show_progress = TRUE)
   return(data3)
 }
 
