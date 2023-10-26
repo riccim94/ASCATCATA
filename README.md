@@ -19,7 +19,14 @@ devtools::install_github("riccim94/ASCATCATA")
 
 ## The functions available
 
-The ASCATCATA package offers a main function to apply an ASCA decomposition on datasets from dynamic sensory analysis and offers a set of functions to plot, interpret, and validate the results of the analysis. The decomposition applied consists of assuming a Gaussian distribution after applying a unit scale normalization to the interval considered. The decomposition is applied for each combination of unit of time and, when available, sensory attributes asked. 
+The ASCATCATA package offers a main function to apply an ASCA decomposition on datasets from dynamic sensory analysis. It offers a set of functions to plot, interpret, and validate the analysis results.
+
+ASCA analysis (Smilde et al. 2012) consists of applying the same general linear model (GLM) decomposition for each variable of the dataset at the time. In the present case, to deal properly with time-resolved datasets, the decomposition is applied for each combination of time unit and parameter available.
+The glm decomposition is applied without the application of a link function and assuming a Gaussian distribution of the residuals. The decomposition is applied to data after a unit scale normalization step.
+From the decomposition applied to each sub-unit of the dataset, it is possible to estimate a coefficient for each level of all the factors included in the glm model.
+The second step of the ASCA framework consists of the construction of *n* matrices of dimension [*k*,*m*], where *n* is the number of factors included in the model, *k* is the number of levels of each factor respectively and *m* is the total number of the glm decomposition applied.
+Each matrix is treated adopting a matrix decomposition based on SVD and the final values are analyzed as a Principal Component Analysis (PCA), assigning scores values to the levels of the factor considered, loading values to the combination between time units and sensory descriptors. 
+
 
 The package offers a set of functions to analyze three different kinds of dynamic sensory analysis:
 * asca_ti: To analyze data from Time Intensity (TI) analysis
@@ -32,7 +39,7 @@ The package offers a set of functions to analyze three different kinds of dynami
 This function applies ASCA decomposition to a Time-Intensity (TI) dataset. It is required that the dataset is put in a long format. The decomposition applied is based on the assumption of a normal data distribution. Each decomposition is applied to each unit of time.  
 
 ``` r
-#first of all a dataset of Time Intensity data is used. An open Time Intensity is taken from the website https://help.xlstat.com/dataset/time-intensity-data_0.xlsm
+# An open Time Intensity is taken from the website https://help.xlstat.com/dataset/time-intensity-data_0.xlsm
 library(readxl)
 library(httr)
 library(tidyverse)
@@ -45,7 +52,7 @@ data.long <- data %>% gather(time, intensity, 6:36) %>% filter(time != "0") %>% 
 #the function is then applied on the dataset, defining the formula applied by the ASCA decomposition and the column containing the time column
 test_ti <- asca_ti(intensity ~ PANELIST+PRODUCT, data = data.long, timecol = "time")
 ```
-The package also offers two functions that report the data in visual graphical devices. The first is plot_ASCA() function
+The package also offers two functions that report the reesults of ASCA analysis using visual graphical devices. The first is plot_ASCA() function
 
 ``` r
 plot_ASCA(test_ti)
@@ -241,4 +248,6 @@ samp | 0.0740
 Michele Ricci, Ph.D.
 ricci.michele94@gmail.com
 
+## Bibliography
 
+A.K. Smilde, M.E. Timmerman, M.M.W.B. Hendriks, J.J. Jansen, H.C.J. Hoefsloot. 2012, Generic framework for high-dimensional fixed-effects ANOVA Briefings in Bioinformatics, 13 (5), pp. 524-535, 10.1093/bib/bbr071
