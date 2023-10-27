@@ -44,10 +44,13 @@ In the present work, the ASCA framework is proposed as a reliable tool to infer 
 ## Functions available
 
 The package offers a set of functions to analyze three different kinds of dynamic sensory analysis:
-* asca_ti: To analyze data from Time Intensity (TI) analysis
+* asca_ti: To analyze data from Time Intensity (TI) analysis.
 * asca_tds: To analyze data from Temporal Dominant Sensation (TDS) analysis.
 * asca_tcata: To analyze data from Temporal Check All That Apply (TCATA) data.
 
+For each function is reported and discussed the output obtained by applying the graphical tools contained in the functions plot_ASCA() and plot_time_loadings().
+
+Finally, the use of the function perm_asca() for model validation and plot_perm() for the graphical representation.
 
 ### asca_ti
 This function applies ASCA decomposition to a Time-Intensity (TI) dataset. It is required that the dataset is put in a long format. The decomposition applied is based on the assumption of a normal data distribution. Each decomposition is applied to each unit of time.  
@@ -66,16 +69,21 @@ data.long <- data %>% gather(time, intensity, 6:36) %>% filter(time != "0") %>% 
 #the function is then applied on the dataset, defining the formula applied by the ASCA decomposition and the column containing the time column
 test_ti <- asca_ti(intensity ~ PANELIST+PRODUCT, data = data.long, timecol = "time")
 ```
-The package also offers two functions that report the reesults of ASCA analysis using visual graphical devices. The first is plot_ASCA() function
+The package also offers two functions that report the results of ASCA analysis using visual graphical devices. The first is the plot_ASCA() function, which plots an adapted form of biplot for time-structured loadings values.
 
 ``` r
 plot_ASCA(test_ti)
 ```
 ![](Images/plot_ti_1.png)
 
+To interpret this plot properly, The loading values need to be evaluated as the overall variation of the intensity values in different moments, from the central position of the plot toward the last moment second of the analysis, indicated by an arrow. 
 
+The score values correspond to one level of the factors defined in the formula of the asca_ti() function. Hence, it corresponds to the aggregate values of all the time series related to that level. The score value is singular but it is estimated considering all the time series values.
 
-The second is plot_time_loadings().
+The score values can be interpreted considering that the loading values indicate different time intervals when the intensity was higher in the measurement collected in the levels with score values positively correlated with them, and lower in levels with score values negatively correlated with them.
+
+The second graphical function available is plot_time_loadings(). It prints a series of line plot that shows the same loading values reported by the plot_ASCA() function organized per time.
+The resulting plot compares loading values along time between different factors, highlighting which time points are affecting the most the differences between levels.
 ``` r
 plot_time_loadings(test_ti)
 ```
@@ -83,7 +91,7 @@ plot_time_loadings(test_ti)
 
 
 ### asca_tds
-This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) dataset. It is required that the dataset is put in long format. The decomposition applied is based on the assumption of a normal distribution of the data. Each decomposition is applied to each combination of units of time and sensory descriptors.  
+This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) dataset. It is required that the dataset is put in a long format. The decomposition applied is based on the assumption of a normal distribution of the data. Each decomposition is applied to each combination of units of time and sensory descriptors.  
 
 
 ``` r
@@ -110,10 +118,10 @@ plot_ASCA(test_tds)
 
 ![](Images/plot_tds_3.png)
 
-It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function. By defining a number or the name of the factor in **object** it is possible to select which plot will be printed. Specifying the logical value of **density**, **path**, and **path.smooth** is possible to modify the aestethic of the plot.
+It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function. By defining a number or the name of the factor in **object** it is possible to select which plot will be printed. Specifying the logical value of **density**, **path**, and **path.smooth** makes it possible to modify the aesthetic of the plot.
 
 ``` r
-plot_ASCA(test_tds, object = 1, density = T, path = F, path.smooth = F)
+plot_ASCA(test_tds, object = 1, density = TRUE, path = FALSE, path.smooth = FALSE)
 
 ```
 ![](Images/ASCA_plot_tds_density.png)
@@ -131,7 +139,7 @@ plot_ASCA(test_tds_short)
 
 ![](Images/ASCA_plot_tds_s_3.png)
 
-It is possible to plot the contribution of each attribute on the overall variability for each factor adopting the function plot_time_loadings()
+It is possible to plot the contribution of each attribute on the overall variability for each factor by adopting the function plot_time_loadings()
 
 ``` r
 plot_time_loadings(test_tds)
@@ -178,7 +186,7 @@ ASCATCATA::plot_ASCA(ASCA_T1)
 ``` r
 # There are multiple display options available to show the loading values
 
-ASCATCATA::plot_ASCA(ASCA_T1, density = T, path = F,, path.smooth = F)
+ASCATCATA::plot_ASCA(ASCA_T1, density = TRUE, path = FALSE,, path.smooth = FALSE)
 ```
 
 ![](Images/plot_ASCA_3.png)
