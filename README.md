@@ -17,29 +17,43 @@ library(devtools)
 devtools::install_github("riccim94/ASCATCATA")
 ```
 
-## The functions available
+## The package
 
 The ASCATCATA package offers a main function to apply an ASCA decomposition on datasets from dynamic sensory analysis. It offers a set of functions to plot, interpret, and validate the analysis results.
 
 ASCA analysis (Smilde et al. 2012) consists of applying the same general linear model (GLM) decomposition for each variable of the dataset at the time. In the present case, to deal properly with time-resolved datasets, the decomposition is applied for each combination of time unit and parameter available.
 The glm decomposition is applied without the application of a link function and assuming a Gaussian distribution of the residuals. The decomposition is applied to data after a unit scale normalization step.
 From the decomposition applied to each sub-unit of the dataset, it is possible to estimate a coefficient for each level of all the factors included in the glm model.
-The second step of the ASCA framework consists of the construction of *n* matrices of dimension [*k*,*m*], where *n* is the number of factors included in the model, *k* is the number of levels of each factor respectively and *m* is the total number of the glm decomposition applied.
-Each matrix is treated adopting a matrix decomposition based on SVD and the final values are analyzed as a Principal Component Analysis (PCA), assigning scores values to the levels of the factor considered, loading values to the combination between time units and sensory descriptors. 
 
+The second step of the ASCA framework consists of the construction of *n* matrices of dimension [*k*,*m*], where *n* is the number of factors included in the model, *k* is the number of levels of each factor respectively and *m* is the total number of the glm decomposition applied.
+Each matrix is treated adopting a matrix decomposition based on SVD and the final values are analyzed as a Principal Component Analysis (PCA), assigning score values to the levels of the factor considered, loading values to the combination between time units and sensory descriptors. 
+
+The information obtained from the ASCA framework consists of a multivariate comparison between the levels of a single factor, highlighting similarities and differences between multiple measurements of an experiment using the scores values. Furthermore, the analysis estimates also how each variable varies in relation to each factor taking into account possible interaction effects.
+
+In the context of dynamic sensory data, the ASCA framework proposed can be used for:
+* The comparison of different conditions (i.e. two different foods, the behavior of the judges during the whole test, the presence or the absence of an ingredient in the same product), obtaining an individual score value estimated considering the whole time-series datasets available. The analysis reports also how the parameters (in the case of dynamic sensory analysis the sensory descriptors) vary over time according to the factors considered.
+* The comparison of different conditions during time at multivariate levels, obtaining a time-resolved score value for each level of the factor considered. The analysis report also the loadings values that define how sensory descriptors vary.
+* After a bootstrap test, the estimation of confidence intervals allows the estimation of significant differences between conditions at the multivariate level from ASCA models, and to estimate which loading values are significantly different from zero, to define the most important parameters that cause those differences.
+* The multivariate distribution of residuals is an indicator of the significance of the model applied.
+* The aggregate distribution of Sum of Squares values in ASCA models is an indicator of the explained variance by each factor included in the model and can be associated with the power of the effect analyzed.
+
+In the present work, the ASCA framework is proposed as a reliable tool to infer practical information from dynamic sensory datasets allowing the sensory researcher to extract summarizing information from structured datasets considering the issues related to the autocorrelated structure of time series and the effects of confounding factors.
+
+ ***
+
+## Functions available
 
 The package offers a set of functions to analyze three different kinds of dynamic sensory analysis:
 * asca_ti: To analyze data from Time Intensity (TI) analysis
 * asca_tds: To analyze data from Temporal Dominant Sensation (TDS) analysis.
 * asca_tcata: To analyze data from Temporal Check All That Apply (TCATA) data.
 
-  ***
 
 ### asca_ti
 This function applies ASCA decomposition to a Time-Intensity (TI) dataset. It is required that the dataset is put in a long format. The decomposition applied is based on the assumption of a normal data distribution. Each decomposition is applied to each unit of time.  
 
 ``` r
-# An open Time Intensity is taken from the website https://help.xlstat.com/dataset/time-intensity-data_0.xlsm
+# An open Time Intensity dataset is taken from the website https://help.xlstat.com/dataset/time-intensity-data_0.xlsm
 library(readxl)
 library(httr)
 library(tidyverse)
