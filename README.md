@@ -91,7 +91,7 @@ plot_time_loadings(test_ti)
 
 
 ### asca_tds
-This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) dataset. It is required that the dataset is put in a long format. The decomposition applied is based on the assumption of a normal distribution of the data. Each decomposition is applied to each combination of units of time and sensory descriptors.  
+This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) dataset. It is required that the dataset is put in a long format. The decomposition applied is based on the assumption of a normal data distribution. Each decomposition is applied to each combination of units of time and sensory descriptors.  
 
 
 ``` r
@@ -101,30 +101,52 @@ data <- tempR::bars
 data.long <- data %>% gather( time, CATA, 5:455) %>% mutate(time = str_remove(time, "time_") %>% str_remove(., "s$"))
 
 ```
-Once the dataset is arranged in long format with a column for the time values and a column for the attribute values, then we apply time-resolved ASCA decomposition on the dataset using the function asca_tds().
+Once the dataset is arranged in long format with a column for the time values and a column for the attribute values, we apply time-resolved ASCA decomposition on the dataset using the function asca_tds().
 
 ``` r
 test_tds <- asca_tds(CATA~(sample+assessor)^2, data = data.long, timecol = "time", attributes = "attribute")
 ```
 
-The results can be reported using the plot_ASCA function.
+The results can be reported using the plot_ASCA function. Calling the function with only the object obtained from the asca_tds() function will print one bi-plot for each factor plus one other bi-plot for residuals. It is possible to call one plot at a time specifying a number or a string containing the exact name of the factor as reported in the formula.
 
 ``` r
-plot_ASCA(test_tds)
+#plot_ASCA(test_tds) This will print all the plots one after the other.
+
+plot_ASCA(test_tds, object = 1)
+# plot_ASCA(test_tds, object = "sample") This has the same result
 ```
 ![](Images/plot_tds_1.png)
 
+
+``` r
+plot_ASCA(test_tds, object = 2)
+# plot_ASCA(test_tds, object = "assessor") This has the same result
+```
 ![](Images/plot_tds_2.png)
+
+``` r
+plot_ASCA(test_tds, object = 3)
+# plot_ASCA(test_tds, object = "sample:assessor") This has the same result
+```
 
 ![](Images/plot_tds_3.png)
 
-It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function. By defining a number or the name of the factor in **object** it is possible to select which plot will be printed. Specifying the logical value of **density**, **path**, and **path.smooth** makes it possible to modify the aesthetic of the plot.
+``` r
+plot_ASCA(test_tds, object = 4)
+# plot_ASCA(test_tds, object = "Residuals") This has the same result
+```
+
+
+It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function. By defining a number or the name of the factor in **object** it is possible to select which plot will be printed. Modifying the values of **density**, **path**, and **path.smooth** parameters it is possible to modify the aesthetic of the plot.
 
 ``` r
 plot_ASCA(test_tds, object = 1, density = TRUE, path = FALSE, path.smooth = FALSE)
 
 ```
 ![](Images/ASCA_plot_tds_density.png)
+
+The values reported here are the same as the plot above. This depiction is suggested only if it is not necessary to report information about the time structure, but onl about the attributes. May be useful to summarize the differences due to the overall use of sensory descriptors.
+
 
 ``` r
 test_tds_short <- asca_tds(CATA~(sample+assessor)^2, data = data.long, timecol = "time", attributes = "attribute", loadings.time.structure = "short")
