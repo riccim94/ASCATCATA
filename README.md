@@ -90,11 +90,11 @@ data.long
 For the correct functioning of the function, it is required that the time units are all defined in a separate column, and each factor included in the ASCA decomposition must be in its proper column.
 
 > [!WARNING]
-> For the correct application of ASCA decomposition, it is necessary that for all time units, the same experimental design is replicated. The function is not designed to work for different kinds of datasets.
+> For the correct application of ASCA decomposition, it is necessary that for every time unit, the same experimental design is replicated. The function is not designed to work for different kinds of datasets than dynamic sensory datasets.
 
 ``` r
 #the function is then applied to the dataset, defining the formula applied by the ASCA decomposition and the column containing the time column
-test_ti <- asca_ti(intensity ~ PANELIST+PRODUCT, data = data.long, timecol = "time")
+test_ti <- asca_ti(intensity ~ PANELIST*PRODUCT, data = data.long, timecol = "time")
 ```
 After the estimations, the result of the function is a list containing as many pca objects as the number of factors and interactions included by the formula, another pca object for residuals, and a list called `info` containing information about the analysis.
 
@@ -122,6 +122,13 @@ The score values correspond to one level of the factors defined in the formula o
 
 The score values can be interpreted considering that the loading values indicate different time intervals when the intensity was higher in the measurement collected in the levels with score values positively correlated with them, and lower in levels with score values negatively correlated with them.
 
+Furthermore, there are other graphical displays available in the function that can be used to improve graphical representation.
+
+``` r
+plot_ASCA(test_ti, object = "PANELIST", path = FALSE, time.label = 10) # This function displays the same biplot as before, but instead of the solid line, loadings are represented only by the smooth line and numbers indicating the time units.
+# The number inside the time.label parameter indicates how many time units are excluded between one value and another.
+``` 
+![](Images/plot_ti_1_2.png)
 
 
 The second graphical function available is plot_time_loadings(). It prints a series of line plot that shows the same loading values reported by the plot_ASCA() function organized per time.
