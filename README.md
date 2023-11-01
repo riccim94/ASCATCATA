@@ -66,21 +66,63 @@ GET(url1, write_disk(tf <- tempfile(fileext = ".xlsm")))
 tf <- str_replace_all(tf, "\\\\", "//")
 data <- read_excel(tf)
 data.long <- data %>% gather(time, intensity, 6:36) %>% filter(time != "0") %>% droplevels()
-#the function is then applied on the dataset, defining the formula applied by the ASCA decomposition and the column containing the time column
+``` 
+Here is reported a snippet of the data structure requested for launching the function.
+
+``` r
+data.long
+# A tibble: 15 × 7
+# >    ...1 PANELIST REPLICATE PRODUCT `TIME(S)` time  intensity
+# >   <dbl> <chr>        <dbl> <chr>   <chr>     <chr>     <dbl>
+# > 1     1 Judge.A          1 Prod.A  sample1   0           0  
+# > 2     1 Judge.A          1 Prod.A  sample1   2          10.6
+# > 3     1 Judge.A          1 Prod.A  sample1   4          20.9
+# > 4     1 Judge.A          1 Prod.A  sample1   6          30.4
+# > 5     1 Judge.A          1 Prod.A  sample1   8          40.7
+# > 6     1 Judge.A          1 Prod.A  sample1   10         50.8
+# > 7     1 Judge.A          1 Prod.A  sample1   12         60.4
+# > 8     1 Judge.A          1 Prod.A  sample1   14         70.3
+# > 9     1 Judge.A          1 Prod.A  sample1   16         80.6
+# >10     1 Judge.A          1 Prod.A  sample1   18         90.1
+# ℹ 734 more rows
+# ℹ Use `print(n = ...)` to see more rows
+``` 
+For the correct functioning of the function, it is required that the time units are all defined in a separate column, and each factor included in the ASCA decomposition must be in its proper column.
+
+> [!WARNING]
+> For the correct application of ASCA decomposition, it is necessary that for all time units, the same experimental design is replicated. The function is not designed to work for different kinds of datasets.
+
+``` r
+#the function is then applied to the dataset, defining the formula applied by the ASCA decomposition and the column containing the time column
 test_ti <- asca_ti(intensity ~ PANELIST+PRODUCT, data = data.long, timecol = "time")
 ```
+After the estimations, the result of the function is a list containing as many pca objects as the number of factors and interactions included by the formula, another pca object for residuals, and a list called `info` containing information about the analysis.
+
 The package also offers two functions that report the results of ASCA analysis using visual graphical devices. The first is the plot_ASCA() function, which plots an adapted form of biplot for time-structured loadings values.
 
 ``` r
-plot_ASCA(test_ti)
+#plot_ASCA(test_ti) #calling the function this way will plot all the plots available
+plot_ASCA(test_ti, object = "PANELIST") # This will print only the biplot for panelist
 ```
 ![](Images/plot_ti_1.png)
+
+
+``` r
+plot_ASCA(test_ti, object = "Product:PANELIST") # This will print only the biplot for the interaction between the product and panelist.
+``` 
+![](Images/plot_ti_3.png)
+
+> [!NOTE]
+> In a long structure, the function plot_ASCA() can plot only factors with more than two levels. A warning signal will be displayed in case of an attempt. To plot information for two levels factors check for the functions plot_time_loadings().
+
 
 To interpret this plot properly, The loading values need to be evaluated as the overall variation of the intensity values in different moments, from the central position of the plot toward the last moment second of the analysis, indicated by an arrow. 
 
 The score values correspond to one level of the factors defined in the formula of the asca_ti() function. Hence, it corresponds to the aggregate values of all the time series related to that level. The score value is singular but it is estimated considering all the time series values.
 
 The score values can be interpreted considering that the loading values indicate different time intervals when the intensity was higher in the measurement collected in the levels with score values positively correlated with them, and lower in levels with score values negatively correlated with them.
+
+
 
 The second graphical function available is plot_time_loadings(). It prints a series of line plot that shows the same loading values reported by the plot_ASCA() function organized per time.
 The resulting plot compares loading values along time between different factors, highlighting which time points are affecting the most the differences between levels.
