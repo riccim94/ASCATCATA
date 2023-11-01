@@ -7,6 +7,7 @@
 plot_ASCA(
   ASCA_obj,
   object = NA,
+  time.label = NULL,
   print = T,
   axes = c(1, 2),
   path = T,
@@ -21,6 +22,8 @@ plot_ASCA(
 \item{ASCA_obj}{A list of PCA estimated by the TCATASCA function.}
 
 \item{object}{A vector of string or numbers indicating which parameter of the ASCA decomposition will be plotted}
+
+\item{time.label}{Numeric. Adds numeric values of the time units in the plot for loadings values for loadings.time.structure == "long". The number indicates how big has to be the interval between each label.}
 
 \item{print}{Logical. Indicates whether or not to print the plots.}
 
