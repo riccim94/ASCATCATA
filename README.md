@@ -138,8 +138,9 @@ plot_time_loadings(test_ti)
 ```
 ![](Images/plot_ti_2.png)
 
-The "contribution" index refers to the contribution to the overall variance for the dimensions considered, and it is calculated in the same procedure used by the function `fviz_contrib` contained in the `factoextra` package ().
+The "contribution" index refers to the contribution to the overall variance for the dimensions considered, and it is calculated in the same procedure used by the function `fviz_contrib` contained in the `factoextra` package (Kassambara & Mundt 2020).
 This index indicates the percentage of the contribution of the loadings in a specific time unit to the definition of the principal components (Kassambara, 2017). 
+
 It is possible to define which are the dimensions considered specifying in the object `axes` the number corresponding to the dimension of interest.
 The information reported highlights for each factor to which time interval the differences between the levels detected using the previous plot are due.
 
@@ -152,16 +153,37 @@ plot_time_loadings(test_ti, choice = "loadings")
 ![](Images/plot_ti_2_1.png)
 
 ### asca_tds
-This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) dataset. It is required that the dataset is put in a long format. The decomposition applied is based on the assumption of a normal data distribution. Each decomposition is applied to each combination of units of time and sensory descriptors.  
-
+This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) raw dataset. the function is applied to the 0 and 1 raw datasets, without any prior preprocess besides the wrangling of the structure of the data.frame.
+In this case, the ASCA decomposition is applied for every combination of time units and sensory descriptors applied, and the glm model is applied using an `identity` link function and assuming a normal distribution of the residuals after a unit scales normalization.
 
 ``` r
 # The first step consists of wrangling the dataset to put it in a long format
 # and to mutate in factors the columns "cons" and "samp", and in numeric the column time
 data <- tempR::bars
 data.long <- data %>% gather( time, CATA, 5:455) %>% mutate(time = str_remove(time, "time_") %>% str_remove(., "s$"))
-
 ```
+
+The dataset structure required consists of a long format, with one column containing the time units, one column indicating the different sensory parameters considered, one having all the 0 and 1 values, and as many columns as are the factors and interactions considered in the experimental design. A snippet of a valid data.frame structure is reported below.
+
+``` r
+data.long
+# A tibble: 649,440 × 6
+# >   assessor session sample attribute           time   CATA
+# >      <int>   <int>  <int> <fct>               <chr> <int>
+# > 1        1       1      1 Caramelized Flavour 0.0       0
+# > 2        1       1      1 Dried Fruit Flavour 0.0       0
+# > 3        1       1      1 Grain Flavour       0.0       0
+# > 4        1       1      1 Nutty Flavour       0.0       0
+# > 5        1       1      1 Sweetness           0.0       0
+# > 6        1       2      1 Caramelized Flavour 0.0       0
+# > 7        1       2      1 Dried Fruit Flavour 0.0       0
+# > 8        1       2      1 Grain Flavour       0.0       0
+# > 9        1       2      1 Nutty Flavour       0.0       0
+# >10        1       2      1 Sweetness           0.0       0
+# ℹ 649,430 more rows
+# ℹ Use `print(n = ...)` to see more rows
+```
+
 Once the dataset is arranged in long format with a column for the time values and a column for the attribute values, we apply time-resolved ASCA decomposition on the dataset using the function asca_tds().
 
 ``` r
@@ -197,6 +219,7 @@ plot_ASCA(test_tds, object = 4)
 # plot_ASCA(test_tds, object = "Residuals") This has the same result
 ```
 
+![](Images/plot_tds_4.png)
 
 It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function. By defining a number or the name of the factor in **object** it is possible to select which plot will be printed. Modifying the values of **density**, **path**, and **path.smooth** parameters it is possible to modify the aesthetic of the plot.
 
@@ -355,8 +378,10 @@ ricci.michele94@gmail.com
 
 ## Bibliography
 
-A. Kassambara. 2017. Practical Guide to Principal Components Methods in R. STHDA. ISBN	1975721136, 9781975721138
+A. Kassambara. 2017. _Practical Guide to Principal Components Methods in R_. STHDA. ISBN	1975721136, 9781975721138
 
-A.K. Smilde, M.E. Timmerman, M.M.W.B. Hendriks, J.J. Jansen, H.C.J. Hoefsloot. 2012, Generic framework for high-dimensional fixed-effects ANOVA Briefings in Bioinformatics, 13 (5), pp. 524-535, 10.1093/bib/bbr071
+Kassambara A, Mundt F (2020). _factoextra: Extract and Visualize the Results of Multivariate Data Analyses_. R package version 1.0.7, https://CRAN.R-project.org/package=factoextra.
+
+A.K. Smilde, M.E. Timmerman, M.M.W.B. Hendriks, J.J. Jansen, H.C.J. Hoefsloot. 2012, _Generic framework for high-dimensional fixed-effects ANOVA Briefings in Bioinformatics_, 13 (5), pp. 524-535, 10.1093/bib/bbr071
 
 
