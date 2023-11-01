@@ -221,7 +221,16 @@ plot_ASCA(test_tds, object = 4)
 
 ![](Images/plot_tds_4.png)
 
-It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function. By defining a number or the name of the factor in **object** it is possible to select which plot will be printed. Modifying the values of **density**, **path**, and **path.smooth** parameters it is possible to modify the aesthetic of the plot.
+It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function. By defining a number or the name of the factor in **object** it is possible to select which plot will be printed. Modifying the values of **density**, **path**, **path.smooth**, and **time.label** parameters it is possible to modify the aesthetic of the plot.
+
+``` r
+plot_ASCA(test_tds, object = 1, density = TRUE, path = FALSE, time.label = 10)
+
+```
+![](Images/ASCA_plot_tds_path_num.png)
+
+This graphical representation adds time unit values to the plot, it is necessary to pay attention to the choice of the right interval to avoid plotting an excessive amount of time labels.
+
 
 ``` r
 plot_ASCA(test_tds, object = 1, density = TRUE, path = FALSE, path.smooth = FALSE)
