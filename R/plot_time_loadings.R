@@ -116,13 +116,13 @@ if(ASCA_obj[["info"]][["type"]] %in% c("TDS_ASCA", "TCATA_ASCA")){
 
 if(choice== "loadings"){
   title <- "Loadings value in time organized per factor"
-  subtitle <- paste0("Estimations on axe: ", axes[1])
+  subtitle <- paste0("Estimations on dimension: ", axes[1])
   ylab_text <- "Loading values"
 }
 
   if(choice == "contrib"){
     title <- "Cumulative contribution of loadings on time organized for attributes"
-    subtitle <- paste0("Estimation on axes: ", axes[1], ", ", axes[2])
+    subtitle <- paste0("Estimation on dimensions: ", axes[1], ", ", axes[2])
     ylab_text <- "Contribution to explained variance"
   }
 
@@ -168,9 +168,13 @@ if("attributes" %in% ref){
 if(ASCA_obj[["info"]][["type"]] == "TI_ASCA"){
   resulting_plots[["attributes"]] <- data %>% ggplot() +
     geom_line(aes(x = Class, y = contrib, color = Factor), size = 0.8) +
-    xlab("time") + ylab(ylab_text) +
-    theme_minimal() +
+    xlab("time") + ylab(ylab_text) + theme_minimal() +
     ggtitle(title, subtitle = subtitle) +
+    {
+      if(choice== "loadings"){
+        geom_hline(yintercept = 0, linetype = 2)
+      }
+    }  +
     theme(
       legend.position = "bottom",
       axis.text = element_text(color = "black"),

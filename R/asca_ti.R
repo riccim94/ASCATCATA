@@ -125,6 +125,11 @@ asca_ti <- function(formula, data, timecol, time.quantization = NULL, ...){
   data3[["info"]][["structure"]] <- "long"
   data3[["info"]][["type"]] <- "TI_ASCA"
   data3[["info"]][["timecol"]] <- unique(data[,as.character(timecol)])
+
+  if(is_tibble(data3[["info"]][["timecol"]])){
+    data3[["info"]][["timecol"]] <- pull(data3[["info"]][["timecol"]])
+  }
+
   data3[["info"]][["formula"]] <- formula
   data3[["info"]][["labels"]]$timecol <- as.character(timecol)
 
