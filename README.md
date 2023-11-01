@@ -113,7 +113,7 @@ plot_ASCA(test_ti, object = "Product:PANELIST") # This will print only the biplo
 ![](Images/plot_ti_3.png)
 
 > [!NOTE]
-> In a long structure, the function plot_ASCA() can plot only factors with more than two levels. A warning signal will be displayed in case of an attempt. To plot information for two levels factors check for the functions plot_time_loadings().
+> In the default "long" loadings structure, the function plot_ASCA() can plot only factors with more than two levels. A warning signal will be displayed in case of an attempt. To plot information for two levels factors check for the functions plot_time_loadings().
 
 
 To interpret this plot properly, The loading values need to be evaluated as the overall variation of the intensity values in different moments, from the central position of the plot toward the last moment second of the analysis, indicated by an arrow. 
@@ -122,7 +122,7 @@ The score values correspond to one level of the factors defined in the formula o
 
 The score values can be interpreted considering that the loading values indicate different time intervals when the intensity was higher in the measurement collected in the levels with score values positively correlated with them, and lower in levels with score values negatively correlated with them.
 
-Furthermore, there are other graphical displays available in the function that can be used to improve graphical representation.
+Furthermore, there are other graphical displays available in the function that can be used to improve graphical representation. . Modifying the values of **density**, **path**, **path.smooth**, and **time.label** parameters it is possible to modify the aesthetic of the plot.
 
 ``` r
 plot_ASCA(test_ti, object = "PANELIST", path = FALSE, time.label = 10) # This function displays the same biplot as before, but instead of the solid line, loadings are represented only by the smooth line and numbers indicating the time units.
@@ -138,6 +138,18 @@ plot_time_loadings(test_ti)
 ```
 ![](Images/plot_ti_2.png)
 
+The "contribution" index refers to the contribution to the overall variance for the dimensions considered, and it is calculated in the same procedure used by the function `fviz_contrib` contained in the `factoextra` package ().
+This index indicates the percentage of the contribution of the loadings in a specific time unit to the definition of the principal components (Kassambara, 2017). 
+It is possible to define which are the dimensions considered specifying in the object `axes` the number corresponding to the dimension of interest.
+The information reported highlights for each factor to which time interval the differences between the levels detected using the previous plot are due.
+
+This function can compare the loading values directly, one axe at a time, defining the value "loadings" in the `choice` parameter of the function. This representation permits a better understanding of the results displayed using the function plot_ASCA and a direct comparison between different factors for the interpretation of the results.
+
+``` r
+plot_time_loadings(test_ti, choice = "loadings")
+```
+
+![](Images/plot_ti_2_1.png)
 
 ### asca_tds
 This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) dataset. It is required that the dataset is put in a long format. The decomposition applied is based on the assumption of a normal data distribution. Each decomposition is applied to each combination of units of time and sensory descriptors.  
@@ -343,4 +355,8 @@ ricci.michele94@gmail.com
 
 ## Bibliography
 
+A. Kassambara. 2017. Practical Guide to Principal Components Methods in R. STHDA. ISBN	1975721136, 9781975721138
+
 A.K. Smilde, M.E. Timmerman, M.M.W.B. Hendriks, J.J. Jansen, H.C.J. Hoefsloot. 2012, Generic framework for high-dimensional fixed-effects ANOVA Briefings in Bioinformatics, 13 (5), pp. 524-535, 10.1093/bib/bbr071
+
+
