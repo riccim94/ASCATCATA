@@ -35,7 +35,7 @@ In the context of dynamic sensory data, the ASCA framework proposed can be used 
 * The comparison of different conditions during time at multivariate levels, obtaining a time-resolved score value for each level of the factor considered. The analysis report also the loadings values that define how sensory descriptors vary.
 * After a bootstrap test, the estimation of confidence intervals allows the estimation of significant differences between conditions at the multivariate level from ASCA models, and to estimate which loading values are significantly different from zero, to define the most important parameters that cause those differences.
 * The multivariate distribution of residuals is an indicator of the significance of the model applied.
-* The aggregate distribution of Sum of Squares values in ASCA models is an indicator of the explained variance by each factor included in the model and can be associated with the power of the effect analyzed.
+* The aggregate distribution of Sum of Squares values in ASCA models is an indicator of the explained variance by each factor included in the model and it is associated with the effect size of the factor.
 
 In the present package, the ASCA framework is proposed as a reliable tool to infer practical information from dynamic sensory datasets allowing the sensory researcher to extract summarizing information from structured datasets considering the issues related to the autocorrelated structure of time series and the effects of confounding factors.
 
@@ -164,6 +164,9 @@ data.long <- data %>% gather( time, CATA, 5:455) %>% mutate(time = str_remove(ti
 ```
 
 The dataset structure required consists of a long format, with one column containing the time units, one column indicating the different sensory parameters considered, one having all the 0 and 1 values, and as many columns as are the factors and interactions considered in the experimental design. A snippet of a valid data.frame structure is reported below.
+
+> [!NOTE]
+> For the correct functioning of the functions, it is necessary that the time column defined in `timecol` does not have any alphabet characters or symbols.
 
 ``` r
 data.long
@@ -304,8 +307,7 @@ data.long
 # ℹ Use `print(n = ...)` to see more rows
 ```
 
-> [!NOTE]
-> For the correct functioning of the functions, it is necessary that the time column defined in `timecol` does not have any alphabet characters or symbols.
+
 
 ``` r
 # Apply time-resolved ASCA decomposition on the dataset.
