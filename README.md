@@ -37,7 +37,7 @@ In the context of dynamic sensory data, the ASCA framework proposed can be used 
 * The multivariate distribution of residuals is an indicator of the significance of the model applied.
 * The aggregate distribution of Sum of Squares values in ASCA models is an indicator of the explained variance by each factor included in the model and can be associated with the power of the effect analyzed.
 
-In the present work, the ASCA framework is proposed as a reliable tool to infer practical information from dynamic sensory datasets allowing the sensory researcher to extract summarizing information from structured datasets considering the issues related to the autocorrelated structure of time series and the effects of confounding factors.
+In the present package, the ASCA framework is proposed as a reliable tool to infer practical information from dynamic sensory datasets allowing the sensory researcher to extract summarizing information from structured datasets considering the issues related to the autocorrelated structure of time series and the effects of confounding factors.
 
  ***
 
