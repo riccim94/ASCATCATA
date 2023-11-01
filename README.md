@@ -265,38 +265,78 @@ plot_time_loadings(test_tds)
 ![](Images/tds_time_2.png)
 
 ### asca_tcata
+This function applies ASCA decomposition to a Temporal Check-All-That-Apply (TCATA) raw dataset. the function is applied to the 0 and 1 raw datasets, without any prior preprocess besides the wrangling of the structure of the data.frame.
+Similarly to previous cases, the ASCA decomposition is applied for every combination of time units and sensory descriptors applied, and the glm model is applied using an `identity` link function and assuming a normal distribution of the residuals after a unit scales normalization.
+The procedure of TCATA allows the collection of a more dense dataset than TDS, and the estimation of multiple other parameters is possible.
+
 ``` r
 library(ASCATCATA)
 library(tempR)
 library(tidyverse)
 ## basic example code
-```
 
-``` r
 # The first step consists of wrangling the dataset to put it in a long format
 # and to mutate in factors the columns "cons" and "samp", and in numeric the column time
 data <- tempR::ojtcata
 data.long <- data %>% gather(time, CATA, 5:25) %>%
 mutate(cons = as.factor(cons), samp = as.factor(samp),
 time = as.numeric(str_extract(time, "\\d+")))
-
-# then we apply time-resolved ASCA decomposition on the dataset.
 ```
+The present case required some string manipulation in the column referred to time because initially there were multiple alphabet characters in the time column that interfered with the function.
+Here is a snippet of a data.frame that has the right structure for the function:
 
 ``` r
+data.long
+# A tibble: 37,800 × 6
+# >   cons  samp  samp_pos attribute       time  CATA
+# >   <fct> <fct>    <int> <fct>          <dbl> <int>
+# > 1 1     1            1 Astringent         0     0
+# > 2 1     1            1 Bitterness         0     0
+# > 3 1     1            1 Off Flavour        0     0
+# > 4 1     1            1 Orange Flavour     0     0
+# > 5 1     1            1 Sourness           0     0
+# > 6 1     1            1 Sweetness          0     0
+# > 7 1     2            3 Astringent         0     0
+# > 8 1     2            3 Bitterness         0     0
+# > 9 1     2            3 Off Flavour        0     0
+# >10 1     2            3 Orange Flavour     0     0
+# ℹ 37,790 more rows
+# ℹ Use `print(n = ...)` to see more rows
+```
+
+> [!NOTE]
+> For the correct functioning of the functions, it is necessary that the time column defined in `timecol` does not have any alphabet characters or symbols.
+
+``` r
+# Apply time-resolved ASCA decomposition on the dataset.
 ASCA_T1 <- ASCATCATA::asca_tcata(CATA ~ cons+samp, data = data.long, timecol = "time", attributes = "attribute")
 ```
+
+The resulting object is a list containing multiple objects:
+* A PCA object (as estimated by `prcomp` function) for every factor and interaction defined in the formula of the function.
+* A PCA object for the residual structure, called `Residuals`.
+* a list called `info` containing information about the sensory descriptors, the time units, and the parameter specified for the asca decomposition.
+* A data.frame called `Parameters` containing all the residuals and fitted values estimated from the glm decomposition.
+* A data.frame called `SS_decomposition` containing the values of the aggregated sum of squares estimated for each factor and interaction included in the model. 
+
 
 ``` r
 # The results can be represented using biplots adopting the plot_ASCA() function.
 
-ASCATCATA::plot_ASCA(ASCA_T1)
+ASCATCATA::plot_ASCA(ASCA_T1, object = 1)
 ```
 
 ![](Images/plot_ASCA_1.png)
 
+``` r
+ASCATCATA::plot_ASCA(ASCA_T1, object = 2)
+```
 ![](Images/plot_ASCA_2.png)
 
+``` r
+ASCATCATA::plot_ASCA(ASCA_T1, object = "Residuals")
+```
+![](Images/plot_ASCA_res.png)
 
 ``` r
 # There are multiple display options available to show the loading values
