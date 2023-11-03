@@ -411,11 +411,22 @@ ASCA_T2 <- ASCATCATA::asca_tcata(CATA ~ cons+samp, data = data.long, timecol = "
 The function plot_ASCA() will plot the results adopting a different plot structure to represent properly the results.
 
 ``` r
-plot_ASCA(ASCA_T2)
+plot_ASCA(ASCA_T2, object = 1)
+#plot_ASCA(ASCA_T2, object "Panelist_Code") gives the same result
 ```
 ![](Images/plot_line_1.png)
 
+
+``` r
+plot_ASCA(ASCA_T2, object = 2)
+#plot_ASCA(ASCA_T2, object "WineSip") gives the same result
+```
 ![](Images/plot_line_2.png)
+
+``` r
+plot_ASCA(ASCA_T2, object = 3)
+#plot_ASCA(ASCA_T2, object "Residuals") gives the same result
+```
 
 ![](Images/plot_line_3.png)
 
