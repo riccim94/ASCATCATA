@@ -230,7 +230,7 @@ It is possible to select different arrangements for the depiction of loading val
 plot_ASCA(test_tds, object = 1, density = TRUE, path = FALSE, time.label = 10)
 
 ```
-![](Images/ASCA_plot_tds_path_num.png)
+![](Images/plot_tds_path_num.png)
 
 This graphical representation adds time unit values to the plot, it is necessary to pay attention to the choice of the right interval to avoid plotting an excessive amount of time labels.
 
