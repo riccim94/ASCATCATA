@@ -422,6 +422,13 @@ samp | 0.0740
 
 
 
+## permutation procedure
+
+The Package contains a function for the model's validation by performing a permutation test.
+
+
+
+
 ## Author
 
 Michele Ricci, Ph.D.
