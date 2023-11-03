@@ -247,15 +247,33 @@ The values reported here are the same as the plot above. This depiction is sugge
 ``` r
 test_tds_short <- asca_tds(CATA~(sample+assessor)^2, data = data.long, timecol = "time", attributes = "attribute", loadings.time.structure = "short")
 
-plot_ASCA(test_tds_short)
+```
+The object created by this function is a list containing as many PCA object (as estimated by `prcomp()` function) as the number of factor and interactions indicated in the formula, and another PCA object for the residual structure.
 
+
+``` r
+plot_ASCA(test_tds_short, object = 1)
 ```
 
 ![](Images/ASCA_plot_tds_s_1.png)
 
+``` r
+plot_ASCA(test_tds_short, object = 2)
+```
+
 ![](Images/ASCA_plot_tds_s_2.png)
 
+``` r
+plot_ASCA(test_tds_short, object = 3)
+```
+
 ![](Images/ASCA_plot_tds_s_3.png)
+
+``` r
+plot_ASCA(test_tds_short, object = "Residuals")
+```
+
+![](Images/ASCA_plot_tds_s_4.png)
 
 It is possible to plot the contribution of each attribute on the overall variability for each factor by adopting the function plot_time_loadings()
 
