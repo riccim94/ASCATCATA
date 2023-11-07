@@ -2,6 +2,8 @@
 #' @param ASCA_obj A list of PCA estimated by the TCATASCA function.
 #' @param object A vector of string or numbers indicating which parameter of the ASCA decomposition will be plotted
 #' @param axes A numeric vector indicating two numbers indicating the axes of the ASCA decomposition.
+#' @param score.points Logical. Adds the points indicating the scores values. Standard is TRUE.
+#' @param score.labels Logical. Adds the text labels indicating the score names. Standard is TRUE.
 #' @param path Logical. Adds a path indicating the position of the loadings according to their cronological order. Default is TRUE.
 #' @param path.smooth Logical. Adds a path smoothed indicating the position of the loadings according to their cronological order. Default is TRUE.
 #' @param density Logical. Superimpose a 2-dimensional density plot, indicating th distribution of the temporal resolved loadings according to their density. Default is FLASE.
@@ -25,6 +27,7 @@
 #' @importFrom ggplot2 scale_alpha_continuous
 #' @importFrom ggplot2 scale_y_continuous
 #' @importFrom ggplot2 scale_shape_manual
+#' @importFrom ggplot2 labeller
 #' @importFrom ggplot2 geom_path
 #' @importFrom ggplot2 geom_col
 #' @importFrom ggplot2 aes
@@ -111,6 +114,8 @@ plot_ASCA <- function(
     object = NA,
     time.label = NULL,
     print = T,
+    score.points = T,
+    score.labels = T,
     axes = c(1,2), path = T, density = F,
     path.smooth = T,
     h_clus = NULL,
@@ -239,23 +244,23 @@ if(density){
 
 
   pl <- pl + {
-    if(is.numeric(h_clus)){
+    if(is.numeric(h_clus) & score.points){
       geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y), color = cluster),
             data = data_plot, size = point.size)
-        }else{
+        }else if(score.points){
           geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)),
             color = "black", data = data_plot, size = point.size)
         }
       } + scale_shape_manual(values = rep(19,15)) +
     scale_x_continuous(labels = unicode_minus) +
     scale_y_continuous(labels = unicode_minus) + theme_minimal() +
-      {if(is.numeric(h_clus)){
+      {if(is.numeric(h_clus) & score.labels){
         geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
           label = col_p, color = cluster),
           max.overlaps = getOption("ggrepel.max.overlaps",
                                    default = max.overlaps.value),
           data = data_plot)
-        }else{
+        }else if(score.labels){
           geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
             label = col_p),
             max.overlaps = getOption("ggrepel.max.overlaps",
@@ -292,36 +297,43 @@ pl <- pl + geom_text(aes(x = !!sym(axes_x), y = !!sym(axes_y),
 
 }
 
-if(ASCA_obj %>% .[["info"]] %>% .[["structure"]] == "short"){
+if(ASCA_obj[["info"]][["structure"]] == "short"){
   if(is.numeric(h_clus)){
       message("Clustering is not estimated for loadings.time.structure = 'short'")
   }
 
 if(names(ASCA_obj)[reference] != "Residuals" & reference != "Residuals"){
+  facet_names <- c(axe_x_title, axe_y_title)
+  names(facet_names) <- ASCA_obj[[reference]]$x %>% .[] %>%
+    as.data.frame() %>% .[,axes] %>% colnames(.)
   data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
       as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.)) %>%
       separate(col_p, c("time", "levels"), sep = "_") %>%
     gather(Component, Score, 1:2) %>%
-    mutate(time = as.numeric(time),
-           Component = str_replace(Component,"PC", "Dim"))
+    mutate(time = as.numeric(time))
   pl <- ggplot()
   pl <- pl + geom_line(aes(x = time, y = Score, color = levels), data_plot) +
-  facet_grid(rows = "Component", scales = "free_y") +
+  facet_grid(rows = "Component", scales = "free_y",
+             labeller = labeller(Component = facet_names)) +
     geom_hline(yintercept = 0, linetype = 2) +
     ggtitle("", subtitle = paste0("Factor: ", final_label)) +
     theme_minimal() + theme(legend.position = "bottom",
         plot.title = element_blank(),
-        legend.key.size = unit(0.2, 'cm')
-        ) +
-    guides(color = guide_legend(ncol = 13, byrow = TRUE))
+        axis.text = element_text(color = "black"),
+         legend.key.size = unit(0.3, 'cm') ) +
+    guides(color = guide_legend(ncol = 12, byrow = TRUE,
+                                override.aes=list(linewidth = 4)))
   data_loadings <- ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
     as.data.frame() %>% .[,axes] %>% mutate(Levels = rownames(.)) %>%
-    gather(Component, Loadings, 1:2) %>%
-    mutate(Component = str_replace(Component, "PC", "Dim"))
+    gather(Component, Loadings, 1:2)
   pl2 <- ggplot() + geom_col(aes(x = Levels, y = Loadings),
       color = "black", fill = "white", data = data_loadings) +
-    facet_grid(rows = "Component", scales = "free_y") +
-    theme_minimal()
+    facet_grid(rows = "Component", scales = "free_y",
+               labeller = labeller(Component = facet_names)) +
+    theme_minimal() +
+    theme(axis.title.x = element_blank(),
+          axis.text = element_text(color = "black"),
+          axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
 pl <- ggarrange(pl, pl2, nrow = 1)
 }
 
@@ -330,9 +342,14 @@ if(names(ASCA_obj)[reference] == "Residuals"|reference == "Residuals"){
   data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
     as.data.frame() %>% .[,axes] %>% mutate(levels = rownames(.))
   pl <- ggplot()
-  pl <- pl + geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)), data_plot) +
+  pl <- pl + {
+    if(score.points){
+    geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)), data_plot)}
+    } +
     geom_hline(yintercept = 0, linetype = 2) +
+    xlab(axe_x_title) + ylab(axe_y_title) +
     ggtitle("", subtitle = paste0("Factor: ", final_label)) +
+
     theme_minimal() + theme(legend.position = "bottom",
       plot.title = element_blank()) +
     guides(color = guide_legend(ncol = 10, byrow = TRUE))
@@ -424,23 +441,23 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
 
 
     pl <- pl + {
-      if(is.numeric(h_clus)){
+      if(is.numeric(h_clus) & score.points){
         geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y), color = cluster),
                    data = data_plot, size = point.size)
-      }else{
+      }else if(score.points){
         geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)),
                    color = "black", data = data_plot, size = point.size)
       }
     } + scale_shape_manual(values = rep(19,15)) +
       scale_x_continuous(labels = unicode_minus) +
       scale_y_continuous(labels = unicode_minus) + theme_minimal() +
-      {if(is.numeric(h_clus)){
+      {if(is.numeric(h_clus) & score.labels){
         geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
           label = col_p, color = cluster),
           max.overlaps = getOption("ggrepel.max.overlaps",
                                    default = max.overlaps.value),
           data = data_plot)
-      }else{
+      }else if(score.labels){
         geom_text_repel(aes(x = !!sym(axes_x), y = !!sym(axes_y),
             label = col_p),
             max.overlaps = getOption("ggrepel.max.overlaps",
