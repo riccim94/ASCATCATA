@@ -9,6 +9,8 @@ plot_ASCA(
   object = NA,
   time.label = NULL,
   print = T,
+  score.points = T,
+  score.labels = T,
   axes = c(1, 2),
   path = T,
   density = F,
@@ -26,6 +28,10 @@ plot_ASCA(
 \item{time.label}{Numeric. Adds numeric values of the time units in the plot for loadings values for loadings.time.structure == "long". The number indicates how big has to be the interval between each label.}
 
 \item{print}{Logical. Indicates whether or not to print the plots.}
+
+\item{score.points}{Logical. Adds the points indicating the scores values. Standard is TRUE.}
+
+\item{score.labels}{Logical. Adds the text labels indicating the score names. Standard is TRUE.}
 
 \item{axes}{A numeric vector indicating two numbers indicating the axes of the ASCA decomposition.}
 
