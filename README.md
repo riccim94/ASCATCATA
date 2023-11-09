@@ -90,7 +90,7 @@ data.long
 For the correct functioning of the function, it is required that the time units are all defined in a separate column, and each factor included in the ASCA decomposition must be in its proper column.
 
 > [!WARNING]
-> For the correct application of ASCA decomposition, it is necessary that for every time unit, the same experimental design is replicated. The function is not designed to work for different kinds of datasets than dynamic sensory datasets.
+> For the correct application of ASCA decomposition, it is necessary that the same experimental design is replicated for each time unit.
 
 ``` r
 #the function is then applied to the dataset, defining the formula applied by the ASCA decomposition and the column containing the time column
