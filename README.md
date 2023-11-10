@@ -107,6 +107,13 @@ After the estimations, the result of the function is a list containing as many p
 
 The package also offers two functions that report the results of ASCA analysis using visual graphical devices. The first is the plot_ASCA() function, which plots an adapted form of biplot for time-structured loadings values.
 
+> [!NOTE]
+> To interpret this kind of plot, it is necessary to remember that this analysis reports relative values, referred to the structure of the dataset, that highlight the similarities and differences between the levels of the factors considered at the multivariate level.
+> 
+> For this reason, each point represents the aggregated results referred to a level of the factor considered. The position on the new-estimated dimension is calculated by estimating all the runs that were assigned to the levels of that factor, and, most importantly, estimating this value considering all the units of time collected from the runs. Consequently, each point represents an average of each value collected from all the information collected by the dynamic sensory procedure.
+> 
+> The loading values are represented by the path that begins near the center of the plot. The points forming the line represent the loading values estimated for each point of time of the dynamic sensory experiments in order. To interpret the loading values, it is necessary to check their alignment with each axe, and considering that a higher loading value in a dimension represents that the dimension considered represents the similarities and differences of the levels in the time intervals of the experiments that have higher loading values.
+
 ``` r
 #plot_ASCA(test_ti) #calling the function this way will plot all the plots available
 plot_ASCA(test_ti, object = "PANELIST") # This will print only the biplot for panelist
@@ -115,12 +122,7 @@ plot_ASCA(test_ti, object = "PANELIST") # This will print only the biplot for pa
 
 This plot is a bi-plot reporting the results of the ASCA analysis for the factor "PANELIST".
 
-> [!NOTE]
-> To interpret this kind of plot, it is necessary to remember that this analysis reports relative values, referred to the structure of the dataset, that highlight the similarities and differences between the levels of the factors considered at the multivariate level.
-> 
-> For this reason, each point represents the aggregated results referred to a level of the factor considered. The position on the new-estimated dimension is calculated by estimating all the runs that were assigned to the levels of that factor, and, most importantly, estimating this value considering all the units of time collected from the runs. Consequently, each point represents an average of each value collected from all the information collected by the dynamic sensory procedure.
-> 
-> The loading values are represented by the path that begins near the center of the plot. The points forming the line represent the loading values estimated for each point of time of the dynamic sensory experiments in order. To interpret the loading values, it is necessary to check their alignment with each axe, and considering that a higher loading value in a dimension represents that the dimension considered represents the similarities and differences of the levels in the time intervals of the experiments that have higher loading values.
+
 
 The present plot highlights that according to the first dimension, there is a strong difference between panelists due to a higher overall value reported by Panelists A, B, and C on the left side due to the intermediate and final time interval. 
 
