@@ -1,7 +1,9 @@
 
-<p align = "center"> 
+<p align = "center">
+  
 ![](Images/badge.png)
-<\p>
+  
+</p>
 # ASCATCATA package
 
 <!-- badges: start -->
