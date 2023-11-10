@@ -1,7 +1,7 @@
 
 <p align = "center">
 
-<img src = "Images/badge.png" width = "48">
+<img src = "Images/badge.png" width = "200">
 
 </p>
 
@@ -12,6 +12,12 @@
 ![](https://img.shields.io/badge/Preliminary%20Version-Test-red.svg)
 
 <!-- badges: end -->
+
+<p align = "right">
+
+<img src = "Images/badge.png" width = "200">
+
+</p>
 
 The package ASCATCATA offers a set of functions to apply, interpret, and report multivariate ASCA (ANOVA-Simultaneous Component Analysis) analysis on Dynamic Sensory Analysis data.
 
