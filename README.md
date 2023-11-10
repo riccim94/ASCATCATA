@@ -15,7 +15,7 @@
 
 
 
-<img src = "Images/badge.png" width = "300" style="float:right">
+<img src = "Images/badge.png" width = "300" style="float:left">
 
 
 
