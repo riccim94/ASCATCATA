@@ -1,7 +1,7 @@
 
 <p align = "center">
 
-<img src = "Images/badge.png" width = "200">
+<img src = "Images/badge.png" width = "200" >
 
 </p>
 
@@ -15,7 +15,7 @@
 
 
 
-<img src = "Images/badge.png" width = "300" style="float:left">
+<img src = "Images/badge.png" width = "300" style="float:left" id = "badge" />
 
 
 
