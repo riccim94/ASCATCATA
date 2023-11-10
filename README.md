@@ -1,5 +1,7 @@
 # ASCATCATA package
 
+![](Images/badge.png)
+
 <!-- badges: start -->
 
 ![](https://img.shields.io/badge/Preliminary%20Version-Test-red.svg)
