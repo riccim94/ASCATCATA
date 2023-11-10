@@ -122,8 +122,6 @@ plot_ASCA(test_ti, object = "PANELIST") # This will print only the biplot for pa
 
 This plot is a bi-plot reporting the results of the ASCA analysis for the factor "PANELIST".
 
-
-
 The present plot highlights that according to the first dimension, there is a strong difference between panelists due to a higher overall value reported by Panelists A, B, and C on the left side due to the intermediate and final time interval. 
 
 According to the second dimension, there is a difference between panelists due to the overall intensity values that they gave at some specific time intervals, more precisely, at the time interval from 50 to 54, when the panelist in the lower part of the plot (C and E) gave higher values on average compared to the others. Panelist A gave values lower than the average for these values and values higher than the average in the time units 46, 56, and 60. 
@@ -140,14 +138,11 @@ plot_ASCA(test_ti, object = "Product:PANELIST") # This will print only the biplo
 > [!NOTE]
 > In the default "long" loadings structure, the function plot_ASCA() can plot only factors with more than two levels. A warning signal will be displayed in case of an attempt. To plot information for two levels factors check for the functions plot_time_loadings().
 
+In this plot, there are reported similarities and differences considering the interaction of the two factors.
 
-To interpret this plot properly, The loading values need to be evaluated as the overall variation of the intensity values in different moments, from the central position of the plot toward the last moment second of the analysis, indicated by an arrow. 
+In this case, the score values represent the aggregated values considering all the possible combinations of the levels of two factors available in the dataset. The comparison between those points indicates how much each level of a factor changes when it is estimated with another factor at the same time. In the case of a sensory experiment, it is very probable that at least two factors (panelist, product, repetition) are affecting the final response, and it is necessary to consider if there is a modification of the effect due to an interaction between two or three factors. Considering them could be useful for controlling the overall behavior of the panel (by checking for outlier effects or detecting the presence of confounding factors) and to investigate the effects of specific interactions of factors of interest, in case of multiple factors affecting the product or the panelist behavior (i.e. the presence of multiple ingredients and their combination, the different demographic of the panel).
 
-The score values correspond to one level of the factors defined in the formula of the asca_ti() function. Hence, it corresponds to the aggregate values of all the time series related to that level. The score value is singular but it is estimated considering all the time series values.
-
-The score values can be interpreted considering that the loading values indicate different time intervals when the intensity was higher in the measurement collected in the levels with score values positively correlated with them, and lower in levels with score values negatively correlated with them.
-
-Furthermore, there are other graphical displays available in the function that can be used to improve graphical representation. . Modifying the values of **density**, **path**, **path.smooth**, and **time.label** parameters it is possible to modify the aesthetic of the plot.
+Furthermore, there are other graphical displays available in the function that can be used to improve graphical representation. Modifying the values of **density**, **path**, **path.smooth**, and **time.label** parameters it is possible to modify the aesthetic of the plot.
 
 ``` r
 plot_ASCA(test_ti, object = "PANELIST", path = FALSE, time.label = 10) # This function displays the same biplot as before, but instead of the solid line, loadings are represented only by the smooth line and numbers indicating the time units.
