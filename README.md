@@ -13,11 +13,11 @@
 
 <!-- badges: end -->
 
-<p align = "right">
 
-<img src = "Images/badge.png" width = "200">
 
-</p>
+<img src = "Images/badge.png" width = "300" style="float:right">
+
+
 
 The package ASCATCATA offers a set of functions to apply, interpret, and report multivariate ASCA (ANOVA-Simultaneous Component Analysis) analysis on Dynamic Sensory Analysis data.
 
