@@ -116,11 +116,19 @@ plot_ASCA(test_ti, object = "PANELIST") # This will print only the biplot for pa
 This plot is a bi-plot reporting the results of the ASCA analysis for the factor "PANELIST".
 
 > [!NOTE]
-> To interpret this plot, it is necessary to remember that this analysis reports relative values, referred to the structure of the dataset, that highlight the similarities and differences between the levels of the factors considered at the multivariate level.
+> To interpret this kind of plot, it is necessary to remember that this analysis reports relative values, referred to the structure of the dataset, that highlight the similarities and differences between the levels of the factors considered at the multivariate level.
 > 
 > For this reason, each point represents the aggregated results referred to a level of the factor considered. The position on the new-estimated dimension is calculated by estimating all the runs that were assigned to the levels of that factor, and, most importantly, estimating this value considering all the units of time collected from the runs. Consequently, each point represents an average of each value collected from all the information collected by the dynamic sensory procedure.
 > 
 > The loading values are represented by the path that begins near the center of the plot. The points forming the line represent the loading values estimated for each point of time of the dynamic sensory experiments in order. To interpret the loading values, it is necessary to check their alignment with each axe, and considering that a higher loading value in a dimension represents that the dimension considered represents the similarities and differences of the levels in the time intervals of the experiments that have higher loading values.
+
+The present plot highlights that according to the first dimension, there is a strong difference between panelists due to a higher overall value reported by Panelists A, B, and C on the left side due to the intermediate and final time interval. 
+
+According to the second dimension, there is a difference between panelists due to the overall intensity values that they gave at some specific time intervals, more precisely, at the time interval from 50 to 54, when the panelist in the lower part of the plot (C and E) gave higher values on average compared to the others. Panelist A gave values lower than the average for these values and values higher than the average in the time units 46, 56, and 60. 
+
+The two dimensions explain 89% of the overall variance between the levels of this factor, consequently, already an important percentage of the variance is reported by this plot, if necessary it is possible to depict the other dimension by specifying in the parameter `axes` the number of the dimension desired.
+
+The results contained in the first plot report that the largest fraction of the differences between the panelists is related to a specific interval of time and that there are panelists that are similar in this behavior.
 
 ``` r
 plot_ASCA(test_ti, object = "Product:PANELIST") # This will print only the biplot for the interaction between the product and panelist.
