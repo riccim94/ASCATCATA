@@ -1,10 +1,4 @@
 
-<p align = "center">
-
-<img src = "Images/badge.png" width = "200" >
-
-</p>
-
 # ASCATCATA package
 
 <!-- badges: start -->
