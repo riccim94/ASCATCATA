@@ -1,7 +1,7 @@
 #' Creates bi-plots for each factor decompsed in the ASCA object elaborated by the function tcatasca().
 #' @param ASCA_obj A list of PCA estimated by the TCATASCA function.
 #' @param object A vector of string or numbers indicating which parameter of the ASCA decomposition will be plotted
-#' @param axes A numeric vector indicating two numbers indicating the axes of the ASCA decomposition.
+#' @param dimensions A numeric vector indicating two numbers indicating the dimensions of the ASCA decomposition.
 #' @param score.points Logical. Adds the points indicating the scores values. Standard is TRUE.
 #' @param score.labels Logical. Adds the text labels indicating the score names. Standard is TRUE.
 #' @param path Logical. Adds a path indicating the position of the loadings according to their cronological order. Default is TRUE.
@@ -92,10 +92,10 @@
 #'
 #' plot_ASCA(ASCA_obj)
 #'
-#' # using the `axes` parameter is possible to specify which axes will be
+#' # using the `dimensions` parameter is possible to specify which dimensions will be
 #' # displayed in the plot
 #'
-#' plot_ASCA(ASCA_obj, axes = c(2,3))
+#' plot_ASCA(ASCA_obj, dimensions = c(2,3))
 #'
 #' # Estethic parameters can be addd or removed specifying TRUE or FALSE towards
 #'  # the parameters density, path, and path.smooth
@@ -116,7 +116,7 @@ plot_ASCA <- function(
     print = T,
     score.points = T,
     score.labels = T,
-    axes = c(1,2), path = T, density = F,
+    dimensions = c(1,2), path = T, density = F,
     path.smooth = T,
     h_clus = NULL,
     max.overlaps.value = 10,
@@ -164,10 +164,10 @@ for(reference in object){
   next
     }
   ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
-    dplyr::select(axes) %>% `colnames<-`(c("x", "y")) -> ind
+    dplyr::select(dimensions) %>% `colnames<-`(c("x", "y")) -> ind
 
   ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>% as.data.frame() %>%
-    dplyr::select(axes) %>% `colnames<-`(c("x", "y")) -> var
+    dplyr::select(dimensions) %>% `colnames<-`(c("x", "y")) -> var
 
   r <- min((max(ind[,"x"]) - min(ind[,"x"])/(
     max(var[,"x"]) - min(var[,"x"]))),
@@ -175,19 +175,19 @@ for(reference in object){
       max(var[,"y"]) - min(var[,"y"]))))
 
 axes_x <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
-  colnames(.) %>% .[axes[1]]
+  colnames(.) %>% .[dimensions[1]]
 
 axes_y <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
-  colnames() %>% .[axes[2]]
+  colnames() %>% .[dimensions[2]]
 
 
-axe_x_title <- paste0("Dim", axes[1]," (", as.character(ASCA_obj %>%
- .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,axes[1]]*100) %>%
+axe_x_title <- paste0("Dim", dimensions[1]," (", as.character(ASCA_obj %>%
+ .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,dimensions[1]]*100) %>%
    str_extract("\\d+\\.\\d{1,2}"), "%)")
 
 
-axe_y_title <- paste0("Dim",axes[2]," (", as.character(ASCA_obj %>%
- .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,axes[2]]*100) %>%
+axe_y_title <- paste0("Dim",dimensions[2]," (", as.character(ASCA_obj %>%
+ .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,dimensions[2]]*100) %>%
    str_extract("\\d+\\.\\d{1,2}"), "%)")
 
 
@@ -214,16 +214,16 @@ if(is.numeric(h_clus)){
     `colnames<-`(c("cluster")) %>% mutate(col_p = rownames(.),
            cluster = paste0("cluster ", cluster)) -> cluster_km
   ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
-    as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.)) %>%
+    as.data.frame() %>% .[,dimensions] %>% mutate(col_p = rownames(.)) %>%
     left_join(cluster_km, by = c("col_p")) %>%
     mutate(cluster = as.factor(cluster)) -> data_plot
 }else{
   data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
-  as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.), cluster = NA)
+  as.data.frame() %>% .[,dimensions] %>% mutate(col_p = rownames(.), cluster = NA)
   }
 
 data_loadings <- ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
-  as.data.frame() %>% .[,axes] %>%
+  as.data.frame() %>% .[,dimensions] %>%
   mutate_all(function(x){x <- x*(r)}) %>%
   mutate(param = rownames(.)) %>%
   separate(param, c("time", "param"), sep = "_") %>% arrange(as.numeric(time)) %>%
@@ -305,9 +305,9 @@ if(ASCA_obj[["info"]][["structure"]] == "short"){
 if(names(ASCA_obj)[reference] != "Residuals" & reference != "Residuals"){
   facet_names <- c(axe_x_title, axe_y_title)
   names(facet_names) <- ASCA_obj[[reference]]$x %>% .[] %>%
-    as.data.frame() %>% .[,axes] %>% colnames(.)
+    as.data.frame() %>% .[,dimensions] %>% colnames(.)
   data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
-      as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.)) %>%
+      as.data.frame() %>% .[,dimensions] %>% mutate(col_p = rownames(.)) %>%
       separate(col_p, c("time", "levels"), sep = "_") %>%
     gather(Component, Score, 1:2) %>%
     mutate(time = as.numeric(time))
@@ -324,7 +324,7 @@ if(names(ASCA_obj)[reference] != "Residuals" & reference != "Residuals"){
     guides(color = guide_legend(ncol = 12, byrow = TRUE,
                                 override.aes=list(linewidth = 4)))
   data_loadings <- ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
-    as.data.frame() %>% .[,axes] %>% mutate(Levels = rownames(.)) %>%
+    as.data.frame() %>% .[,dimensions] %>% mutate(Levels = rownames(.)) %>%
     gather(Component, Loadings, 1:2)
   pl2 <- ggplot() + geom_col(aes(x = Levels, y = Loadings),
       color = "black", fill = "white", data = data_loadings) +
@@ -340,7 +340,7 @@ pl <- ggarrange(pl, pl2, nrow = 1)
 if(names(ASCA_obj)[reference] == "Residuals"|reference == "Residuals"){
 
   data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
-    as.data.frame() %>% .[,axes] %>% mutate(levels = rownames(.))
+    as.data.frame() %>% .[,dimensions] %>% mutate(levels = rownames(.))
   pl <- ggplot()
   pl <- pl + {
     if(score.points){
@@ -354,7 +354,7 @@ if(names(ASCA_obj)[reference] == "Residuals"|reference == "Residuals"){
       plot.title = element_blank()) +
     guides(color = guide_legend(ncol = 10, byrow = TRUE))
   data_loadings <- ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
-    as.data.frame() %>% .[,axes] %>%
+    as.data.frame() %>% .[,dimensions] %>%
     mutate_all(function(x){x <- x*(r)}) %>%
     mutate(Levels = rownames(.))
   pl <- pl + geom_text(
@@ -401,16 +401,16 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
         `colnames<-`(c("cluster")) %>% mutate(col_p = rownames(.),
               cluster = paste0("cluster ", cluster)) -> cluster_km
       ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
-        as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.)) %>%
+        as.data.frame() %>% .[,dimensions] %>% mutate(col_p = rownames(.)) %>%
         left_join(cluster_km, by = c("col_p")) %>%
         mutate(cluster = as.factor(cluster)) -> data_plot
     }else{
       data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
-        as.data.frame() %>% .[,axes] %>% mutate(col_p = rownames(.), cluster = NA)
+        as.data.frame() %>% .[,dimensions] %>% mutate(col_p = rownames(.), cluster = NA)
     }
 
     data_loadings <- ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
-      as.data.frame() %>% .[,axes] %>%
+      as.data.frame() %>% .[,dimensions] %>%
       mutate_all(function(x){x <- x*(r)}) %>%
       mutate(time = rownames(.)) %>%
       arrange(as.numeric(time)) %>%
