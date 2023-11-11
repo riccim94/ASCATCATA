@@ -140,9 +140,13 @@ plot_ASCA(test_ti, object = "Product:PANELIST") # This will print only the biplo
 
 In this plot, there are reported similarities and differences considering the interaction of the two factors.
 
-In this case, the score values represent the aggregated values considering all the possible combinations of the levels of two factors available in the dataset. The comparison between those points indicates how much each level of a factor changes when it is estimated with another factor at the same time. In the case of a sensory experiment, it is very probable that at least two factors (panelist, product, repetition) are affecting the final response, and it is necessary to consider if there is a modification of the effect due to an interaction between two or three factors. Considering them could be useful for controlling the overall behavior of the panel (by checking for outlier effects or detecting the presence of confounding factors) and to investigate the effects of specific interactions of factors of interest, in case of multiple factors affecting the product or the panelist behavior (i.e. the presence of multiple ingredients and their combination, the different demographic of the panel).
+In this case, the score values represent the aggregated values considering all the possible combinations of the levels of two factors available in the dataset. The comparison between those points indicates how much each level of a factor changes when it is estimated with another factor at the same time. In the case of a sensory experiment, at least two factors (panelist, product, repetition) are probably affecting the final response, and it is necessary to consider if there is a modification of the effect due to an interaction between two or three factors. Considering them could be useful for controlling the overall behavior of the panel (by checking for outlier effects or detecting the presence of confounding factors) and to investigate the effects of specific interactions of factors of interest, in case of multiple factors affecting the product or the panelist behavior (i.e. the presence of multiple ingredients and their combination, the different demographic of the panel).
 
-Furthermore, there are other graphical displays available in the function that can be used to improve graphical representation. Modifying the values of **density**, **path**, **path.smooth**, and **time.label** parameters it is possible to modify the aesthetic of the plot.
+This plot can be interpreted in a similar way to the previous one, but it is necessary to consider the different meanings of the score values, which in this case refer to the combination of a panelist and a product. The similarities and differences highlighted in each dimension correspond to the differences due to the variation of the answer of each judge with different products.
+
+In the first dimension of this plot, the answers of each judge are separated into two different sides, highlighting how the differences due to the products are more influential than the differences between judges in 81% of the explained variance. The second dimension separates only 4 points from the average values, highlighting how the answers of the judges were different due to another portion of the time span of the questions. The judges considered in this dimension are Judge.A and Judge.B.
+
+Furthermore, there are other graphical displays available in the function that can be used to improve graphical representation. Modifying the values of **density**, **path**, **path.smooth**, and **time.label** parameters it is possible to modify the aesthetic of the plot. 
 
 ``` r
 plot_ASCA(test_ti, object = "PANELIST", path = FALSE, time.label = 10) # This function displays the same biplot as before, but instead of the solid line, loadings are represented only by the smooth line and numbers indicating the time units.
@@ -153,6 +157,7 @@ plot_ASCA(test_ti, object = "PANELIST", path = FALSE, time.label = 10) # This fu
 
 The second graphical function available is plot_time_loadings(). It prints a series of line plot that shows the same loading values reported by the plot_ASCA() function organized per time.
 The resulting plot compares loading values along time between different factors, highlighting which time points are affecting the most the differences between levels.
+
 ``` r
 plot_time_loadings(test_ti)
 ```
