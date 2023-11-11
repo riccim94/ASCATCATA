@@ -11,7 +11,7 @@ plot_ASCA(
   print = T,
   score.points = T,
   score.labels = T,
-  axes = c(1, 2),
+  dimensions = c(1, 2),
   path = T,
   density = F,
   path.smooth = T,
@@ -33,7 +33,7 @@ plot_ASCA(
 
 \item{score.labels}{Logical. Adds the text labels indicating the score names. Standard is TRUE.}
 
-\item{axes}{A numeric vector indicating two numbers indicating the axes of the ASCA decomposition.}
+\item{dimensions}{A numeric vector indicating two numbers indicating the dimensions of the ASCA decomposition.}
 
 \item{path}{Logical. Adds a path indicating the position of the loadings according to their cronological order. Default is TRUE.}
 
@@ -96,10 +96,10 @@ gather(time, intensity, 6:36), timecol = "time")
 
 plot_ASCA(ASCA_obj)
 
-# using the `axes` parameter is possible to specify which axes will be
+# using the `dimensions` parameter is possible to specify which dimensions will be
 # displayed in the plot
 
-plot_ASCA(ASCA_obj, axes = c(2,3))
+plot_ASCA(ASCA_obj, dimensions = c(2,3))
 
 # Estethic parameters can be addd or removed specifying TRUE or FALSE towards
  # the parameters density, path, and path.smooth
