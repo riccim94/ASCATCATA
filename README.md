@@ -166,6 +166,8 @@ plot_time_loadings(test_ti)
 The "contribution" index refers to the contribution to the overall variance for the dimensions considered, and it is calculated in the same procedure used by the function `fviz_contrib` contained in the `factoextra` package (Kassambara & Mundt 2020).
 This index indicates the percentage of the contribution of the loadings in a specific time unit to the definition of the principal components (Kassambara, 2017). 
 
+This plot conveys two kinds of information: which time intervals are most significant for differentiating between different levels of a single factor. This information is reported by each individual line, and higher values at certain time intervals mean that the estimation of the model is inferred mostly from the differences detected in those intervals of time. The second information conveyed by this plot is the comparison of the contribution levels between different factors, estimated by comparing the plot's lines of different colors. This highlights how the differences estimated within different factors are different: the differences are not only due to different intensity values but also to the moments when those differences occur in the analysis.
+
 It is possible to define which are the dimensions considered specifying in the object `dimensions` the number corresponding to the dimension of interest.
 The information reported highlights for each factor to which time interval the differences between the levels detected using the previous plot are due.
 
@@ -177,6 +179,10 @@ plot_time_loadings(test_ti, choice = "loadings")
 
 ![](Images/plot_ti_2_1.png)
 
+This function is also necessary for the interpretation of ASCA decomposition in case of factors that have only two levels. In this case, the function plot_ASCA() has been disabled, because a two-dimensional algorithm can not report properly the information. A line plot that contains information related to a single index and time can highlight better the differences between the two levels.
+
+To help the information, automatically the plot will print labels reporting the name of the two levels of interest when the the plot_time_loadings() function is applied on an ASCA decomposition of a two-levels factor.
+
 ### asca_tds
 This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) raw dataset. the function is applied to the 0 and 1 raw datasets, without any prior preprocess besides the wrangling of the structure of the data.frame.
 In this case, the ASCA decomposition is applied for every combination of time units and sensory descriptors applied, and the glm model is applied using an `identity` link function and assuming a normal distribution of the residuals after a unit scales normalization.
@@ -185,10 +191,12 @@ In this case, the ASCA decomposition is applied for every combination of time un
 # The first step consists of wrangling the dataset to put it in a long format
 # and to mutate in factors the columns "cons" and "samp", and in numeric the column time
 data <- tempR::bars
-data.long <- data %>% gather( time, CATA, 5:455) %>% mutate(time = str_remove(time, "time_") %>% str_remove(., "s$"))
+data.long <- data %>% gather( time, CATA, 5:455) %>% mutate(time = str_remove(time, "time_") %>% str_remove(., "s$")) %>% rename(product = sample)
 ```
 
 The dataset structure required consists of a long format, with one column containing the time units, one column indicating the different sensory parameters considered, one having all the 0 and 1 values, and as many columns as are the factors and interactions considered in the experimental design. A snippet of a valid data.frame structure is reported below.
+
+The name change of the factor `sample` to `product` is applied for interpretability's sake, because the term "sample" can be attributed erroneously to a single observation, while in this case the experiment report multiple observation on different recipes of bars, each defined as "product". The overall structure of the dataset it is not affected.
 
 > [!NOTE]
 > For the correct functioning of the functions, it is necessary that the time column defined in `timecol` does not have any alphabet characters or symbols.
@@ -196,7 +204,7 @@ The dataset structure required consists of a long format, with one column contai
 ``` r
 data.long
 # A tibble: 649,440 × 6
-# >   assessor session sample attribute           time   CATA
+# >   assessor session product attribute           time   CATA
 # >      <int>   <int>  <int> <fct>               <chr> <int>
 # > 1        1       1      1 Caramelized Flavour 0.0       0
 # > 2        1       1      1 Dried Fruit Flavour 0.0       0
@@ -215,7 +223,7 @@ data.long
 Once the dataset is arranged in long format with a column for the time values and a column for the attribute values, we apply time-resolved ASCA decomposition on the dataset using the function asca_tds().
 
 ``` r
-test_tds <- asca_tds(CATA~(sample+assessor)^2, data = data.long, timecol = "time", attributes = "attribute")
+test_tds <- asca_tds(CATA~(product+assessor)^2, data = data.long, timecol = "time", attributes = "attribute")
 ```
 
 The results can be reported using the plot_ASCA function. Calling the function with only the object obtained from the asca_tds() function will print one bi-plot for each factor plus one other bi-plot for residuals. It is possible to call one plot at a time specifying a number or a string containing the exact name of the factor as reported in the formula.
@@ -224,10 +232,16 @@ The results can be reported using the plot_ASCA function. Calling the function w
 #plot_ASCA(test_tds) This will print all the plots one after the other.
 
 plot_ASCA(test_tds, object = 1)
-# plot_ASCA(test_tds, object = "sample") This has the same result
+# plot_ASCA(test_tds, object = "product") This has the same result
 ```
 ![](Images/plot_tds_1.png)
 
+The interpretation of this biplot is similar to the biplot obtained from the asca_ti() function, but there are important differences.
+The score values have a similar meaning because they represent the aggregated values of all the measurements collected at that same level, and they are estimated considering all the time units of the dynamic sensory analysis, the loading values are more complex because they are estimated considering all the combinations of sensory attributes and time units, consequently there are multiple trails representing the multiple sensory descriptors asked. This representation compares how the different definitions of multiple attributes at the time caused a differentiation between the measurements collected between different levels of a factor, which can be the two different judges, two different products, or other variations considered in the model. 
+
+The interpretations of the loadings values can be effected properly considering that the correlation between score and loadings values means that there is an overall higher occurrence of selection of a specific sensory attribute in that interval of time in the TDS runs done having that specific level comparing to the levels that are negatively or not correlated with the loading value considered. at an aggregated level, the trails of loadings that move from the center of the plot to a side of the plot indicate the area of the plot that contains the levels with higher levels for specific sensory descriptors during their whole time interval. On the contrary, the trails that move from the center to one side of the plot and then another one indicate that sensory descriptors there are no constant differences in the occurrence of the prominence of sensory descriptors in a single group of levels, therefore there could be only certain portion of time which are significant for the dimensions considered or there are no significant time portions at all.
+
+In this specific case, the first dimension separates the products according to the attribute
 
 ``` r
 plot_ASCA(test_tds, object = 2)
@@ -237,10 +251,11 @@ plot_ASCA(test_tds, object = 2)
 
 ``` r
 plot_ASCA(test_tds, object = 3)
-# plot_ASCA(test_tds, object = "sample:assessor") This has the same result
+# plot_ASCA(test_tds, object = "product:assessor") This has the same result
 ```
-
 ![](Images/plot_tds_3.png)
+
+In this case, it is important to highlight that the factor depicted is actually the interaction between two factors, consequently, each point defining score values describes part of the answers attributed to a product according to the assessor tasting it. Considering that each product has been evaluated 3 times by each assessor, each point aggregates multiple time series.
 
 ``` r
 plot_ASCA(test_tds, object = 4)
