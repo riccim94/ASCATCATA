@@ -77,6 +77,8 @@ plot_time_loadings <- function(
   . <- NULL
 
 
+
+
   for(reference in object){
 
     if(choice == "contrib"){
@@ -86,12 +88,24 @@ plot_time_loadings <- function(
         Factor = names(ASCA_obj)[reference]))
     }
     if(choice == "loadings"){
+
+      row_num <- nrow(ASCA_obj %>% .[[reference]] %>% .$x)
+      test_nrow <- row_num == 2
+
       contrib <- rbind(contrib, ASCA_obj %>% .[[reference]] %>%
         .$rotation %>% .[,axes[1]] %>% as.data.frame() %>%
           `colnames<-`("contrib") %>%
             mutate(name = rownames(.),
               Class = str_extract(name, "\\d+\\.?\\d*"),
               Factor = names(ASCA_obj)[reference]))
+
+      if(test_nrow){
+        label_data <- data.frame(label = ASCA_obj %>% .[[reference]] %>%
+                                   .$x %>% rownames(.),
+                                 position = ASCA_obj %>% .[[reference]] %>%
+                                   .$x %>% .[,axes[1]])
+      }
+
     }
   }
 

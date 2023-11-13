@@ -160,7 +160,9 @@ for(reference in object){
 
   if(test_nrow){
     message(paste0("The factor ", ASCA_obj %>% names() %>% .[reference],
-    " contains only 2 levels, therefore can't be represented using a biplot."));
+    " contains only 2 levels, therefore can't be represented using a biplot.
+    It is recommended using the function plot_time_loadings().")
+    );
   next
     }
   ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
@@ -319,6 +321,7 @@ if(names(ASCA_obj)[reference] != "Residuals" & reference != "Residuals"){
     ggtitle("", subtitle = paste0("Factor: ", final_label)) +
     theme_minimal() + theme(legend.position = "bottom",
         plot.title = element_blank(),
+        legend.title = element_blank(),
         axis.text = element_text(color = "black"),
          legend.key.size = unit(0.3, 'cm') ) +
     guides(color = guide_legend(ncol = 12, byrow = TRUE,
@@ -344,9 +347,11 @@ if(names(ASCA_obj)[reference] == "Residuals"|reference == "Residuals"){
   pl <- ggplot()
   pl <- pl + {
     if(score.points){
-    geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)), data_plot)}
+    geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)), data_plot,
+               alpha = 0.2)}
     } +
     geom_hline(yintercept = 0, linetype = 2) +
+    geom_vline(xintercept = 0, linetype = 2) +
     xlab(axe_x_title) + ylab(axe_y_title) +
     ggtitle("", subtitle = paste0("Factor: ", final_label)) +
 
@@ -358,8 +363,9 @@ if(names(ASCA_obj)[reference] == "Residuals"|reference == "Residuals"){
     mutate_all(function(x){x <- x*(r)}) %>%
     mutate(Levels = rownames(.))
   pl <- pl + geom_text(
-    aes(x = !!sym(axes_x), y = !!sym(axes_y), label = Levels),
-    data = data_loadings)
+    aes(x = !!sym(axes_x), y = !!sym(axes_y), label = Levels, color = Levels),
+    data = data_loadings) +
+    theme(legend.position = "none")
 
 
   }
