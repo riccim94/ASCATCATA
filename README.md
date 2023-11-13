@@ -267,7 +267,7 @@ plot_ASCA(test_tds, object = 4)
 It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function. By defining a number or the name of the factor in **object** it is possible to select which plot will be printed. Modifying the values of **density**, **path**, **path.smooth**, and **time.label** parameters it is possible to modify the aesthetic of the plot.
 
 ``` r
-plot_ASCA(test_tds, object = 1, density = TRUE, path = FALSE, time.label = 10)
+plot_ASCA(test_tds, object = 1, path = FALSE, time.label = 100)
 
 ```
 ![](Images/plot_tds_path_num.png)
@@ -281,11 +281,11 @@ plot_ASCA(test_tds, object = 1, density = TRUE, path = FALSE, path.smooth = FALS
 ```
 ![](Images/ASCA_plot_tds_density.png)
 
-The values reported here are the same as the plot above. This depiction is suggested only if it is not necessary to report information about the time structure, but onl about the attributes. May be useful to summarize the differences due to the overall use of sensory descriptors.
+The values reported here are the same as the plot above. This depiction is suggested only if it is not necessary to report information about the time structure, but only about the attributes. May be useful to summarize the differences due to the overall use of sensory descriptors.
 
 
 ``` r
-test_tds_short <- asca_tds(CATA~(sample+assessor)^2, data = data.long, timecol = "time", attributes = "attribute", loadings.time.structure = "short")
+test_tds_short <- asca_tds(CATA~(product+assessor)^2, data = data.long, timecol = "time", attributes = "attribute", loadings.time.structure = "short")
 
 ```
 The object created by this function is a list containing as many PCA object (as estimated by `prcomp()` function) as the number of factor and interactions indicated in the formula, and another PCA object for the residual structure.
