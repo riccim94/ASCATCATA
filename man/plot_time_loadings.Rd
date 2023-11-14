@@ -9,8 +9,9 @@ plot_time_loadings(
   choice = "contrib",
   ref = c("attributes", "factors"),
   object = NA,
-  print = T,
-  axes = c(1, 2)
+  print = TRUE,
+  lab_two_lvl = TRUE,
+  dimensions = c(1, 2)
 )
 }
 \arguments{
@@ -24,7 +25,9 @@ plot_time_loadings(
 
 \item{print}{Logical. Indicates wether or not to print the plots.}
 
-\item{axes}{A numeric vector indicating two numbers indicating the axes of the ASCA decomposition.}
+\item{lab_two_lvl}{Logical. Adds a label indicating the direction where the score values are if in the plot there are loading values from a factor with only two levels. Default is TRUE.}
+
+\item{dimensions}{A numeric vector indicating two numbers indicating the dimensions of the ASCA decomposition.}
 }
 \value{
 A plot representing the loadings of the ASCA decomposition and the density plot of the loadings of ASCA decomposition.
@@ -57,10 +60,10 @@ plot_time_loadings(ASCA_obj, object = 1:2)
 
 plot_time_loadings(ASCA_obj, choice = "loadings")
 
-# It is possible to define for which axes the contribution or
-# the loading values will be reported. You can define them at the axes variable
+# It is possible to define for which dimensions the contribution or
+# the loading values will be reported. You can define them at the dimensions variable
 
-plot_time_loadings(ASCA_obj, axes = c(2,3))
+plot_time_loadings(ASCA_obj, dimensions = c(2,3))
 
 }
 }
