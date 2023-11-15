@@ -423,10 +423,14 @@ ASCATCATA::plot_ASCA(ASCA_T1, object = "Residuals")
 ``` r
 # There are multiple display options available to show the loading values
 
-ASCATCATA::plot_ASCA(ASCA_T1, density = TRUE, path = FALSE,, path.smooth = FALSE)
+ASCATCATA::plot_ASCA(ASCA_T1, density = TRUE, path = FALSE,, path.smooth = FALSE, object = 1)
 ```
 
 ![](Images/plot_ASCA_3.png)
+
+``` r
+ASCATCATA::plot_ASCA(ASCA_T1, density = TRUE, path = FALSE,, path.smooth = FALSE, object = 2)
+```
 
 ![](Images/plot_ASCA_4.png)
 
@@ -484,20 +488,20 @@ The function plot_ASCA() will plot the results adopting a different plot structu
 
 ``` r
 plot_ASCA(ASCA_T2, object = 1)
-#plot_ASCA(ASCA_T2, object "Panelist_Code") gives the same result
+#plot_ASCA(ASCA_T2, object "cons") gives the same result
 ```
 ![](Images/plot_line_1.png)
 
 
 ``` r
 plot_ASCA(ASCA_T2, object = 2)
-#plot_ASCA(ASCA_T2, object "WineSip") gives the same result
+#plot_ASCA(ASCA_T2, object "samp") gives the same result
 ```
 ![](Images/plot_line_2.png)
 
 ``` r
 plot_ASCA(ASCA_T2, object = 3)
-#plot_ASCA(ASCA_T2, object "Residuals") gives the same result
+#plot_ASCA(ASCA_T2, object = "Residuals") gives the same result
 ```
 
 ![](Images/plot_line_3.png)
