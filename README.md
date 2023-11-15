@@ -334,10 +334,16 @@ plot_ASCA(test_tds_short, object = "Residuals")
 It is possible to plot the contribution of each attribute on the overall variability for each factor by adopting the function plot_time_loadings()
 
 ``` r
-plot_time_loadings(test_tds)
+#plot_time_loadings(test_tds) #this format will print two plots in succession
+plot_time_loadings(test_tds, ref = "attributes") # print the results organized in different colors according to the attribute and different panels according to the factor
 ```
 
 ![](Images/tds_time_1.png)
+
+``` r
+#plot_time_loadings(test_tds) #this format will print two plots in succession
+plot_time_loadings(test_tds, ref = "factors") # print the results organized in different colors according to the factor and different faceting panels according to the attributes
+```
 
 ![](Images/tds_time_2.png)
 
@@ -427,22 +433,32 @@ ASCATCATA::plot_ASCA(ASCA_T1, density = TRUE, path = FALSE,, path.smooth = FALSE
 ``` r
 # To estimate the variability along time of the attributes we can use the function plot_time_loadings.
 
-#In its standard formulation, this function plots the contribution during time of each attribut organized by factor or organized by individual attribute.
+#In its standard formulation, this function plots the contribution during the time of each sensory attribute of the experiment organizing the plot in different faceting panels by each factor or by individual attribute.
 
-ASCATCATA::plot_time_loadings(ASCA_T1)
+#plot_time_loadings(ASCA_T1) # this command will print two plots in succession
+plot_time_loadings(ASCA_T1, ref = "attributes") # Each line has a different color for each sensory descriptor asked and the values are divided in faceting panels according to the factor and the interactions included in the model.
 ```
 
 ![](Images/plot_time_loading_ex_1.png)
 
+``` r
+plot_time_loadings(ASCA_T1, ref = "factors") # Each line has a different color for each factor included in the model, and the values are divided into faceting panels according to the sensory attributes of the experiment
+```
 ![](Images/plot_time_loadings_ex_2.png)
 
 ``` r
 #The same function can also plot the loading values resolved by time for one dimension at time.
-ASCATCATA::plot_time_loadings(ASCA_T1, choice = "loadings")
+#plot_time_loadings(ASCA_T1, choice = "loadings")
+plot_time_loadings(ASCA_T1, choice = "loadings", ref = "attributes")
 
 ``` 
 
 ![](Images/plot_time_loading_ex_3.png)
+
+``` r
+plot_time_loadings(ASCA_T1, choice = "loadings", ref = "factors")
+
+```
 
 ![](Images/plot_time_loading_ex_4.png)
 
