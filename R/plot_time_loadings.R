@@ -4,7 +4,7 @@
 #' @param dimensions A numeric vector indicating two numbers indicating the dimensions of the ASCA decomposition.
 #' @param ref A string vector indicating which graph print. "attributes" prints a plot using the attributes factor as a faceting variable. "factor" prints a plot with the attribute variable as a faceting factor.
 #' @param choice A string that could be "loadings" or "contrib", to indicate whether the loading values or the contribution values will be estimatd and plotted.
-#' @param lab_two_lvl Logical. Adds a label indicating the direction where the score values are if in the plot there are loading values from a factor with only two levels. Default is TRUE.
+#' @param lab_two_lvl Logical. Adds a label indicating the direction where the score values are if in the plot there are loading values from a factor with only two levels. Default is FALSE.
 #' @param print Logical. Indicates wether or not to print the plots.
 #' @return A plot representing the loadings of the ASCA decomposition and the density plot of the loadings of ASCA decomposition.
 #' @import dplyr
@@ -17,6 +17,7 @@
 #' @importFrom ggplot2 aes
 #' @importFrom ggplot2 facet_wrap
 #' @importFrom ggplot2 geom_line
+#' @importFrom ggplot2 geom_label
 #' @importFrom ggplot2 theme_minimal
 #' @importFrom ggplot2 ggtitle
 #' @importFrom ggplot2 theme
@@ -62,7 +63,7 @@ plot_time_loadings <- function(
     ref = c("attributes", "factors"),
     object = NA,
     print = TRUE,
-    lab_two_lvl = TRUE,
+    lab_two_lvl = FALSE,
     dimensions = c(1,2)){
 
   if(is.na(object[1])){
