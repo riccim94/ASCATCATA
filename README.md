@@ -179,9 +179,19 @@ plot_time_loadings(test_ti, choice = "loadings")
 
 ![](Images/plot_ti_2_1.png)
 
-This function is also necessary for the interpretation of ASCA decomposition in case of factors that have only two levels. In this case, the function plot_ASCA() has been disabled, because a two-dimensional algorithm can not report properly the information. A line plot that contains information related to a single index and time can highlight better the differences between the two levels.
+This function is also necessary for the interpretation of ASCA decomposition in case of factors that have only two levels. In this case, the function plot_ASCA() has been disabled, because a two-dimensional algorithm can not report properly the information. A line plot that contains information related to a single index and time can better highlight the differences between the two levels.
 
-To help the information, automatically the plot will print labels reporting the name of the two levels of interest when the the plot_time_loadings() function is applied on an ASCA decomposition of a two-levels factor.
+To help the information, automatically the plot will print labels reporting the name of the two levels of interest when the plot_time_loadings() function is applied on an ASCA decomposition of a two-level factor, by specifying TRUE in the parameter `lab_two_lvl`.
+
+``` r
+plot_time_loadings(test_ti, choice = "loadings", object = "PRODUCT", lab_two_lvl = TRUE)
+# "object" parameter defines from which factor's decomposition the loadings factors will be depicted. It can be a string containing the name of the factor or a number.
+# "lab_two_lvl" indicates whether or not the labels related to the two levels of the factors will be depicted.
+```
+
+![](Images/plot_line_label.png)
+
+The plot indicates in which intervals of time there are overall higher values for one level or another. It allows to compare the overall response at a multivariate level in the case of reduced dimensions.
 
 ### asca_tds
 This function applies ASCA decomposition to a Temporal Dominant Sensation (TDS) raw dataset. the function is applied to the 0 and 1 raw datasets, without any prior preprocess besides the wrangling of the structure of the data.frame.
