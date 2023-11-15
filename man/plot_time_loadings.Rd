@@ -10,7 +10,7 @@ plot_time_loadings(
   ref = c("attributes", "factors"),
   object = NA,
   print = TRUE,
-  lab_two_lvl = TRUE,
+  lab_two_lvl = FALSE,
   dimensions = c(1, 2)
 )
 }
@@ -25,7 +25,7 @@ plot_time_loadings(
 
 \item{print}{Logical. Indicates wether or not to print the plots.}
 
-\item{lab_two_lvl}{Logical. Adds a label indicating the direction where the score values are if in the plot there are loading values from a factor with only two levels. Default is TRUE.}
+\item{lab_two_lvl}{Logical. Adds a label indicating the direction where the score values are if in the plot there are loading values from a factor with only two levels. Default is FALSE.}
 
 \item{dimensions}{A numeric vector indicating two numbers indicating the dimensions of the ASCA decomposition.}
 }
