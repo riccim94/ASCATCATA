@@ -274,6 +274,10 @@ plot_ASCA(test_tds, object = 4)
 
 ![](Images/plot_tds_4.png)
 
+This plot represents the distribution of the residuals estimated from glm decomposition. This plot is available to evaluate if there are evident structures in the residuals at the multivariate level, to estimate if a significant factor was not considered, or if there is some outlier value that behave in a completely different way compared to the other values.
+
+To estimate this it is necessary to evaluate the correlation structure between loadings attributes to different sensory descriptors and observe the presence of outliers in the scores values, or score values that are not related to a bivariate normal structure.
+
 It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function. By defining a number or the name of the factor in **object** it is possible to select which plot will be printed. Modifying the values of **density**, **path**, **path.smooth**, and **time.label** parameters it is possible to modify the aesthetic of the plot.
 
 ``` r
@@ -282,7 +286,7 @@ plot_ASCA(test_tds, object = 1, path = FALSE, time.label = 100)
 ```
 ![](Images/plot_tds_path_num.png)
 
-This graphical representation adds time unit values to the plot, it is necessary to pay attention to the choice of the right interval to avoid plotting an excessive amount of time labels.
+This graphical representation adds time unit values to the plot, it is necessary to pay attention to the choice of the right interval to avoid plotting an excessive amount of time labels. This representation compares the time structure of the loading values.
 
 
 ``` r
@@ -293,6 +297,8 @@ plot_ASCA(test_tds, object = 1, density = TRUE, path = FALSE, path.smooth = FALS
 
 The values reported here are the same as the plot above. This depiction is suggested only if it is not necessary to report information about the time structure, but only about the attributes. May be useful to summarize the differences due to the overall use of sensory descriptors.
 
+In the function asca_tds is available a parameter called `loadings.time.structure` that changes the estimation of the ASCA model modifying the loading structure while maintaining the same procedure for the glm decomposition step.
+If the value attributed to `loadings.time.structure` is changed from "long" (default value) to "short", another list object will be created, containing a series of objects having the same names, but with important differences in all the `prcomp` objects. The difference consists in the fact that the loading values will be only one for each sensory descriptor, while the score values will be estimated for each combination between the levels of the factor considered and the time unit of the dataset. Consequently, in this case, the results compare multiple values for each level, as many as the number of time units, knowing that the different values are related to the overall amount of time that a specific descriptor was defined or wasn't defined as prominent. Which descriptors are defined is reported by the loading values.
 
 ``` r
 test_tds_short <- asca_tds(CATA~(product+assessor)^2, data = data.long, timecol = "time", attributes = "attribute", loadings.time.structure = "short")
