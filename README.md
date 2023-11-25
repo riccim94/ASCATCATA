@@ -402,7 +402,8 @@ The resulting object is a list containing multiple objects:
 * **Parameters**: A data.frame containing all the raw fitted values and the residuals estimated from all the glm decomposition of the model.
 * **SS_decomposition**: A data.frame containing the values of the aggregated sum of squares estimated for each factor and interaction included in the model. 
 
-The list contains as many PCA objects from the decomposition of factors as the number of factors and interactions are defined in the formula of the `asca_tcata()` function.
+> [!NOTE]
+> The list contains as many PCA objects from the decomposition of factors as the number of factors and interactions are defined in the formula of the `asca_tcata()` function.
 
 The results can be represented using biplots adopting the plot_ASCA() function, as shown below.
 
