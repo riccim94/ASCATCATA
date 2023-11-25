@@ -26,13 +26,13 @@ devtools::install_github("riccim94/ASCATCATA")
 
 ## The package
 
-The ASCATCATA package offers a main function to apply an ASCA decomposition on datasets from dynamic sensory analysis. It offers a set of functions to plot, interpret, and validate the analysis results.
+The ASCATCATA package offers a main function to apply an ASCA (ANOVA-Simultaneous Component Analysis) decomposition on datasets from dynamic sensory analysis. It offers a set of functions to plot, interpret, and validate the analysis results.
 
-ASCA analysis (Smilde et al. 2012) consists of applying the same general linear model (GLM) decomposition for each variable of the dataset at the time. In the present case, to deal properly with time-resolved datasets, the decomposition is applied for each combination of time unit and parameter available.
-The glm decomposition is applied without the application of a link function and assuming a Gaussian distribution of the residuals. The decomposition is applied to data after a unit scale normalization step.
+ASCA analysis (Smilde et al. 2012) applies the same general linear model (glm) decomposition for each variable of the dataset at the time. In the present case, to deal properly with time-resolved datasets, the decomposition is applied for each combination of time unit and parameter available.
+The glm decomposition is applied using an identity link function and assuming a Gaussian distribution of the residuals. The decomposition is applied to data after a unit scale normalization step.
 From the decomposition applied to each sub-unit of the dataset, it is possible to estimate a coefficient for each level of all the factors included in the glm model.
 
-The second step of the ASCA framework consists of the construction of *n* matrices of dimension [*k*,*m*], where *n* is the number of factors included in the model, *k* is the number of levels of each factor respectively and *m* is the total number of the glm decomposition applied.
+After the application of the glm models, the next step is the construction of *n* matrices of dimension [*k*,*m*], where *n* is the number of factors included in the model, *k* is the number of levels of each factor respectively and *m* is the total number of the glm decomposition applied.
 Each matrix is treated adopting a matrix decomposition based on SVD and the final values are analyzed as a Principal Component Analysis (PCA), assigning score values to the levels of the factor considered, loading values to the combination between time units and sensory descriptors. 
 
 The information obtained from the ASCA framework consists of a multivariate comparison between the levels of a single factor, highlighting similarities and differences between multiple measurements of an experiment using the scores values. Furthermore, the analysis estimates also how each variable varies in relation to each factor taking into account possible interaction effects.
