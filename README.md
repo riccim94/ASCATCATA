@@ -395,16 +395,18 @@ ASCA_T1 <- ASCATCATA::asca_tcata(CATA ~ cons+samp, data = data.long, timecol = "
 ```
 
 The resulting object is a list containing multiple objects:
-* A PCA object (as estimated by `prcomp` function) for every factor and interaction defined in the formula of the function.
-* A PCA object for the residual structure, called `Residuals`.
-* a list called `info` containing information about the sensory descriptors, the time units, and the parameter specified for the asca decomposition.
-* A data.frame called `Parameters` containing all the residuals and fitted values estimated from the glm decomposition.
-* A data.frame called `SS_decomposition` containing the values of the aggregated sum of squares estimated for each factor and interaction included in the model. 
+* **cons**: A PCA object (as estimated by `prcomp` function) for the first factor defined in the formula of the function.
+* **samp**: A PCA object (as estimated by `prcomp` function) for the second factor defined in the formula of the function.
+* **Residuals**: A PCA object estimated from the residual matrix obtained from the combination of all the residuals matrices from every glm model estimated.
+* **info**: A list containing information about the model. The information reported are: whether the structure of the loadings is "long" or "short", the type of dynamic sensory data considered by the function used, the individual time units, the attributes' name, the formula used by the model, and the names of the column from which the time units and the names of the attributes are estimated from in the original dataset.
+* **Parameters**: A data.frame containing all the raw fitted values and the residuals estimated from all the glm decomposition of the model.
+* **SS_decomposition**: A data.frame containing the values of the aggregated sum of squares estimated for each factor and interaction included in the model. 
 
+The list contains as many PCA objects from the decomposition of factors as the number of factors and interactions are defined in the formula of the `asca_tcata()` function.
+
+The results can be represented using biplots adopting the plot_ASCA() function, as shown below.
 
 ``` r
-# The results can be represented using biplots adopting the plot_ASCA() function.
-
 ASCATCATA::plot_ASCA(ASCA_T1, object = 1)
 ```
 
