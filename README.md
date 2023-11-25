@@ -408,17 +408,20 @@ The resulting object is a list containing multiple objects:
 The results can be represented using biplots adopting the plot_ASCA() function, as shown below.
 
 ``` r
-ASCATCATA::plot_ASCA(ASCA_T1, object = 1)
-```
-
-![](Images/plot_ASCA_1.png)
-
-``` r
+# This is the function that creates the biplot from the second PCA object, explaining the multivariate variance related to the factor "samp".
 ASCATCATA::plot_ASCA(ASCA_T1, object = 2)
 ```
+
 ![](Images/plot_ASCA_2.png)
 
 ``` r
+#This is the function that creates the biplot from the first PCA object, explaining the multivariate variance related to the the factor "cons".
+ASCATCATA::plot_ASCA(ASCA_T1, object = 1)
+```
+![](Images/plot_ASCA_1.png)
+
+``` r
+#This function creates the biplot for the structure of the multivariate residuals.
 ASCATCATA::plot_ASCA(ASCA_T1, object = "Residuals")
 ```
 ![](Images/plot_ASCA_res.png)
