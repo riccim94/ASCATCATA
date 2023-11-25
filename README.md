@@ -348,7 +348,7 @@ plot_time_loadings(test_tds, ref = "factors") # print the results organized in d
 ![](Images/tds_time_2.png)
 
 ### asca_tcata
-This function applies ASCA decomposition to a Temporal Check-All-That-Apply (TCATA) raw dataset. the function is applied to the 0 and 1 raw datasets, without any prior preprocess besides the wrangling of the structure of the data.frame.
+This function applies ASCA decomposition to a Temporal Check-All-That-Apply (TCATA) raw dataset. The function is applied to the 0 and 1 raw datasets, without any prior preprocessing besides the wrangling of the structure of the data.frame.
 Similarly to previous cases, the ASCA decomposition is applied for every combination of time units and sensory descriptors applied, and the glm model is applied using an `identity` link function and assuming a normal distribution of the residuals after a unit scales normalization.
 The procedure of TCATA allows the collection of a more dense dataset than TDS, and the estimation of multiple other parameters is possible.
 
@@ -387,7 +387,7 @@ data.long
 # ℹ Use `print(n = ...)` to see more rows
 ```
 
-
+Once the dataset has been properly wrangled, the ASCA decomposition can be applied using the asca_tcata() function.
 
 ``` r
 # Apply time-resolved ASCA decomposition on the dataset.
