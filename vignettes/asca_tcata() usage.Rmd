@@ -1,0 +1,72 @@
+---
+title: "asca_tcata() usage"
+author: "Michele Ricci"
+date: "2023-11-25"
+output: 
+  rmarkdown::html_vignette:
+    fig_caption: yes
+vignette: >
+  %\VignetteIndexEntry{Vignette Title}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r setup, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment = "#>"
+)
+```
+
+This function applies ASCA decomposition to a Temporal Check-All-That-Apply (TCATA) raw dataset. the function is applied to the 0 and 1 raw datasets, without any prior preprocess besides the wrangling of the structure of the data.frame. Similarly to previous cases, the ASCA decomposition is applied for every combination of time units and sensory descriptors applied, and the glm model is applied using an identity link function and trasforming the values using a unit scales normalization.
+
+### Wrangling procedure
+
+```{r}
+library(ASCATCATA)
+library(tempR)
+library(tidyverse, verbose = F)
+# Example code
+
+
+# The first step consists of wrangling the dataset to put it in a long format
+# and to convert in optimal format the columns "cons", "samp" and "time".
+data <- tempR::ojtcata
+data.long <- data %>% gather(time, CATA, 5:25) %>%
+mutate(cons = as.factor(cons), samp = as.factor(samp),
+time = as.numeric(str_extract(time, "\\d+")))
+
+```
+
+
+The procedure in example proposed includes some string manipulation in the column referred to time because initially there were multiple alphabet characters in the time column that interfered with the function. Here is a snippet of a data.frame that has the right structure for the function:
+
+```{r}
+head(data.long)
+
+str(data.long)
+```
+
+## Application of the function
+
+After the initial wrangling procedure showed above, it is possible to proceed with the function to apply the ASCA decomposition to our dataset.
+
+```{r}
+# Apply time-resolved ASCA decomposition on the dataset.
+ASCA_T1 <- ASCATCATA::asca_tcata(CATA ~ cons+samp, data = data.long, timecol = "time", attributes = "attribute")
+
+```
+
+
+The resulting object is a list containing multiple objects:
+
+* **cons**:A PCA object (as estimated by prcomp function) for a factor defined in the formula of the function.
+* **samp**: A PCA object (as estimated by prcomp function) for a factor defined in the formula of the function.
+* **Residuals**: A PCA object estimated from the residual structure.
+* **Info**: a list containing information about the sensory descriptors, the time units, and the parameter specified for the asca decomposition.
+* **Parameters**: A data.frame containing all the residuals and fitted values estimated from the glm decomposition.
+* **SS_decomposition**: A data.frame called SS_decomposition containing the values of the aggregated sum of squares estimated for each factor and interaction included in the model.
+
+
+
+
