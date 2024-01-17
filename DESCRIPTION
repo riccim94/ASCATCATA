@@ -1,6 +1,6 @@
 Package: ASCATCATA
 Type: Package
-Title: Functionalities for applying ANOVA simultaneous components analysis on Temporal Check All That Apply Data
+Title: Functionalities for applying ASCA decomposition on data from dynamic sensory analysis.
 Version: 0.1.0
 Author: person("Michele", "Ricci", email = "ricci.michele94@gmail.com", role = c("aut", "cre"))
 Maintainer: Michele Ricci <ricci.michele94@gmail.com>
