@@ -279,22 +279,19 @@ data_score <- list()
 
           data_temp[[name2]] <- temp %>% dplyr::select(-timecol) %>%
             dplyr::select(-c(name2)) %>%
-            group_by_at(vars(as.name(refk), as.name(attributes))) %>% slice(1) %>%
-            ungroup() %>%
+            group_by_at(vars(as.name(refk), as.name(attributes))) %>%
+            slice(1) %>% ungroup() %>%
             pivot_wider(names_from = attributes, values_from = as.symbol(anchor)) %>%
             column_to_rownames(refk) %>%
             mutate_all(., function(x){x <- ifelse(is.na(x), mean(x, na.rm = T), x)}) %>%
             mutate_all(., function(x){x <- x - mean(x, na.rm = T)}) %>% prcomp()
 
-
-          data_boot[[name2]] <- rbind(
-            data_boot[[name2]],
+          data_boot[[name2]] <- rbind(data_boot[[name2]],
             (data_temp[[name2]] %>% .$rotation %>%
                EFA.dimensions::PROCRUSTES(
                  ., ASCA_object[[name2]][["rotation"]],
                  type = "orthogonal", verbose = F) %>% .$loadingsPROC) %*% (
                    data_temp[[name2]] %>% .$x))
-
 
           data_score[[name2]] <- rbind(data_score[[name2]],
             (data_temp[[name2]] %>% .$x %>%

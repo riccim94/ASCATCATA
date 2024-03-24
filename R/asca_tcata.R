@@ -1,4 +1,4 @@
-#' Compute ANOVA Simultaneous Component Analysis (ASCA) of Temporal Check All That Apply (TCATA) data.
+#' Compute ASCA on Temporal Check All That Apply (TCATA) data.
 #' @param data A data frame, or object coercible by as.data.frame to a data frame, containing the variables in the model. It must be in long format and must contain a column for Temporal Check All That Apply binary data, a column reporting the time values, and a column that defines the attributes analyzed.
 #' @param formula An object of class "formula" (or one that can be coerced to that class): a symbolic description of the model to be fitted. The formula will be applied for each atttribut at each time interval defined by the timecol column
 #' @param timecol A string containing the name of the column indicating the time intervals of the TCATA dataset.

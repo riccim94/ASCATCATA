@@ -8,6 +8,7 @@
 #' @param path.smooth Logical. Adds a path smoothed indicating the position of the loadings according to their cronological order. Default is TRUE.
 #' @param density Logical. Superimpose a 2-dimensional density plot, indicating th distribution of the temporal resolved loadings according to their density. Default is FLASE.
 #' @param time.label Numeric. Adds numeric values of the time units in the plot for loadings values for loadings.time.structure == "long". The number indicates how big has to be the interval between each label.
+#' @param loadings.contrib.treshold Determinates which loadings will be shown according to their contribution to explained variance in the dimensions specified. If it is numeric, it will show only the loadings with more contribution value than the value. If the input is "mean", only the loadings with a value higher than the mean will be shown.
 #' @param h_clus Numeric. Indicates whether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.
 #' @param point.size A numeric value defining the size of the points of the score values.
 #' @param max.overlaps.value Numeric, default is 10. Define the maximum number of overlaps allowed for text in the plots.
@@ -20,6 +21,7 @@
 #' @importFrom stats reorder
 #' @importFrom dplyr select
 #' @importFrom stringr str_replace
+#' @importFrom factoextra fviz_contrib
 #' @importFrom ggplot2 ggplot
 #' @importFrom ggplot2 geom_text
 #' @importFrom ggplot2 stat_density2d
@@ -118,6 +120,7 @@ plot_ASCA <- function(
     score.labels = T,
     dimensions = c(1,2), path = T, density = F,
     path.smooth = T,
+    loadings.contrib.treshold = NULL,
     h_clus = NULL,
     max.overlaps.value = 10,
     point.size = 2){
@@ -147,6 +150,9 @@ plot_ASCA <- function(
   Score <- NULL
   Loadings <- NULL
   Levels <- NULL
+  contrib <- NULL
+  name <- NULL
+  position <- NULL
 
   attr <- ASCA_obj$info$attributes
   num_attr <- length(attr)
@@ -231,7 +237,31 @@ data_loadings <- ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
   separate(param, c("time", "param"), sep = "_") %>% arrange(as.numeric(time)) %>%
   mutate(time = reorder(time, as.numeric(time), mean))
 
+if(!is.null(loadings.contrib.treshold)){
+if(is.numeric(loadings.contrib.treshold)){
+  mask <- ASCA_obj %>% .[[reference]] %>%
+    fviz_contrib(axes = dimensions, choice = "var") %>%
+    .$data %>% filter(contrib > loadings.contrib.treshold) %>%
+    separate(name, c("time", "param"), sep = "_") %>%
+    droplevels()
+  data_loadings <- data_loadings %>%
+    filter( time %in% c( mask$time ) & param %in% c( mask$param ) ) %>%
+    droplevels()
+  rm(mask)
+}
 
+if(loadings.contrib.treshold == "mean" ){
+  mask <- ASCA_obj %>% .[[reference]] %>%
+    fviz_contrib(axes = dimensions, choice = "var") %>%
+    .$data %>% filter(contrib > mean(contrib)) %>%
+    separate(name, c("time", "param"), sep = "_") %>%
+    droplevels()
+  data_loadings <- data_loadings %>%
+    filter( time %in% c( mask$time ) & param %in% c( mask$param ) ) %>%
+    droplevels()
+}
+
+}
 pl <- ggplot()
 if(density){
   pl <- pl + stat_density2d(aes(x = !!sym(axes_x), y = !!sym(axes_y),
@@ -282,10 +312,16 @@ if(density){
   }
 
   if(is.numeric(time.label)){
-time_series <- ASCA_obj[["info"]]$timecol %>% .[seq(1,length(.), time.label)]
+time_series <- ASCA_obj[["info"]]$timecol %>% {
+  if(is_tibble(.)){
+    pull(.)
+  }else{
+      .
+    }
+  } %>% .[seq(1, length(.), (time.label))]
 pl <- pl + geom_text(aes(x = !!sym(axes_x), y = !!sym(axes_y),
                      color = param, label = time),
-                     data = filter(data_loadings, time %in% time_series))
+                     data = filter(data_loadings, as.numeric(time) %in% time_series))
 
   }
 
@@ -362,6 +398,30 @@ if(names(ASCA_obj)[reference] == "Residuals"|reference == "Residuals"){
     as.data.frame() %>% .[,dimensions] %>%
     mutate_all(function(x){x <- x*(r)}) %>%
     mutate(Levels = rownames(.))
+
+  if(!is.null(loadings.contrib.treshold)){
+
+  if(is.numeric(loadings.contrib.treshold)){
+    data_loadings <- data_loadings %>%
+      filter(time %in% c(
+        ASCA_obj %>% .[[reference]] %>%
+          fviz_contrib(axes = dimensions, choice = "var") %>%
+          .$data %>% filter(contrib > loadings.contrib.treshold) %>%
+          droplevels() %>% .$name )
+      )
+  }
+
+  if(loadings.contrib.treshold == "mean" ){
+    data_loadings <- data_loadings %>%
+      filter(time %in% c(
+        ASCA_obj %>% .[[reference]] %>%
+          fviz_contrib(axes = dimensions, choice = "var") %>%
+          .$data %>% filter(contrib > mean(contrib)) %>%
+          droplevels() %>% .$name ) )
+  }
+
+}
+
   pl <- pl + geom_text(
     aes(x = !!sym(axes_x), y = !!sym(axes_y), label = Levels, color = Levels),
     data = data_loadings) +
@@ -422,7 +482,28 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
       arrange(as.numeric(time)) %>%
       mutate(time = reorder(time, as.numeric(time), mean))
 
+    if(!is.null(loadings.contrib.treshold)){
 
+    if(is.numeric(loadings.contrib.treshold)){
+      data_loadings <- data_loadings %>%
+        filter(time %in% c(
+      ASCA_obj %>% .[[reference]] %>%
+        fviz_contrib(axes = dimensions, choice = "var") %>%
+        .$data %>% filter(contrib > loadings.contrib.treshold) %>%
+        droplevels() %>% .$name )
+      )
+    }
+
+    if(loadings.contrib.treshold == "mean" ){
+      data_loadings <- data_loadings %>%
+        filter(time %in% c(
+          ASCA_obj %>% .[[reference]] %>%
+            fviz_contrib(axes = dimensions, choice = "var") %>%
+            .$data %>% filter(contrib > mean(contrib)) %>%
+            droplevels() %>% .$name )
+        )
+    }
+}
     pl <- ggplot()
 
     if(density){
@@ -438,10 +519,17 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
 
 
     if(is.numeric(time.label)){
-      time_series <- ASCA_obj[["info"]]$timecol %>% .[seq(1,length(.), time.label)]
+      time_series <- ASCA_obj[["info"]]$timecol %>% {
+        if(is_tibble(.)){
+          pull(.)
+        }else{
+          .
+        }
+      } %>% .[seq(1, length(.),  time.label)]
+
       pl <- pl + geom_text(aes(x = !!sym(axes_x), y = !!sym(axes_y),
                                label = time),
-                           data = filter(data_loadings, time %in% time_series))
+                           data = filter(data_loadings, as.numeric(time) %in% time_series))
 
     }
 

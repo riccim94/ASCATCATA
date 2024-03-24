@@ -80,6 +80,7 @@ plot_time_loadings <- function(
   . <- NULL
   nfactor <- NA
   label_data <- NA
+  position <-NULL
 
   for(reference in object){
 
