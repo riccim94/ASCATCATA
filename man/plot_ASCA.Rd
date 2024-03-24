@@ -15,6 +15,7 @@ plot_ASCA(
   path = T,
   density = F,
   path.smooth = T,
+  loadings.contrib.treshold = NULL,
   h_clus = NULL,
   max.overlaps.value = 10,
   point.size = 2
@@ -40,6 +41,8 @@ plot_ASCA(
 \item{density}{Logical. Superimpose a 2-dimensional density plot, indicating th distribution of the temporal resolved loadings according to their density. Default is FLASE.}
 
 \item{path.smooth}{Logical. Adds a path smoothed indicating the position of the loadings according to their cronological order. Default is TRUE.}
+
+\item{loadings.contrib.treshold}{Determinates which loadings will be shown according to their contribution to explained variance in the dimensions specified. If it is numeric, it will show only the loadings with more contribution value than the value. If the input is "mean", only the loadings with a value higher than the mean will be shown.}
 
 \item{h_clus}{Numeric. Indicates whether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.}
 

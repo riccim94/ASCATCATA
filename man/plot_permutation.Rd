@@ -32,3 +32,19 @@ A series of plots representing the results of the permutation test and the resul
 \description{
 Creates
 }
+\examples{
+
+\dontrun{
+#'ASCA_model <- asca_tcata(CATA~(samp+cons)^2, data = data.long, timecol = "time",
+        attributes = "attribute")
+perm_model <- perm_asca(data = data.long, ASCA_object = ASCA_model,
+nrep = 1000)
+
+plot_permutation(perm_model)
+
+}
+
+
+
+
+}
