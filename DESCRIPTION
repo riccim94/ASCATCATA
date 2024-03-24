@@ -1,20 +1,22 @@
 Package: ASCATCATA
 Type: Package
-Title: Functionalities for applying ASCA decomposition on data from dynamic sensory analysis.
+Title: Functionalities for applying ANOVA simultaneous components analysis on dynamic sensory Datasets
 Version: 0.1.0
 Author: person("Michele", "Ricci", email = "ricci.michele94@gmail.com", role = c("aut", "cre"))
 Maintainer: Michele Ricci <ricci.michele94@gmail.com>
-Description: A set of function to apply ANOVA simultaneous component analysis on Temporal Check All That Apply data. It contains a set of function to apply the analysis on a TCATA dataset in long format table and to represent the results in biplots. It contains also a function to apply a permutation test to validate the analysis.
+Description: A set of function to apply ANOVA simultaneous component analysis on Dynamic sensory datasets.
 depends: R (>= 4.0.0),
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.1
 Imports: 
    rlang, magrittr, stringr, dplyr, plyr, purrr, tidyr, tibble, ggplot2, ggrepel, factoextra, car, scales, ggpubr, EFA.dimensions, matrixcalc
 Suggests: 
     knitr,
+    tempR,
+    tidyverse,
     rmarkdown,
     testthat (>= 3.1.0)
 Config/testthat/edition: 3
