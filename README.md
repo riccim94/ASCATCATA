@@ -21,7 +21,7 @@ You can install the development version of ASCATCATA like so:
 
 ``` r
 library(devtools)
-devtools::install_github("riccim94/ASCATCATA")
+devtools::install_github("riccim94/ASCATCATA", force = FALSE, build_vignettes = TRUE)
 ```
 
 ## The package
