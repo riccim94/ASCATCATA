@@ -110,7 +110,7 @@ plot_ASCA(test_tds, object = 4)
 ```
 
 It is possible to select different arrangements for the depiction of loading values specifying the different parameters of the plot_ASCA() function. 
-By defining a number or the name of the factor in **object** it is possible to select which plot will be printed. Modifying the values of **density**, **path**, and **path.smooth** parameters it is possible to modify the aesthetic of the plot.
+By defining a number or the name of the factor in **object** it is possible to select which plot will be printed. Modifying the values of **density**, **path**, **time.label**, and **path.smooth** parameters it is possible to modify the aesthetic of the plot.
 
 ```{r , fig.dim = c(8, 6)}
 plot_ASCA(test_tds, object = 1, density = TRUE, path = FALSE, path.smooth = FALSE)
@@ -129,7 +129,7 @@ test_tds_short <- asca_tds(CATA~(sample+assessor)^2, data = data.long, timecol =
 
 
 
-```{r , fig.dim = c(8, 6)}
+```{r , fig.dim = c(12, 6)}
 
 plot_ASCA(test_tds_short)
 
