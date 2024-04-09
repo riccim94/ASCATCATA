@@ -9,6 +9,11 @@ vignette: >
   %\VignetteIndexEntry{asca_ti_usage}
   %\VignetteEngine{knitr::rmarkdown}
   %\VignetteEncoding{UTF-8}
+  %\VignetteDepends{tempR}
+  %\VignetteDepends{tidyverse}
+  %\VignetteDepends{readxl}
+  %\VignetteDepends{httr}
+  
 ---
 
 ```{r setup, include = FALSE}
@@ -18,50 +23,53 @@ knitr::opts_chunk$set(
 )
 ```
 
-Vignettes are long form documentation commonly included in packages. Because they are part of the distribution of the package, they need to be as compact as possible. The `html_vignette` output type provides a custom style sheet (and tweaks some options) to ensure that the resulting html is as small as possible. The `html_vignette` format:
+This function applies ASCA decomposition to a Time-Intensity (TI) dataset. It is required that the dataset is put in a long format. The decomposition applied is based on the assumption of a normal data distribution. Each decomposition is applied to each unit of time.  
 
-- Never uses retina figures
-- Has a smaller default figure size
-- Uses a custom CSS stylesheet instead of the default Twitter Bootstrap style
 
-## Vignette Info
+### Wrangling procedure
 
-Note the various macros within the `vignette` section of the metadata block above. These are required in order to instruct R how to build the vignette. Note that you should change the `title` field and the `\VignetteIndexEntry` to match the title of your vignette.
+The wrangling procedure required to prepare a dataset for the application of the function is reported.
+An open Time Intensity dataset is taken from the website https://help.xlstat.com/dataset/time-intensity-data_0.xlsm
 
-## Styles
 
-The `html_vignette` template includes a basic CSS theme. To override this theme you can specify your own CSS in the document metadata as follows:
+```{r , warning=F, message=F}
 
-    output: 
-      rmarkdown::html_vignette:
-        css: mystyles.css
+library(readxl)
+library(httr)
+library(tidyverse)
+library(ASCATCATA)
 
-## Figures
+url1 <- "https://help.xlstat.com/dataset/time-intensity-data_0.xlsm"
 
-The figure sizes have been customised so that you can easily put two images side-by-side. 
+GET(url1, write_disk(tf <- tempfile(fileext = ".xlsm")))
 
-```{r, fig.show='hold'}
-plot(1:10)
-plot(10:1)
+tf <- str_replace_all(tf, "\\\\", "//")
+data <- read_excel(tf)
 ```
 
-You can enable figure captions by `fig_caption: yes` in YAML:
+After downloading the dataset, it is necessary to arrange it in the required structure. It is necesessary to put it in the long format and to define a specific column containing the time data.
 
-    output:
-      rmarkdown::html_vignette:
-        fig_caption: yes
+```{r}
+data.long <- data %>% gather(time, intensity, 6:36) %>% filter(time != "0") %>% droplevels()
 
-Then you can use the chunk option `fig.cap = "Your figure caption."` in **knitr**.
+str(data.long)
 
-## More Examples
-
-You can write math expressions, e.g. $Y = X\beta + \epsilon$, footnotes^[A footnote here.], and tables, e.g. using `knitr::kable()`.
-
-```{r, echo=FALSE, results='asis'}
-knitr::kable(head(mtcars, 10))
 ```
 
-Also a quote using `>`:
+Once the dataset has been prepared, the asca_ti() function is applied, defining the formula applied by the ASCA decomposition and the column containing the time column
 
-> "He who gives up [code] safety for [code] speed deserves neither."
-([via](https://twitter.com/hadleywickham/status/504368538874703872))
+
+``` {r}
+
+test_ti <- asca_ti(intensity ~ PANELIST+PRODUCT, data = data.long, timecol = "time")
+```
+
+
+The resulting object is a list containing multiple objects:
+
+* **PANELIST**:A PCA object (as estimated by `prcomp` function) for a factor defined in the formula of the function.
+* **PRODUCT**: A PCA object (as estimated by `prcomp` function) for a factor defined in the formula of the function.
+* **Residuals**: A PCA object estimated from the residual structure.
+* **Info**: a list containing information about the sensory descriptors, the time units, and the parameter specified for the asca decomposition.
+* **Parameters**: A data.frame containing all the residuals and fitted values estimated from the glm decomposition.
+

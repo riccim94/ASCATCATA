@@ -20,19 +20,28 @@ knitr::opts_chunk$set(
 )
 ```
 
-This function applies ASCA decomposition to a Temporal Check-All-That-Apply (TCATA) raw dataset. the function is applied to the 0 and 1 raw datasets, without any prior preprocess besides the wrangling of the structure of the data.frame. Similarly to previous cases, the ASCA decomposition is applied for every combination of time units and sensory descriptors applied, and the glm model is applied using an identity link function and trasforming the values using a unit scales normalization.
+This function applies ASCA decomposition to a Temporal Check-All-That-Apply (TCATA) raw dataset. the function is applied to the 0 and 1 raw datasets, without any prior preprocess besides the wrangling of the structure of the data.frame. 
+Similarly to previous cases, the ASCA decomposition is applied for every combination of time units and sensory descriptors applied, and the glm model is applied using an identity link function and trasforming the values using a unit scales normalization.
+
+
+
 
 ### Wrangling procedure
 
-```{r}
+In this section is presented an example code for the preparation of the dataset for the data analysis procedure.
+
+```{r, message=F, warning=F}
 library(ASCATCATA)
 library(tempR)
-library(tidyverse, verbose = F)
-# Example code
+library(tidyverse)
+```
 
+ The first step consists of wrangling the dataset to put it in a long format.
+ Then, it is required to mutate to factor all the columns that are included in the right side of the formula. In this case thee columns are "cons" and "samp", the columns that definines the different samples and the different panelists. 
+ 
+Last step consists to mutate the type of the column indicating the time when the data are acquired in numeric format.
 
-# The first step consists of wrangling the dataset to put it in a long format
-# and to convert in optimal format the columns "cons", "samp" and "time".
+```{r}
 if(require(tempR)){
 data <- tempR::ojtcata
 }
@@ -62,7 +71,7 @@ ASCA_T1 <- ASCATCATA::asca_tcata(CATA ~ cons+samp, data = data.long, timecol = "
 ```
 
 
-The resulting object is a list containing multiple objects:
+This function creates a list containing multiple objects:
 
 * **cons**:A PCA object (as estimated by prcomp function) for a factor defined in the formula of the function.
 * **samp**: A PCA object (as estimated by prcomp function) for a factor defined in the formula of the function.
