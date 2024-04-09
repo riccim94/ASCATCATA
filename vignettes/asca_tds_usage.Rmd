@@ -141,7 +141,7 @@ plot_ASCA(test_tds_short)
 It is possible to plot the contribution of each attribute on the overall variability for each factor by adopting the function plot_time_loadings()
 
 
-```{r , fig.dim = c(8, 6)}
+```{r , fig.dim = c(10, 6)}
 
 plot_time_loadings(test_tds)
 

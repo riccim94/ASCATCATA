@@ -14,13 +14,22 @@ knitr::opts_chunk$set(
 )
 ```
 
+## Application and interpretation of the ASCATCATA package
+
 ```{r setup}
 library(ASCATCATA)
 ```
 
+> This vignette is under construction. It will be updated soon.
+
+## Case study 1
 
 
 
+## Case study 2
 
+
+
+## Case study 3
 
 
