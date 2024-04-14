@@ -2,7 +2,7 @@
 % Please edit documentation in R/asca_tcata.R
 \name{asca_tcata}
 \alias{asca_tcata}
-\title{Compute ANOVA Simultaneous Component Analysis (ASCA) of Temporal Check All That Apply (TCATA) data.}
+\title{Compute ASCA on Temporal Check All That Apply (TCATA) data.}
 \usage{
 asca_tcata(
   formula,
@@ -33,14 +33,13 @@ asca_tcata(
 A list of objects containing the results of ASCA decomposition of a structured dataset.
 }
 \description{
-Compute ANOVA Simultaneous Component Analysis (ASCA) of Temporal Check All That Apply (TCATA) data.
+Compute ASCA on Temporal Check All That Apply (TCATA) data.
 }
 \examples{
 \dontrun{
 library(tidyverse)
-# To apply ASCA decomposition for each combination of time and attribute
-# and estimate unique coordinates for each levels on score values.
-# It is necessary to organize the data in long format
+library(ASCATCATA)
+# To apply ASCA decomposition it is necessary to organize the data in long format
 asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata  \%>\%
 gather(time, CATA, 5:25) \%>\%
  mutate(cons = as.factor(cons), samp = as.factor(samp),

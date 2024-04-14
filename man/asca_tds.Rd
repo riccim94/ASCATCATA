@@ -2,7 +2,7 @@
 % Please edit documentation in R/asca_tds.R
 \name{asca_tds}
 \alias{asca_tds}
-\title{Compute ANOVA Simultaneous Component Analysis (ASCA) of Temporal Dominant Sensation (TDS) data.}
+\title{Compute ASCA on Temporal Dominant Sensation (TDS) data.}
 \usage{
 asca_tds(
   formula,
@@ -33,7 +33,7 @@ asca_tds(
 A list of objects containing the results of ASCA decomposition of a structured dataset.
 }
 \description{
-Compute ANOVA Simultaneous Component Analysis (ASCA) of Temporal Dominant Sensation (TDS) data.
+Compute ASCA on Temporal Dominant Sensation (TDS) data.
 }
 \examples{
 \dontrun{

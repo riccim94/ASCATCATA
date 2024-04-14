@@ -2,7 +2,7 @@
 % Please edit documentation in R/asca_ti.R
 \name{asca_ti}
 \alias{asca_ti}
-\title{Compute ANOVA Simultaneous Component Analysis (ASCA) of Time Intensity (TI) data.}
+\title{Compute ASCA on Time Intensity (TI) data.}
 \usage{
 asca_ti(formula, data, timecol, time.quantization = NULL, ...)
 }
@@ -21,7 +21,7 @@ asca_ti(formula, data, timecol, time.quantization = NULL, ...)
 A list of objects containing the results of ASCA decomposition of a structured dataset.
 }
 \description{
-Compute ANOVA Simultaneous Component Analysis (ASCA) of Time Intensity (TI) data.
+Compute ASCA on Time Intensity (TI) data.
 }
 \examples{
 \dontrun{

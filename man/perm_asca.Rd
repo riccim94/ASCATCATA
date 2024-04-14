@@ -9,6 +9,7 @@ perm_asca(
   ASCA_object,
   nrep = 1000,
   plot = F,
+  dimensions = c(1, 2),
   confidence = 0.95,
   test = c("permutation", "bootstrap"),
   ...
@@ -22,6 +23,8 @@ perm_asca(
 \item{nrep}{Number of iteration for bootstrap and permutation test, default is 1000.}
 
 \item{plot}{Logical. If TRUE, prints a plot after estimating the permutation test.}
+
+\item{dimensions}{A numeric vector indicating the dimensions included in the final results of the bootstrap procedure. It can be larger than two.}
 
 \item{confidence}{Numeric, values from 0 to 1. Indicates the probability applied for the estimation of the confidence interval via bootstrapping.}
 

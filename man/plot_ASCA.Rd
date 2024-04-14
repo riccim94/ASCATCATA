@@ -34,7 +34,7 @@ plot_ASCA(
 
 \item{score.labels}{Logical. Adds the text labels indicating the score names. Standard is TRUE.}
 
-\item{dimensions}{A numeric vector indicating two numbers indicating the dimensions of the ASCA decomposition.}
+\item{dimensions}{A numeric vector indicating the two dimensions of the ASCA decomposition.}
 
 \item{path}{Logical. Adds a path indicating the position of the loadings according to their cronological order. Default is TRUE.}
 
