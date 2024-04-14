@@ -4,6 +4,7 @@
 #' @param test A vector of strings defyning which kind of iteration test will be performed by the function between permutation test (to estimate the statistical significance of the model) and bootstrap test (to define the confidence intervals of the parameters estimated). The application of permutation depends on the presence of the string "permutation" in the vector, and the application of bootstrap dpends on the presence of the string "bootstrap".
 #' @param nrep Number of iteration for bootstrap and permutation test, default is 1000.
 #' @param plot Logical. If TRUE, prints a plot after estimating the permutation test.
+#' @param dimensions A numeric vector indicating the dimensions included in the final results of the bootstrap procedure. It can be larger than two.
 #' @param confidence Numeric, values from 0 to 1. Indicates the probability applied for the estimation of the confidence interval via bootstrapping.
 #' @param ... Optional parameters
 #' @return A list of objects containing the results of ASCA decomposition of a structured dataset.
@@ -11,6 +12,8 @@
 #' @import purrr
 #' @import tidyr
 #' @importFrom tibble is_tibble
+#' @importFrom utils setTxtProgressBar
+#' @importFrom utils txtProgressBar
 #' @importFrom car Anova
 #' @importFrom stats quantile
 #' @importFrom ggplot2 geom_histogram
@@ -35,12 +38,14 @@
 
 perm_asca <- function(data, ASCA_object, nrep = 1000,
                       plot = F,
+                      dimensions = c(1,2),
                       confidence = 0.95,
                       test = c("permutation", "bootstrap"),
                       ...){
 
   prev_contr <- options()$contrasts
-  options(contrasts =  rep("contr.sum", 2))
+  options(contrasts =  rep("contr.sum", 2),
+          dplyr.show_progress = F)
 
   . <- NULL
   colnames1 <- NULL
@@ -93,6 +98,12 @@ if(!(ASCA_object[["info"]][["type"]] %in% c("TI_ASCA", "TDS_ASCA", "TCATA_ASCA")
   colnames1 <- names(data1)
 
   if("permutation" %in% test){
+
+    pb_perm <- txtProgressBar(min = 0,      # Minimum value of the progress bar
+                              max = nrep, # Maximum value of the progress bar
+                              style = 3,    # Progress bar style (also available style = 1 and style = 2)
+                              width = 75,   # Progress bar width. Defaults to getOption("width")
+                              char = "=")
 
     data_temp <- data.frame()
     data_perm <- data.frame()
@@ -149,8 +160,10 @@ if(!(ASCA_object[["info"]][["type"]] %in% c("TI_ASCA", "TDS_ASCA", "TCATA_ASCA")
 data_perm <- rbind(data_perm, data_temp)
 
       }
-
+      setTxtProgressBar(pb_perm, j)
     }
+
+    close(pb_perm)
 
     real_norm <- ASCA_object %>% .[fact] %>%
       lapply(., function(x){matrixcalc::frobenius.norm(x$x)}) %>%
@@ -191,7 +204,14 @@ data_boot_2 <- list()
 data_score <- list()
   data_score_2 <- list()
 
-    for(i in 1:nrep){
+
+  pb_boot <- txtProgressBar(min = 0,      # Minimum value of the progress bar
+                            max = nrep, # Maximum value of the progress bar
+                            style = 3,    # Progress bar style (also available style = 1 and style = 2)
+                            width = 75,   # Progress bar width. Defaults to getOption("width")
+                            char = "=")
+
+    for(k in 1:nrep){
       data1 %>%
         mutate_at(vars(fact), as.factor) %>%
         split(dplyr::select(., timecol)) %>%
@@ -233,7 +253,7 @@ data_score <- list()
       for(i in (length(colnames1)+1):ncol(data2)){
         anchor <- names(data2)[i]
         name <- anchor %>% str_remove(., "^effect.") %>% str_split_1(., "\\.")
-        name2 <- paste(name, collapse = "_") %>% str_remove(., "_1$")
+        name2 <- paste(name, collapse = ":") %>% str_remove(., "_1$")
         refk <- c("refk")
 
         data2 %>% .[,c(1:2, i)] %>% cbind(
@@ -241,6 +261,7 @@ data_score <- list()
             .[, names(.) %in% name] %>% as.data.frame(.) %>%
             ifelse(!is.null(ncol(.)), unite(., col = name2, sep = "_"), .)) %>%
           `colnames<-`(c(names(data2)[c(1,2,i)], name2)) -> temp;
+
     if(ASCA_object[["info"]][["structure"]] == "long"){
           temp[refk] <- paste0(temp[,as.character(timecol)], "_",
                                temp[,as.character(attributes)])
@@ -254,23 +275,26 @@ data_score <- list()
              mutate_all(., function(x){x <- x - mean(x, na.rm = T)}) %>%
              prcomp()
 
-          #print(name2)
 
          data_boot[[name2]] <- rbind(data_boot[[name2]],
             (data_temp[[name2]] %>% .$rotation %>%
             EFA.dimensions::PROCRUSTES(
               ., ASCA_object[[name2]][["rotation"]],
-              type = "orthogonal", verbose = F) %>% .$loadingsPROC) %*% (
-                data_temp[[name2]] %>% .$x))
+              type = "orthogonal", verbose = F) %>% .$loadingsPROC) %>%
+              as.data.frame() %>% .[,dimensions] %>%
+              mutate(reference = rownames(.)) )
+
 
 
          data_score[[name2]] <- rbind(data_score[[name2]],
               (data_temp[[name2]] %>% .$x %>%
                  EFA.dimensions::PROCRUSTES(., ASCA_object[[name2]][["x"]],
                             type = "orthogonal", verbose = F) %>%
-                 .$loadingsPROC) %*% (data_temp[[name2]] %>% .$x))
-
+                 .$loadingsPROC) %>%
+                as.data.frame() %>% .[,dimensions] %>%
+                mutate(reference = rownames(.))  )
          }
+
 
         if(ASCA_object[["info"]][["structure"]] == "short"){
 
@@ -288,45 +312,37 @@ data_score <- list()
 
           data_boot[[name2]] <- rbind(data_boot[[name2]],
             (data_temp[[name2]] %>% .$rotation %>%
-               EFA.dimensions::PROCRUSTES(
-                 ., ASCA_object[[name2]][["rotation"]],
-                 type = "orthogonal", verbose = F) %>% .$loadingsPROC) %*% (
-                   data_temp[[name2]] %>% .$x))
+               EFA.dimensions::PROCRUSTES(.,
+                 ASCA_object[[name2]][["rotation"]],
+                 type = "orthogonal", verbose = F) %>% .$loadingsPROC) %>%
+              as.data.frame() %>% .[,dimensions] %>%
+              mutate(reference = rownames(.)) )
+
 
           data_score[[name2]] <- rbind(data_score[[name2]],
             (data_temp[[name2]] %>% .$x %>%
                EFA.dimensions::PROCRUSTES(., ASCA_object[[name2]][["x"]],
-                    type = "orthogonal", verbose = F) %>%
-               .$loadingsPROC) %*% (data_temp[[name2]] %>% .$x))
-
-
-
-
-
+                    type = "orthogonal", verbose = F) %>% .$loadingsPROC) %>%
+              as.data.frame() %>% .[,dimensions] %>%
+              mutate(reference = rownames(.)) )
         }
-
-
-
-
-
-
-
-    }
-
-
-
-
+      }
+      setTxtProgressBar(pb_boot, k)
 
   }
 
+  close(pb_boot)
+
   #print(data_score)
-for(i in names(data_boot)){
-  #print(i)
-  data_boot_2[[i]] <- rbind(
-    data_boot_2[[i]],
-    data_boot[[i]] %>%
+for(j in names(data_boot)){
+  print(j)
+  print( data_boot[[j]] )
+
+  data_boot_2[[j]] <- rbind(
+    data_boot_2[[j]],
+    data_boot[[j]] %>%
       as.data.frame() %>%
-      mutate(reference = str_remove(rownames(.), "\\.\\d+$")) %>%
+      mutate(reference = str_remove(reference, "\\.\\d+$")) %>%
       gather(Component, value, -reference) %>%
       group_by(reference, Component) %>%
       summarize(
@@ -338,34 +354,25 @@ for(i in names(data_boot)){
 
 
 
-  data_score_2[[i]] <- rbind(
-    data_score_2[[i]],
-    data_score[[i]] %>% as.data.frame() %>%
-      mutate(reference = str_remove(rownames(.), "\\.\\d+$")) %>%
+  data_score_2[[j]] <- rbind(
+    data_score_2[[j]],
+    data_score[[j]] %>% as.data.frame() %>%
+      mutate(reference = str_remove(reference, "\\.\\d+$")) %>%
        gather(Component, value, -reference) %>%
        group_by(reference, Component) %>%
        summarize(
          low = as.numeric(quantile(value, probs = 0.025, na.rm = T)),
          high = as.numeric(quantile(value, probs = 0.975, na.rm = T))) %>%
-       ungroup()
-      )
+       ungroup()  )
 
 
 }
 results <- list(Loadings = data_boot_2, Scores = data_score_2)
-# View(data_boot_2)
-# View(data_boot_2[["cons"]])
-#
-# View(data_score_2)
-# View(data_score_2[["cons"]])
-
 
 return(results)
   options(contrasts =  prev_contr)
 
 }
-
-
 
 }
 

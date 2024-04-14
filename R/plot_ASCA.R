@@ -1,7 +1,7 @@
 #' Creates bi-plots for each factor decompsed in the ASCA object elaborated by the function tcatasca().
 #' @param ASCA_obj A list of PCA estimated by the TCATASCA function.
 #' @param object A vector of string or numbers indicating which parameter of the ASCA decomposition will be plotted
-#' @param dimensions A numeric vector indicating two numbers indicating the dimensions of the ASCA decomposition.
+#' @param dimensions A numeric vector indicating the two dimensions of the ASCA decomposition.
 #' @param score.points Logical. Adds the points indicating the scores values. Standard is TRUE.
 #' @param score.labels Logical. Adds the text labels indicating the score names. Standard is TRUE.
 #' @param path Logical. Adds a path indicating the position of the loadings according to their cronological order. Default is TRUE.

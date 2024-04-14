@@ -30,9 +30,8 @@
 #' @examples
 #' \dontrun{
 #' library(tidyverse)
-#' # To apply ASCA decomposition for each combination of time and attribute
-#' # and estimate unique coordinates for each levels on score values.
-#' # It is necessary to organize the data in long format
+#' library(ASCATCATA)
+#' # To apply ASCA decomposition it is necessary to organize the data in long format
 #' asca_tcata(CATA~(samp+cons)^2, data = tempR::ojtcata  %>%
 #' gather(time, CATA, 5:25) %>%
 #'  mutate(cons = as.factor(cons), samp = as.factor(samp),
