@@ -33,10 +33,25 @@ knitr::opts_chunk$set(
 
 ## Permutation test
 
+The function `perm_asca()` can estimate the model significance of the factors of the model using a permutation test.
 
+The test consists in the comparison of the matrices of effect variances estimated from Frobenious' norm towards the null distribution estimated calculating the Frobenious norm of multiple dataset when all the effects have been randomized.
 
 
 ## Bootstrap procedure
+
+The function `perm_asca()` is also capable to estimate the confidence intervals for both scores and loadings values adopting a bootstrap resample procedure.
+
+To activate the bootstrap functionality of the `perm_asca()` function it is necessary to insert the string "bootstrap" in the parameter `test` when calling the function.
+
+Dealing with a multivariate time-resolved dataset, the bootstrap resampling procedures is applied inside each time unit for Time Intensity datasets and inside each combination of time and attributes. 
+
+After the resampling procedure, the standard ASCA procedure is applied by decomposing via GLM each resampled sub-unit of the dataset and applying Principal Component Analysis to the matrices of effects. After this step, the matrices of scores and loadings estimated after the bootstrap resampling are aligned adopting Procustes Rotation with the matrices of the original non-bootstrapped model.
+
+The results are stored until the number of iteration defined it is estimated. After that, the confidence intervals are estimated considering the confidence value required from the value defined in the `confidence` parameter of the function.
+
+
+
 
 
 
