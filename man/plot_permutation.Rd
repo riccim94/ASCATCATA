@@ -2,7 +2,7 @@
 % Please edit documentation in R/plot_permutation.R
 \name{plot_permutation}
 \alias{plot_permutation}
-\title{Creates}
+\title{Creates a plot to report the results of the permutation test by the \code{perm_asca()} function.}
 \usage{
 plot_permutation(
   ASCA_obj,
@@ -16,7 +16,7 @@ plot_permutation(
 \arguments{
 \item{ASCA_obj}{A list of PCA estimated by the TCATASCA function.}
 
-\item{perm_object}{A list of estimated values from permutation test and bootstrap test estimated using the perm_asca() function.}
+\item{perm_object}{A list of estimated values from permutation test estimated using the perm_asca() function.}
 
 \item{axes}{A numeric vector indicating two numbers indicating the axes of the ASCA decomposition.}
 
@@ -30,7 +30,7 @@ plot_permutation(
 A series of plots representing the results of the permutation test and the results of the bootstrap tests.
 }
 \description{
-Creates
+Creates a plot to report the results of the permutation test by the \code{perm_asca()} function.
 }
 \examples{
 
@@ -38,7 +38,7 @@ Creates
 #'ASCA_model <- asca_tcata(CATA~(samp+cons)^2, data = data.long, timecol = "time",
         attributes = "attribute")
 perm_model <- perm_asca(data = data.long, ASCA_object = ASCA_model,
-nrep = 1000)
+nrep = 1000, test = "permutation")
 
 plot_permutation(perm_model)
 

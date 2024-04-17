@@ -11,6 +11,10 @@ plot_ASCA(
   print = T,
   score.points = T,
   score.labels = T,
+  scores.color = "black",
+  scores.fill = "black",
+  residuals.color = "black",
+  residuals.fill = "black",
   dimensions = c(1, 2),
   path = T,
   density = F,
@@ -33,6 +37,14 @@ plot_ASCA(
 \item{score.points}{Logical. Adds the points indicating the scores values. Standard is TRUE.}
 
 \item{score.labels}{Logical. Adds the text labels indicating the score names. Standard is TRUE.}
+
+\item{scores.color}{Define the color parameter of the scores values in the factors plot.}
+
+\item{scores.fill}{Define the fill parameter of the scores values in the factors plot.}
+
+\item{residuals.color}{Define the color parameter of the scores values in the residual plot.}
+
+\item{residuals.fill}{Define the fill parameter of the scores values in the residual plot.}
 
 \item{dimensions}{A numeric vector indicating the two dimensions of the ASCA decomposition.}
 

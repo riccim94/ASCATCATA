@@ -28,7 +28,7 @@ perm_asca(
 
 \item{confidence}{Numeric, values from 0 to 1. Indicates the probability applied for the estimation of the confidence interval via bootstrapping.}
 
-\item{test}{A vector of strings defyning which kind of iteration test will be performed by the function between permutation test (to estimate the statistical significance of the model) and bootstrap test (to define the confidence intervals of the parameters estimated). The application of permutation depends on the presence of the string "permutation" in the vector, and the application of bootstrap dpends on the presence of the string "bootstrap".}
+\item{test}{A vector of strings defining which kind of iteration test will be performed by the function between permutation test (to estimate the statistical significance of the model) and bootstrap test (to define the confidence intervals of the parameters estimated). The application of permutation depends on the presence of the string "permutation" in the vector, and the application of bootstrap dpends on the presence of the string "bootstrap".}
 
 \item{...}{Optional parameters}
 }
