@@ -1,6 +1,6 @@
-#' Creates
+#' Creates a plot to report the results of the permutation test by the `perm_asca()` function.
 #' @param ASCA_obj A list of PCA estimated by the TCATASCA function.
-#' @param perm_object A list of estimated values from permutation test and bootstrap test estimated using the perm_asca() function.
+#' @param perm_object A list of estimated values from permutation test estimated using the perm_asca() function.
 #' @param axes A numeric vector indicating two numbers indicating the axes of the ASCA decomposition.
 #' @param point.size A numeric value defining the size of the points of the score values.
 #' @param max.overlaps.value Numeric, default is 10. Define the maximum number of overlaps allowed for text in the plots.
@@ -13,7 +13,7 @@
 #'#'ASCA_model <- asca_tcata(CATA~(samp+cons)^2, data = data.long, timecol = "time",
 #'         attributes = "attribute")
 #' perm_model <- perm_asca(data = data.long, ASCA_object = ASCA_model,
-#' nrep = 1000)
+#' nrep = 1000, test = "permutation")
 #'
 #'plot_permutation(perm_model)
 #'

@@ -11,6 +11,10 @@
 #' @param loadings.contrib.treshold Determinates which loadings will be shown according to their contribution to explained variance in the dimensions specified. If it is numeric, it will show only the loadings with more contribution value than the value. If the input is "mean", only the loadings with a value higher than the mean will be shown.
 #' @param h_clus Numeric. Indicates whether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.
 #' @param point.size A numeric value defining the size of the points of the score values.
+#' @param scores.color Define the color parameter of the scores values in the factors plot.
+#' @param scores.fill Define the fill parameter of the scores values in the factors plot.
+#' @param residuals.color Define the color parameter of the scores values in the residual plot.
+#' @param residuals.fill Define the fill parameter of the scores values in the residual plot.
 #' @param max.overlaps.value Numeric, default is 10. Define the maximum number of overlaps allowed for text in the plots.
 #' @param print Logical. Indicates whether or not to print the plots.
 #' @return A series of plots representing the scores of the ASCA decomposition and the values of the loadings of the same ASCA decomposition.
@@ -118,6 +122,10 @@ plot_ASCA <- function(
     print = T,
     score.points = T,
     score.labels = T,
+    scores.color = "black",
+    scores.fill = "black",
+    residuals.color = "black",
+    residuals.fill = "black",
     dimensions = c(1,2), path = T, density = F,
     path.smooth = T,
     loadings.contrib.treshold = NULL,
@@ -281,7 +289,8 @@ if(density){
             data = data_plot, size = point.size)
         }else if(score.points){
           geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)),
-            color = "black", data = data_plot, size = point.size)
+            color = scores.color, fill = scores.fill, data = data_plot,
+            size = point.size)
         }
       } + scale_shape_manual(values = rep(19,15)) +
     scale_x_continuous(labels = unicode_minus) +
@@ -383,7 +392,8 @@ if(names(ASCA_obj)[reference] == "Residuals"|reference == "Residuals"){
   pl <- ggplot()
   pl <- pl + {
     if(score.points){
-    geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)), data_plot,
+    geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y),
+                   color = residuals.color, fill = residuals.fill), data_plot,
                alpha = 0.2)}
     } +
     geom_hline(yintercept = 0, linetype = 2) +
@@ -503,6 +513,9 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
             droplevels() %>% .$name )
         )
     }
+      if(loadings.contrib.treshold != "mean" & !is.numeric(loadings.contrib.treshold)){
+        message("The value assigned to 'loadings.contrib.treshold' must be either numeric either the string 'mean' ")
+      }
 }
     pl <- ggplot()
 
@@ -540,7 +553,8 @@ pl <- pl + geom_vline(xintercept = 0, linetype = 2) +
                    data = data_plot, size = point.size)
       }else if(score.points){
         geom_point(aes(x = !!sym(axes_x), y = !!sym(axes_y)),
-                   color = "black", data = data_plot, size = point.size)
+                   color = scores.color, fill = scores.fill, data = data_plot,
+                   size = point.size)
       }
     } + scale_shape_manual(values = rep(19,15)) +
       scale_x_continuous(labels = unicode_minus) +
