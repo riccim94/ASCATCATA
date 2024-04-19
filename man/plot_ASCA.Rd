@@ -13,6 +13,7 @@ plot_ASCA(
   score.labels = T,
   scores.color = "black",
   scores.fill = "black",
+  loadings.column = T,
   residuals.color = "black",
   residuals.fill = "black",
   dimensions = c(1, 2),
@@ -41,6 +42,8 @@ plot_ASCA(
 \item{scores.color}{Define the color parameter of the scores values in the factors plot.}
 
 \item{scores.fill}{Define the fill parameter of the scores values in the factors plot.}
+
+\item{loadings.column}{Logical. Defines whether or not report the barplot depicting the loadings values for the plot reporting loadings in case of ASCA model with short loadings.time.structure == "short".}
 
 \item{residuals.color}{Define the color parameter of the scores values in the residual plot.}
 

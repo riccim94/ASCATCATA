@@ -16,6 +16,8 @@ plot_bootstrap(
   path = T,
   density = F,
   path.smooth = T,
+  loadings.column = T,
+  loadings.errorbar = T,
   h_clus = NULL,
   max.overlaps.value = 10,
   point.size = 2
@@ -44,6 +46,10 @@ plot_bootstrap(
 
 \item{path.smooth}{Logical. Adds a path smoothed indicating the position of the loadings according to their cronological order. Default is TRUE.}
 
+\item{loadings.column}{Logical. Defines whether or not report the barplot depicting the loadings values for the plot reporting loadings in case of ASCA model with short loadings.time.structure == "short".}
+
+\item{loadings.errorbar}{Logical. Specify wether or not adding the confidence intervals estimated from bootstrap on loading values.}
+
 \item{h_clus}{Numeric. Indicates whether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.}
 
 \item{max.overlaps.value}{Numeric, default is 10. Define the maximum number of overlaps allowed for text in the plots.}
@@ -51,7 +57,7 @@ plot_bootstrap(
 \item{point.size}{A numeric value defining the size of the points of the score values.}
 }
 \value{
-A series of plots representing the results of the permutation test and the results of the bootstrap tests.
+A series of plots representing the results of the bootstrap tests.
 }
 \description{
 Creates bi-plots similar to those created by the \code{plot_ASCA()} function, but it includes also the confidence intervals estimated by the bootstrapped values estimated by the \code{perm_asca()} function.
