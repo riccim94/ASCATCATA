@@ -259,7 +259,7 @@ data_score <- list()
         data2 %>% .[,c(1:2, i)] %>% cbind(
           data2 %>% .[,3:length(colnames1)] %>%
             .[, names(.) %in% name] %>% as.data.frame(.) %>%
-            ifelse(!is.null(ncol(.)), unite(., col = name2, sep = "_"), .)) %>%
+            ifelse(!is.null(ncol(.)), unite(., col = name2, sep = ":"), .)) %>%
           `colnames<-`(c(names(data2)[c(1,2,i)], name2)) -> temp;
 
     if(ASCA_object[["info"]][["structure"]] == "long"){

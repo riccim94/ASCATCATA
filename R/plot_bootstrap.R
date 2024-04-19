@@ -10,11 +10,15 @@
 #' @param path.smooth Logical. Adds a path smoothed indicating the position of the loadings according to their cronological order. Default is TRUE.
 #' @param density Logical. Superimpose a 2-dimensional density plot, indicating th distribution of the temporal resolved loadings according to their density. Default is FLASE.
 #' @param time.label Numeric. Adds numeric values of the time units in the plot for loadings values for loadings.time.structure == "long". The number indicates how big has to be the interval between each label.
+#' @param loadings.column Logical. Defines whether or not report the barplot depicting the loadings values for the plot reporting loadings in case of ASCA model with short loadings.time.structure == "short".
+#' @param loadings.errorbar Logical. Specify wether or not adding the confidence intervals estimated from bootstrap on loading values.
 #' @param h_clus Numeric. Indicates whether to calculate or not hierchical clustering for the levels of each factor. The algorithm applied for hierarchical clustering is "Ward-D2", and it is estimated from euclidean distance for all the principal component estimated.
 #' @param point.size A numeric value defining the size of the points of the score values.
 #' @param max.overlaps.value Numeric, default is 10. Define the maximum number of overlaps allowed for text in the plots.
 #' @param print Logical. Indicates whether or not to print the plots.
-#' @return A series of plots representing the results of the permutation test and the results of the bootstrap tests.
+#' @return A series of plots representing the results of the bootstrap tests.
+#' @importFrom ggplot2 geom_errorbar
+#' @importFrom ggplot2 geom_ribbon
 #' @export
 #' @examples
 #'
@@ -40,6 +44,8 @@ plot_bootstrap <- function(
     object = NA, time.label = NULL, print = T,
     score.points = T, score.labels = T, dimensions = c(1,2),
     path = T, density = F, path.smooth = T,
+    loadings.column = T,
+    loadings.errorbar = T,
     h_clus = NULL, max.overlaps.value = 10, point.size = 2){
 
   if(is.na(object)){
@@ -257,44 +263,76 @@ plot_bootstrap <- function(
           message("Clustering is not estimated for loadings.time.structure = 'short'")
         }
 
-        if(names(ASCA_obj)[reference] != "Residuals" & reference != "Residuals"){
-          facet_names <- c(axe_x_title, axe_y_title)
-          names(facet_names) <- ASCA_obj[[reference]]$x %>% .[] %>%
-            as.data.frame() %>% .[,dimensions] %>% colnames(.)
-          data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
-            as.data.frame() %>% .[,dimensions] %>% mutate(col_p = rownames(.)) %>%
-            separate(col_p, c("time", "levels"), sep = "_") %>%
-            gather(Component, Score, 1:2) %>%
-            mutate(time = as.numeric(time))
+  if(names(ASCA_obj)[reference] != "Residuals" & reference != "Residuals"){
+    facet_names <- c(axe_x_title, axe_y_title)
+    names(facet_names) <- ASCA_obj[[reference]]$x %>% .[] %>%
+      as.data.frame() %>% .[,dimensions] %>% colnames(.)
+    data_plot <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>%
+      as.data.frame() %>% .[,dimensions] %>% mutate(col_p = rownames(.)) %>%
+      separate(col_p, c("time", "levels"), sep = "_") %>%
+      gather(Component, Score, 1:2) %>%
+      left_join(
+        bootstrap_obj$Scores %>% .[[reference]] %>%
+          separate(reference, c("time", "levels"), sep = "_"),
+        by = c("time", "levels", "Component") ) %>%
+      mutate(time = as.numeric(time))
+
+
+
           pl <- ggplot()
+          if(score.points){
           pl <- pl + geom_line(aes(x = time, y = Score, color = levels), data_plot) +
+            geom_ribbon(aes(x = time, y = Score, ymin = low, ymax = high,
+              fill = levels), alpha = 0.08, data = data_plot) +
             facet_grid(rows = "Component", scales = "free_y",
                        labeller = labeller(Component = facet_names)) +
             geom_hline(yintercept = 0, linetype = 2) +
             ggtitle("", subtitle = paste0("Factor: ", final_label)) +
             theme_minimal() + theme(legend.position = "bottom",
-                                    plot.title = element_blank(),
-                                    legend.title = element_blank(),
-                                    axis.text = element_text(color = "black"),
-                                    legend.key.size = unit(0.3, 'cm') ) +
+              plot.title = element_blank(), legend.title = element_blank(),
+              axis.text = element_text(color = "black"),
+              legend.key.size = unit(0.3, 'cm') ) +
             guides(color = guide_legend(ncol = 12, byrow = TRUE,
-                                        override.aes=list(linewidth = 4)))
+              override.aes = list(linewidth = 4)))
+          }
+
+
+          if(loadings.column){
+
           data_loadings <- ASCA_obj %>% .[[reference]] %>% .$rotation %>% .[] %>%
             as.data.frame() %>% .[,dimensions] %>% mutate(Levels = rownames(.)) %>%
-            gather(Component, Loadings, 1:2)
-
-
-
+            gather(Component, Loadings, 1:2) %>%
+            left_join(
+              bootstrap_obj[["Loadings"]] %>% .[[reference]] %>%
+                  rename(Levels = reference),
+              by = c("Levels", "Component") )
 
           pl2 <- ggplot() + geom_col(aes(x = Levels, y = Loadings),
-                                     color = "black", fill = "white", data = data_loadings) +
+                   color = "black", fill = "white", data = data_loadings) +
             facet_grid(rows = "Component", scales = "free_y",
                        labeller = labeller(Component = facet_names)) +
             theme_minimal() +
             theme(axis.title.x = element_blank(),
                   axis.text = element_text(color = "black"),
                   axis.text.x = element_text(angle = 45, vjust = 1, hjust = 1))
+
+          if(loadings.errorbar){
+            pl2 <- pl2 + geom_errorbar(aes(
+              x = Levels, y = Loadings, ymin = low, ymax = high ),
+              linetype = 2)
+          }
+
+
+          if(score.points){
           pl <- ggarrange(pl, pl2, nrow = 1)
+          }else{
+            pl <- pl2
+          }
+
+          }
+
+
+
         }
 
         if(names(ASCA_obj)[reference] == "Residuals"|reference == "Residuals"){
