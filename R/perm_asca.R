@@ -56,6 +56,7 @@ reference <- NULL
 plot_perm <- NULL
 real_norm <- NULL
 p_values <- NULL
+ref_names <- NULL
 
   if(!is.numeric(nrep)){
     message("'nrep' must be numeric.")
@@ -81,6 +82,8 @@ if(!(ASCA_object[["info"]][["type"]] %in% c("TI_ASCA", "TDS_ASCA", "TCATA_ASCA")
     .[!str_detect(.,"^\\d")] %>% str_remove(., "^\\(") %>%
     str_remove(., "\\)$")
 
+
+
   timecol <- ASCA_object[["info"]][["labels"]]$timecol
 
   if(ASCA_object[["info"]][["type"]] %in% c("TCATA_ASCA", "TDS_ASCA")){
@@ -99,11 +102,8 @@ if(!(ASCA_object[["info"]][["type"]] %in% c("TI_ASCA", "TDS_ASCA", "TCATA_ASCA")
 
   if("permutation" %in% test){
 
-    pb_perm <- txtProgressBar(min = 0,      # Minimum value of the progress bar
-                              max = nrep, # Maximum value of the progress bar
-                              style = 3,    # Progress bar style (also available style = 1 and style = 2)
-                              width = 75,   # Progress bar width. Defaults to getOption("width")
-                              char = "=")
+    pb_perm <- txtProgressBar(min = 0, max = nrep, style = 3,
+        width = 75, char = "=")
 
     data_temp <- data.frame()
     data_perm <- data.frame()
@@ -129,10 +129,14 @@ if(!(ASCA_object[["info"]][["type"]] %in% c("TI_ASCA", "TDS_ASCA", "TCATA_ASCA")
       colnames2 <- data2 %>% names(.)
       #print(colnames2)
 
+      ref_names <- c()
       for(i in colnames2[!(colnames2 %in% c(colnames1, "n"))]){
         anchor <- i
         name <- anchor %>% str_remove(., "^effect.") %>% str_split_1(., "\\.")
-        name2 <- paste(name, collapse = "_") %>% str_remove(., "_1$")
+
+        name2 <- paste(name, collapse = ":") %>% str_remove(., "[_\\.]1$")
+
+        ref_names <- c(ref_names, name2)
         refk <- c("refk")
 #print(i)
         data2 %>% dplyr::select(1:2, i) %>% cbind(
@@ -165,9 +169,15 @@ data_perm <- rbind(data_perm, data_temp)
 
     close(pb_perm)
 
-    real_norm <- ASCA_object %>% .[fact] %>%
+
+
+
+    real_norm <- ASCA_object %>% .[ref_names] %>%
       lapply(., function(x){matrixcalc::frobenius.norm(x$x)}) %>%
-      as.data.frame() %>% gather(factor, norm)
+      as.data.frame() %>% gather(factor, norm) %>%
+      mutate(factor = ifelse( factor %in% ref_names, factor, ref_names))
+
+
 
   if(plot){
 plot_perm <- data_perm %>% ggplot() +
@@ -187,10 +197,13 @@ plot_perm <- data_perm %>% ggplot() +
           droplevels() %>% .$F_norm)))) %>% slice(1) %>% ungroup() %>%
       dplyr::select(-norm)
 
-    #print(p_values)
+
 apply(p_values, 1, function(x){
   print(paste0("The p.value estimated for the factor ", x[1], " is: ", x[2]))
   })
+
+  return(p_values)
+
 
   }
     #View(data_perm)
