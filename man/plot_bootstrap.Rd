@@ -12,6 +12,7 @@ plot_bootstrap(
   print = T,
   score.points = T,
   score.labels = T,
+  score.ellipses = T,
   dimensions = c(1, 2),
   path = T,
   density = F,
@@ -37,6 +38,8 @@ plot_bootstrap(
 \item{score.points}{Logical. Adds the points indicating the scores values. Standard is TRUE.}
 
 \item{score.labels}{Logical. Adds the text labels indicating the score names. Standard is TRUE.}
+
+\item{score.ellipses}{Logical. Adds confidence ellipses around score values in plot for long format structures. Default is TRUE.}
 
 \item{dimensions}{A numeric vector indicating two numbers indicating the axes of the ASCA decomposition.}
 
