@@ -6,6 +6,7 @@
 #' @param point.size A numeric value defining the size of the points of the score values.
 #' @param score.points Logical. Adds the points indicating the scores values. Standard is TRUE.
 #' @param score.labels Logical. Adds the text labels indicating the score names. Standard is TRUE.
+#' @param score.ellipses Logical. Adds confidence ellipses around score values in plot for long format structures. Default is TRUE.
 #' @param path Logical. Adds a path indicating the position of the loadings according to their cronological order. Default is TRUE.
 #' @param path.smooth Logical. Adds a path smoothed indicating the position of the loadings according to their cronological order. Default is TRUE.
 #' @param density Logical. Superimpose a 2-dimensional density plot, indicating th distribution of the temporal resolved loadings according to their density. Default is FLASE.
@@ -42,7 +43,9 @@ plot_bootstrap <- function(
     ASCA_obj,
     bootstrap_obj,
     object = NA, time.label = NULL, print = T,
-    score.points = T, score.labels = T, dimensions = c(1,2),
+    score.points = T, score.labels = T,
+    score.ellipses = T,
+    dimensions = c(1,2),
     path = T, density = F, path.smooth = T,
     loadings.column = T,
     loadings.errorbar = T,
@@ -82,6 +85,9 @@ plot_bootstrap <- function(
   highpc1 <- NULL
   lowpc2 <- NULL
   highpc2 <- NULL
+  data_ellipses <- NULL
+  ellipsex <- NULL
+  ellipsey <- NULL
 
   attr <- ASCA_obj$info$attributes
   num_attr <- length(attr)
@@ -225,6 +231,46 @@ plot_bootstrap <- function(
           guides(color = "none", alpha = "none") +
           xlab(axe_x_title) + ylab(axe_y_title)
 
+        if(score.ellipses){
+
+          ellipseFun <- function(center = c(0, 0), axes = c(1, 1), npoints = 101){
+            tt <- seq(0,2*pi, length.out = npoints)
+            xx <- center[1] + axes[1] * cos(tt)
+            yy <- center[2] + axes[2] * sin(tt)
+            return(data.frame(x = xx, y = yy))
+          }
+
+          data_ellipses <- data_plot
+          axes <- unique(bootstrap_obj[["Scores"]][[reference]]$Component)
+              for(i in axes){
+                data_ellipses <- left_join(data_ellipses,
+                bootstrap_obj[["Scores"]][[reference]] %>%
+                  filter(Component == i) %>% dplyr::select(-Component) %>%
+                  `colnames<-`(c("reference", paste0(names(.)[2:3], "_",i))),
+                by = c("col_p" = "reference")  )
+            }
+   data_ellipses <- data_ellipses %>%
+    group_by(col_p, !!sym(axes[1]), !!sym(axes[2])) %>%
+    reframe(ellipsex= ellipseFun(
+      center = c(!!sym(axes[1]), !!sym(axes[2])),
+      axes = c(
+        abs(!!sym(paste0("low_", axes[1]))-!!sym(paste0("high_", axes[1]))),
+        abs(!!sym(paste0("low_", axes[2]))-!!sym(paste0("high_", axes[2]))))) %>% .$x,
+    ellipsey = ellipseFun(
+      center = c(!!sym(axes[1]), !!sym(axes[2])),
+      axes = c(
+        abs(!!sym(paste0("low_", axes[1]))-!!sym(paste0("high_", axes[1]))),
+        abs(!!sym(paste0("low_", axes[2]))-!!sym(paste0("high_", axes[2]))))) %>% .$y)
+
+   pl <- pl + geom_path(aes(x = ellipsex, y = ellipsey, group = col_p),
+                        data = data_ellipses)
+
+
+        }
+
+
+
+
 
         if(path.smooth){
           pl <- pl + geom_path(
@@ -319,6 +365,7 @@ plot_bootstrap <- function(
           if(loadings.errorbar){
             pl2 <- pl2 + geom_errorbar(aes(
               x = Levels, y = Loadings, ymin = low, ymax = high ),
+              data = data_loadings,
               linetype = 2)
           }
 
