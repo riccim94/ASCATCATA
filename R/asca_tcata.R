@@ -268,6 +268,8 @@ data3[["info"]][["labels"]]$attributes <- as.character(attributes)
 
   options(contrasts =  prev_contr,
           dplyr.show_progress = TRUE)
+
+  class(data3) <- "ASCA-TCATA"
   return(data3)
 }
 

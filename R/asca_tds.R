@@ -231,6 +231,8 @@ asca_tds <- function(formula,
 
   options(contrasts =  prev_contr,
           dplyr.show_progress = T)
+
+  class(data3) <- "ASCA-TDS"
   return(data3)
 
 }

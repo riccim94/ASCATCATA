@@ -36,7 +36,6 @@
 #'library(stringr)
 #'library(httr)
 #'url1 <- "https://help.xlstat.com/dataset/time-intensity-data_0.xlsm"
-
 #'GET(url1, write_disk(tf <- tempfile(fileext = ".xlsm")))
 #'tf <- str_replace_all(tf, "\\\\", "//")
 #'data <- read_excel(tf)
@@ -135,6 +134,8 @@ asca_ti <- function(formula, data, timecol, time.quantization = NULL, ...){
 
   options(contrasts =  prev_contr,
           dplyr.show_progress = T)
+
+  class(data3) <- "ASCA-TI"
   return(data3)
 
 }
