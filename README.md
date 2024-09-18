@@ -547,10 +547,27 @@ ricci.michele94@gmail.com
 
 ## Bibliography
 
-A. Kassambara. 2017. _Practical Guide to Principal Components Methods in R_. STHDA. ISBN	1975721136, 9781975721138
+A. Kassambara (2017). Practical Guide to Principal Components Methods in R_. STHDA. ISBN	1975721136, 9781975721138
 
-Kassambara A, Mundt F (2020). _factoextra: Extract and Visualize the Results of Multivariate Data Analyses_. R package version 1.0.7, https://CRAN.R-project.org/package=factoextra.
+A. Kassambara, F. Mundt (2020). _factoextra: Extract and Visualize the Results of Multivariate Data Analyses_. R package version 1.0.7, https://CRAN.R-project.org/package=factoextra.
+
+A. K. Smilde, J. J. Jansen, H. C. J. Hoefsloot, R. A. N. Lamers, J. van der Greef, M. E. Timmerman, (2005). ANOVA-simultaneous component analysis (ASCA): a new tool for analyzing designed metabolomics data. Bioinformatics, 21 (13), 3043- 3048, https://doi.org/10.1093/bioinformatics/bti476 
+![image](https://github.com/user-attachments/assets/12e85c9a-4c19-4a90-88f6-148432405810)
 
 A.K. Smilde, M.E. Timmerman, M.M.W.B. Hendriks, J.J. Jansen, H.C.J. Hoefsloot. 2012, _Generic framework for high-dimensional fixed-effects ANOVA Briefings in Bioinformatics_, 13 (5), pp. 524-535, 10.1093/bib/bbr071
+
+C. Bertinetto, J. Engel, J. Jansen (2020). ANOVA simultaneous component analysis: A tutorial review, Analytica Chimica Acta: X, 6, https://doi.org/10.1016/j.acax.2020.100061
+
+Camacho, José, Caridad Díaz, e Pedro Sánchez-Rovira. 2023 Permutation Tests for ASCA in Multivariate Longitudinal Intervention Studies. Journal of Chemometrics 37, fasc. 7: e3398. https://doi.org/10.1002/cem.3398
+
+M. Meyners & A. Hasted (2021). On the applicability of ANOVA models for CATA data. Food Quality and Preference 92 (1 settembre 2021): 104219. https://doi.org/10.1016/j.foodqual.2021.104219
+
+Okamoto Shogo (2021). Bootstrap Resampling of Temporal Dominance of Sensations Curves to Compute Uncertainties». Foods 10, fasc. 10: 2472. https://doi.org/10.3390/foods10102472
+
+M. E. Timmerman, H. A. L. Kiers, A. K. Smilde (2007). Estimating Confidence Intervals for Principal Component Loadings: A Comparison between the Bootstrap and Asymptotic Results. British Journal of Mathematical and Statistical Psychology 60, fasc. 2 : 295–314. https://doi.org/10.1348/000711006X109636
+
+D. J. Vis, J. A. Westerhuis, A. K. Smilde, J. van der Greef (2007). Statistical validation of megavariate effects in ASCA. BMC Bioinformatics 8, fasc. 1 (30 agosto 2007): 322. https://doi.org/10.1186/1471-2105-8-322
+
+
 
 
