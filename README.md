@@ -552,9 +552,8 @@ A. Kassambara (2017). Practical Guide to Principal Components Methods in R_. STH
 A. Kassambara, F. Mundt (2020). _factoextra: Extract and Visualize the Results of Multivariate Data Analyses_. R package version 1.0.7, https://CRAN.R-project.org/package=factoextra.
 
 A. K. Smilde, J. J. Jansen, H. C. J. Hoefsloot, R. A. N. Lamers, J. van der Greef, M. E. Timmerman, (2005). ANOVA-simultaneous component analysis (ASCA): a new tool for analyzing designed metabolomics data. Bioinformatics, 21 (13), 3043- 3048, https://doi.org/10.1093/bioinformatics/bti476 
-![image](https://github.com/user-attachments/assets/12e85c9a-4c19-4a90-88f6-148432405810)
 
-A.K. Smilde, M.E. Timmerman, M.M.W.B. Hendriks, J.J. Jansen, H.C.J. Hoefsloot. 2012, _Generic framework for high-dimensional fixed-effects ANOVA Briefings in Bioinformatics_, 13 (5), pp. 524-535, 10.1093/bib/bbr071
+A.K. Smilde, M.E. Timmerman, M.M.W.B. Hendriks, J.J. Jansen, H.C.J. Hoefsloot. 2012, _Generic framework for high-dimensional fixed-effects ANOVA Briefings in Bioinformatics_, 13 (5), pp. 524-535, https://doi.org/10.1093/bib/bbr071
 
 C. Bertinetto, J. Engel, J. Jansen (2020). ANOVA simultaneous component analysis: A tutorial review, Analytica Chimica Acta: X, 6, https://doi.org/10.1016/j.acax.2020.100061
 
