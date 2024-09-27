@@ -201,12 +201,12 @@ axes_y <- ASCA_obj %>% .[[reference]] %>% .$x %>% .[] %>% as.data.frame() %>%
 
 axe_x_title <- paste0("Dim", dimensions[1]," (", as.character(ASCA_obj %>%
  .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,dimensions[1]]*100) %>%
-   str_extract("\\d+\\.\\d{1,2}"), "%)")
+   str_extract("\\d+\\.?\\d{1,2}?"), "%)")
 
 
 axe_y_title <- paste0("Dim",dimensions[2]," (", as.character(ASCA_obj %>%
  .[[reference]] %>% summary() %>% .[] %>% .$importance %>% .[2,dimensions[2]]*100) %>%
-   str_extract("\\d+\\.\\d{1,2}"), "%)")
+   str_extract("\\d+\\.?\\d{1,2}?"), "%)")
 
 
 if(is.numeric(reference)){
